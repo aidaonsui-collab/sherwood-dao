@@ -17,7 +17,7 @@
 
 ## This repo
 
-`index.html` — the landing page. Fully self-contained (fonts embedded as data URIs, no external requests): night-forest identity, procedural canvas hero, live proof-of-reserve ledger, wanted-poster bond board, watch countdown, and the tokenomics sung as ballads.
+`index.html` — the landing page. Fully self-contained (Playfair Display, Instrument Sans and Geist Mono embedded as data URIs, no external requests): a cinematic WebGL night-forest hero — moonlit sky, layered pine ridges, and a levitating golden arrow before the great rune-carved oak — with a live proof-of-reserve ledger, glass bounty board, watch-face rebase countdown, range-bound-stability chart, and the tokenomics sung as ballads. Degrades gracefully to a 2D canvas / SVG hero where WebGL is unavailable.
 
 ```sh
 # preview
