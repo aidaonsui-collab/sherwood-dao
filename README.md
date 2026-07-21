@@ -17,17 +17,20 @@
 
 ## This repo
 
-`index.html` — one self-contained file (Playfair Display, Instrument Sans and Geist Mono embedded as data URIs, no external requests), two views, mirroring how OlympusDAO splits `olympusdao.finance` (marketing) from `app.olympusdao.finance` (the dashboard):
+Two self-contained files (Playfair Display, Instrument Sans and Geist Mono embedded as data URIs, no external requests) — split the way OlympusDAO splits `olympusdao.finance` (marketing) from `app.olympusdao.finance` (the dashboard):
 
-- **Marketing** (default view) — a cinematic WebGL night-forest hero, protocol stats strip, feature sections (Protocol-Owned Liquidity, the Vault, Range-Bound Stability, Governance), participate cards, the Olympus-vs-Sherwood reckoning table, the Ballads, and an FAQ. Every CTA funnels into the app.
-- **App** (`Enter the Forest`) — an Olympus-style icon rail + sub-panel shell: **Overview** (dashboard — price/backing chart, sparkline stat cards, feature summary cards, a live activity feed, plus a Treasury sub-tab with the full proof-of-reserve table), **WOOD** (balance, staking), **Heist** (bonds), **Vault** (loans), **Council** (governance, plus a Charter sub-tab). Client-side hash routing; a deep link straight to an app route (e.g. `#vault`) skips the marketing view entirely.
+- **`index.html` — the app** (served at the root). A clean, Apple-caliber product dashboard: a single sidebar (Overview · WOOD · Heist · Vault · Council), and per section — **Overview** (price-vs-backing chart, a row of stat cards with trend indicators, feature cards, a recent-activity feed, plus a Treasury sub-tab with the full proof-of-reserve table), **WOOD** (balances + a stake/unstake widget and the rebase watch-face timer), **Heist** (bond "wanted poster" cards), **Vault** (a borrow-against-backing widget), **Council** (governance empty-state + draft proposals, plus a Charter sub-tab). Client-side hash routing (`#overview`, `#wood`, `#heist`, `#vault`, `#council`, sub-routes like `#overview/treasury`). Links to the landing via "View the landing page ↗".
+- **`index-landing.html` — the marketing landing**. The cinematic WebGL night-forest hero (moonlit sky, pine ridges, levitating golden arrow, runed oak), the Olympus-vs-Sherwood reckoning, and the Ballads.
 
-"Connect Wallet" opens an honest gate — SherwoodDAO is a concept, nothing is deployed, no wallet can truly connect — with an opt-in "enter as a ranger" demo mode (persisted in `localStorage`) that unlocks a simulated stake flow. Every demo action resolves to a toast, never a transaction.
+"Connect Wallet" opens an honest gate — SherwoodDAO is a concept, nothing is deployed, no wallet can truly connect — with an opt-in demo mode (persisted in `localStorage`) that unlocks simulated stake/borrow flows. Every demo action resolves to a toast, never a transaction.
+
+The app presentation was designed via the Claude Design app to a "make it look like a premium Apple app, not a crypto template" brief.
 
 ```sh
-# preview
+# preview the app
 python3 -m http.server 8143
-# → http://localhost:8143
+# → http://localhost:8143  (app)
+# → http://localhost:8143/index-landing.html  (marketing landing)
 ```
 
 Deploys as-is on any static host (Vercel, GitHub Pages).
