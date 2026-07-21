@@ -17,7 +17,9 @@
 
 ## This repo
 
-`index.html` — the landing page. Fully self-contained (Playfair Display, Instrument Sans and Geist Mono embedded as data URIs, no external requests): a cinematic WebGL night-forest hero — moonlit sky, layered pine ridges, and a levitating golden arrow before the great rune-carved oak — with a live proof-of-reserve ledger, glass bounty board, watch-face rebase countdown, range-bound-stability chart, and the tokenomics sung as ballads. Degrades gracefully to a 2D canvas / SVG hero where WebGL is unavailable.
+`index.html` — the app. Fully self-contained (Playfair Display, Instrument Sans and Geist Mono embedded as data URIs, no external requests): a sidebar-routed shell (The Greenwood: Enter the Forest · Camp · Heist · Vault · Treasury — The Lore: Ledger · Governance · Docs), hash-based client-side routing, and a cinematic WebGL night-forest hero on the landing panel — moonlit sky, layered pine ridges, a levitating golden arrow before the great rune-carved oak. Degrades gracefully to a 2D canvas / SVG hero where WebGL is unavailable.
+
+"Connect Wallet" opens an honest gate — SherwoodDAO is a concept, nothing is deployed, no wallet can truly connect — with an opt-in "enter as a ranger" demo mode (persisted in `localStorage`) that unlocks a simulated stake flow. Every demo action resolves to a toast, never a transaction.
 
 ```sh
 # preview
