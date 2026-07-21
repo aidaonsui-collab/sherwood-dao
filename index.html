@@ -150,7 +150,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold2);outline-offs
 @media (max-width:980px){.split,.split.rev{grid-template-columns:1fr;gap:48px}}
 
 /* glass card base */
-.glass{background:var(--pine);border:1px solid var(--hair);border-radius:4px}
+.glass{background:#0F1A13;border:1px solid rgba(206,222,212,.11);border-radius:6px;box-shadow:0 16px 38px -24px rgba(0,0,0,.9)}
 
 /* ============ ledger ============ */
 .ledger-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:28px;padding:34px 38px 30px;border-bottom:1px solid var(--hair)}
@@ -328,8 +328,8 @@ footer{padding:90px 0 44px;position:relative}
 /* ============ app shell ============ */
 :root{--sbw:282px;--tbh:64px}
 body.no-scroll{overflow:hidden}
-.app{margin-left:var(--sbw);min-height:100svh;display:flex;flex-direction:column}
-.app main{flex:1}
+.app{min-height:100svh}
+.app main{flex:1;min-width:0}
 
 /* sidebar */
 .sidebar{position:fixed;inset:0 auto 0 0;width:var(--sbw);z-index:80;display:flex;
@@ -362,8 +362,8 @@ body.no-scroll{overflow:hidden}
 .sb-foot .sigil{font-family:var(--mono);font-size:12px;color:var(--gold)}
 
 /* topbar */
-.topbar{position:fixed;top:0;left:var(--sbw);right:0;height:var(--tbh);z-index:70;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:0 26px;border-bottom:1px solid transparent;transition:background .5s ease,border-color .5s ease,box-shadow .5s ease}
-.topbar.scrolled{background:rgba(8,12,9,.72);-webkit-backdrop-filter:blur(18px) saturate(1.2);backdrop-filter:blur(18px) saturate(1.2);border-bottom-color:var(--hair);box-shadow:0 18px 50px rgba(0,0,0,.45)}
+.topbar{position:sticky;top:0;height:var(--tbh);z-index:30;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:0 26px;background:var(--void);border-bottom:1px solid transparent;transition:border-color .4s ease}
+.topbar.scrolled{border-bottom-color:var(--hair)}
 .tb-left{display:flex;align-items:center;gap:15px;min-width:0}
 .crumb{display:flex;align-items:baseline;gap:10px;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--moon);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .crumb em{font-family:var(--serif);font-style:italic;font-size:15px;letter-spacing:0;color:var(--gold)}
@@ -382,7 +382,7 @@ html[data-lantern] .icon-btn.lantern circle{fill:currentColor}
 .panel.active{display:block;animation:panelIn .7s var(--e)}
 @keyframes panelIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.panel.active{animation:none}}
-.panel .chapter{border-bottom:none;padding:calc(var(--tbh) + 62px) 0 110px;min-height:calc(100svh - 180px)}
+.panel .chapter{border-bottom:none;padding:52px 0 110px;min-height:calc(100svh - var(--tbh) - 60px)}
 .chap-head.sub{margin-top:104px}
 .chap-head.sub .chap-num{font-size:15px;color:var(--gold3)}
 
@@ -488,7 +488,7 @@ a.path:hover .go{color:var(--gold2)}
 @media (prefers-reduced-motion:reduce){.gate-card,.gate-backdrop{animation:none}}
 
 /* toast */
-.toast{position:fixed;left:calc(var(--sbw) + (100% - var(--sbw))/2);bottom:30px;transform:translate(-50%,16px);z-index:130;opacity:0;pointer-events:none;transition:opacity .4s ease,transform .4s var(--e);
+.toast{position:fixed;left:50%;bottom:30px;transform:translate(-50%,16px);z-index:130;opacity:0;pointer-events:none;transition:opacity .4s ease,transform .4s var(--e);
   font-family:var(--serif);font-style:italic;font-size:14px;color:var(--ivory);background:rgba(9,14,10,.94);border:1px solid var(--line-strong);border-radius:3px;padding:13px 22px;box-shadow:0 30px 70px rgba(0,0,0,.6);max-width:min(480px,88vw);text-align:center}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 
@@ -574,9 +574,10 @@ body.app-mode .app{display:block}
 .closing .cta-row{justify-content:center}
 
 /* ============ ICON RAIL + SUB-PANEL (app nav) ============ */
-.nav-shell{display:flex;align-items:stretch}
-.icon-rail{shrink:0;flex:none;display:flex;align-items:center;padding:6px}
-.icon-rail-inner{width:64px;height:100%;display:flex;flex-direction:column;align-items:center;padding-bottom:12px;border-radius:100px;background:rgba(11,19,14,.72);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 20px 50px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.04)}
+.nav-shell{display:flex;align-items:flex-start}
+.app-main{flex:1;min-width:0;display:flex;flex-direction:column;min-height:100svh}
+.icon-rail{flex:none;position:sticky;top:0;height:100svh;display:flex;align-items:stretch;padding:10px 6px}
+.icon-rail-inner{width:64px;height:100%;display:flex;flex-direction:column;align-items:center;padding-bottom:12px;border-radius:38px;background:var(--night);border:1px solid var(--hair)}
 .rail-logo{padding:16px 0;flex:none}
 .rail-logo svg{width:28px;height:28px;display:block}
 .rail-nav{flex:1;display:flex;flex-direction:column;align-items:center;padding-top:6px;gap:2px}
@@ -592,7 +593,7 @@ body.app-mode .app{display:block}
 .rail-bottom a:hover{color:var(--gold2);background:rgba(212,175,55,.06)}
 .rail-bottom svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.5}
 
-.sub-panel{width:236px;flex:none;padding:26px 14px;border-right:1px solid var(--hair);position:relative}
+.sub-panel{width:236px;flex:none;position:sticky;top:0;height:100svh;padding:26px 14px;border-right:1px solid var(--hair);overflow-y:auto}
 .sub-panel::after{content:"";position:absolute;right:0;top:8px;bottom:8px;width:1px;background:linear-gradient(180deg,transparent,var(--hair) 12%,var(--hair) 88%,transparent)}
 .sub-panel h2{font-family:var(--serif);font-weight:500;font-size:19px;color:var(--ivory);padding:0 12px;margin-bottom:18px}
 .sub-nav{display:flex;flex-direction:column;gap:2px}
@@ -601,9 +602,9 @@ body.app-mode .app{display:block}
 .sub-item.active{background:linear-gradient(90deg,rgba(212,175,55,.11),rgba(212,175,55,.02) 75%);border-color:var(--line);color:var(--gold2)}
 .sub-item .n{font-family:var(--mono);font-size:10.5px;color:var(--sage)}
 .sub-item.active .n{color:var(--gold3)}
-@media (max-width:900px){
-  .icon-rail{position:fixed;left:0;top:0;bottom:0;z-index:80;transform:translateX(-100%);transition:transform .35s var(--e)}
-  .sub-panel{position:fixed;left:76px;top:0;bottom:0;z-index:80;background:var(--void);transform:translateX(-120%);transition:transform .35s var(--e);width:220px}
+@media (max-width:1020px){
+  .icon-rail{position:fixed;left:0;top:0;bottom:0;height:auto;z-index:80;transform:translateX(-100%);transition:transform .35s var(--e)}
+  .sub-panel{position:fixed;left:76px;top:0;bottom:0;height:auto;z-index:80;background:var(--void);transform:translateX(-120%);transition:transform .35s var(--e);width:220px}
   body.nav-open .icon-rail,body.nav-open .sub-panel{transform:translateX(0)}
 }
 
@@ -1009,7 +1010,7 @@ body.app-mode .app{display:block}
       <main>
         <!-- ============ OVERVIEW (dashboard) ============ -->
         <section class="panel" id="panel-overview" data-screen-label="Overview">
-          <div class="wrap" style="padding-block:32px 60px">
+          <div class="wrap" style="padding-block:44px 72px">
             <div class="dash-grid">
               <div class="chart-card glass" data-rv id="chartCard">
                 <div class="chart-head">
@@ -1768,12 +1769,10 @@ var heroInner = document.getElementById("heroInner");
 var oakWrap = document.getElementById("oakWrap");
 var arrowStage = document.getElementById("arrowStage");
 function applyParallax(t){
-  var sy = S.sy;
-  if (sy > S.heroH*1.25) return;
-  heroInner.style.transform = "translateY(" + (sy*0.22).toFixed(1) + "px)";
-  heroInner.style.opacity = String(Math.max(0, 1 - sy/(S.heroH*0.85)));
-  oakWrap.style.opacity = String(Math.max(0, 0.96*(1 - sy/(S.heroH*0.8))));
-  oakWrap.style.transform = "translate(calc(-50% + " + (S.mx*-16).toFixed(1) + "px), " + (sy*0.15 + S.my*-8).toFixed(1) + "px)";
+  if (S.sy > S.heroH*1.25) return;
+  /* Hero scrolls naturally with the page — no scroll-driven fade or translate.
+     Only the subtle mouse-hover parallax on the oak + arrow remains. */
+  oakWrap.style.transform = "translate(calc(-50% + " + (S.mx*-16).toFixed(1) + "px), " + (S.my*-8).toFixed(1) + "px)";
   arrowStage.style.transform = "translate(" + (S.mx*12).toFixed(1) + "px, " + (Math.sin(t*0.0011)*9 + S.my*7).toFixed(1) + "px)";
 }
 
