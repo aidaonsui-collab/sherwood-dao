@@ -17,7 +17,10 @@
 
 ## This repo
 
-`index.html` — the app. Fully self-contained (Playfair Display, Instrument Sans and Geist Mono embedded as data URIs, no external requests): a sidebar-routed shell (The Greenwood: Enter the Forest · Camp · Heist · Vault · Treasury — The Lore: Ledger · Governance · Docs), hash-based client-side routing, and a cinematic WebGL night-forest hero on the landing panel — moonlit sky, layered pine ridges, a levitating golden arrow before the great rune-carved oak. Degrades gracefully to a 2D canvas / SVG hero where WebGL is unavailable.
+`index.html` — one self-contained file (Playfair Display, Instrument Sans and Geist Mono embedded as data URIs, no external requests), two views, mirroring how OlympusDAO splits `olympusdao.finance` (marketing) from `app.olympusdao.finance` (the dashboard):
+
+- **Marketing** (default view) — a cinematic WebGL night-forest hero, protocol stats strip, feature sections (Protocol-Owned Liquidity, the Vault, Range-Bound Stability, Governance), participate cards, the Olympus-vs-Sherwood reckoning table, the Ballads, and an FAQ. Every CTA funnels into the app.
+- **App** (`Enter the Forest`) — an Olympus-style icon rail + sub-panel shell: **Overview** (dashboard — price/backing chart, sparkline stat cards, feature summary cards, a live activity feed, plus a Treasury sub-tab with the full proof-of-reserve table), **WOOD** (balance, staking), **Heist** (bonds), **Vault** (loans), **Council** (governance, plus a Charter sub-tab). Client-side hash routing; a deep link straight to an app route (e.g. `#vault`) skips the marketing view entirely.
 
 "Connect Wallet" opens an honest gate — SherwoodDAO is a concept, nothing is deployed, no wallet can truly connect — with an opt-in "enter as a ranger" demo mode (persisted in `localStorage`) that unlocks a simulated stake flow. Every demo action resolves to a toast, never a transaction.
 

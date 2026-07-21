@@ -520,450 +520,407 @@ html[data-lantern] .topbar.scrolled{background:rgba(13,20,15,.75)}
   .btn.small{padding:11px 14px;font-size:9px}
 }
 
+
+/* ============ view switch ============ */
+#marketing{display:block}
+.app{display:none}
+body.app-mode #marketing{display:none}
+body.app-mode .app{display:block}
+
+/* ============ marketing nav ============ */
+.mkt-nav{position:fixed;inset:0 0 auto 0;z-index:50;transition:background .5s ease,border-color .5s ease,box-shadow .5s ease;border-bottom:1px solid transparent}
+.mkt-nav.scrolled{background:rgba(8,12,9,.72);-webkit-backdrop-filter:blur(18px) saturate(1.2);backdrop-filter:blur(18px) saturate(1.2);border-bottom-color:var(--hair);box-shadow:0 18px 50px rgba(0,0,0,.45)}
+.mkt-nav-inner{display:flex;align-items:center;gap:38px;height:72px}
+.mkt-links{display:flex;gap:30px;margin-left:14px}
+.mkt-links a{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--sage);text-decoration:none;padding:8px 0;position:relative;white-space:nowrap}
+.mkt-links a::after{content:"";position:absolute;left:0;right:100%;bottom:2px;height:1px;background:var(--gold);transition:right .35s var(--e)}
+.mkt-links a:hover{color:var(--gold2)}
+.mkt-links a:hover::after{right:0}
+.mkt-cta{margin-left:auto}
+@media (max-width:900px){.mkt-links{display:none}}
+
+/* ============ protocol stats strip ============ */
+.stats-strip{position:relative;z-index:4;border-block:1px solid var(--hair);background:rgba(9,14,10,.72);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.stats-strip .inner{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--hair)}
+.stats-strip .cell{background:var(--void);padding:34px 20px;text-align:center}
+.stats-strip .k{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--sage);margin-bottom:12px}
+.stats-strip .v{font-family:var(--serif);font-weight:500;font-variant-numeric:tabular-nums;font-size:clamp(26px,3.4vw,38px);color:var(--ivory);letter-spacing:-.01em}
+.stats-strip .v.gold{background:linear-gradient(120deg,#F0D68C,var(--gold) 55%,var(--gold3));-webkit-background-clip:text;background-clip:text;color:transparent}
+@media (max-width:700px){.stats-strip .inner{grid-template-columns:1fr}}
+
+/* ============ participate cards (reuses .paths look, standalone context) ============ */
+.participate{padding:120px 0;border-bottom:1px solid var(--hair)}
+
+/* ============ FAQ ============ */
+.faq{padding:120px 0;border-bottom:1px solid var(--hair)}
+.faq-list{margin-top:48px;display:flex;flex-direction:column;gap:1px;background:var(--hair);border:1px solid var(--hair);border-radius:4px;overflow:hidden}
+.faq-item{background:var(--void)}
+.faq-item summary{list-style:none;cursor:pointer;padding:26px 30px;display:flex;align-items:center;justify-content:space-between;gap:20px;font-family:var(--serif);font-weight:500;font-size:19px;color:var(--ivory);transition:color .3s}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary:hover{color:var(--gold2)}
+.faq-item summary .plus{flex:none;font-family:var(--mono);font-size:20px;color:var(--gold3);transition:transform .3s var(--e)}
+.faq-item[open] summary .plus{transform:rotate(45deg);color:var(--gold2)}
+.faq-item .a{padding:0 30px 26px;max-width:70ch;font-size:15.5px;line-height:1.75;color:var(--dim)}
+.faq-item .a em{font-style:normal;color:var(--ivory)}
+
+/* ============ closing CTA ============ */
+.closing{padding:140px 0;text-align:center;position:relative;overflow:hidden}
+.closing::before{content:"";position:absolute;inset:0;background:radial-gradient(60rem 30rem at 50% 100%,rgba(212,175,55,.09),transparent 65%);pointer-events:none}
+.closing h2{font-family:var(--serif);font-weight:500;font-size:clamp(38px,6vw,64px);color:var(--ivory);margin-bottom:14px}
+.closing h2 em{font-style:italic;background:linear-gradient(100deg,#F0D68C,var(--gold) 55%,var(--gold3));-webkit-background-clip:text;background-clip:text;color:transparent}
+.closing p{font-family:var(--serif);font-style:italic;font-size:18px;color:var(--sage);margin-bottom:38px}
+.closing .cta-row{justify-content:center}
+
+/* ============ ICON RAIL + SUB-PANEL (app nav) ============ */
+.nav-shell{display:flex;align-items:stretch}
+.icon-rail{shrink:0;flex:none;display:flex;align-items:center;padding:6px}
+.icon-rail-inner{width:64px;height:100%;display:flex;flex-direction:column;align-items:center;padding-bottom:12px;border-radius:100px;background:rgba(11,19,14,.72);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 20px 50px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.04)}
+.rail-logo{padding:16px 0;flex:none}
+.rail-logo svg{width:28px;height:28px;display:block}
+.rail-nav{flex:1;display:flex;flex-direction:column;align-items:center;padding-top:6px;gap:2px}
+.rail-item{display:flex;flex-direction:column;align-items:center;gap:5px;width:52px;padding:8px 4px 9px;border-radius:16px;text-decoration:none;border:1px solid transparent;background:none;cursor:pointer;font:inherit}
+.rail-item svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;color:var(--sage);transition:color .3s}
+.rail-item .lbl{font-family:var(--mono);font-size:8.5px;font-weight:500;letter-spacing:.05em;color:var(--sage);transition:color .3s;line-height:1}
+.rail-item:hover{background:rgba(212,175,55,.05);border-color:var(--line)}
+.rail-item:hover svg,.rail-item:hover .lbl{color:var(--gold2)}
+.rail-item.active{background:linear-gradient(180deg,rgba(212,175,55,.16),rgba(212,175,55,.03));border-color:var(--line-strong)}
+.rail-item.active svg,.rail-item.active .lbl{color:var(--gold2);filter:drop-shadow(0 0 6px rgba(232,198,112,.4))}
+.rail-bottom{display:flex;flex-direction:column;align-items:center;gap:2px}
+.rail-bottom a{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;color:var(--sage);transition:color .3s,background .3s}
+.rail-bottom a:hover{color:var(--gold2);background:rgba(212,175,55,.06)}
+.rail-bottom svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.5}
+
+.sub-panel{width:236px;flex:none;padding:26px 14px;border-right:1px solid var(--hair);position:relative}
+.sub-panel::after{content:"";position:absolute;right:0;top:8px;bottom:8px;width:1px;background:linear-gradient(180deg,transparent,var(--hair) 12%,var(--hair) 88%,transparent)}
+.sub-panel h2{font-family:var(--serif);font-weight:500;font-size:19px;color:var(--ivory);padding:0 12px;margin-bottom:18px}
+.sub-nav{display:flex;flex-direction:column;gap:2px}
+.sub-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 13px;border-radius:8px;text-decoration:none;font-family:var(--sans);font-size:14px;color:var(--dim);border:1px solid transparent;transition:background .25s,color .25s,border-color .25s}
+.sub-item:hover{background:rgba(212,175,55,.05);color:var(--ivory)}
+.sub-item.active{background:linear-gradient(90deg,rgba(212,175,55,.11),rgba(212,175,55,.02) 75%);border-color:var(--line);color:var(--gold2)}
+.sub-item .n{font-family:var(--mono);font-size:10.5px;color:var(--sage)}
+.sub-item.active .n{color:var(--gold3)}
+@media (max-width:900px){
+  .icon-rail{position:fixed;left:0;top:0;bottom:0;z-index:80;transform:translateX(-100%);transition:transform .35s var(--e)}
+  .sub-panel{position:fixed;left:76px;top:0;bottom:0;z-index:80;background:var(--void);transform:translateX(-120%);transition:transform .35s var(--e);width:220px}
+  body.nav-open .icon-rail,body.nav-open .sub-panel{transform:translateX(0)}
+}
+
+/* ============ dashboard (Overview) ============ */
+.dash-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
+@media (max-width:980px){.dash-grid{grid-template-columns:1fr}}
+.dash-col{display:flex;flex-direction:column;gap:16px}
+.stat-card{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 22px}
+.stat-card .lbl{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--sage);margin-bottom:8px}
+.stat-card .num-row{display:flex;align-items:baseline;gap:10px}
+.stat-card .num{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:22px;font-weight:500;color:var(--ivory)}
+.stat-card .chg{font-family:var(--mono);font-size:11px;font-weight:500;padding:3px 7px;border-radius:20px}
+.stat-card .chg.up{color:#63B98A;background:rgba(46,125,83,.14)}
+.stat-card .chg.down{color:#C97B6C;background:rgba(140,59,46,.14)}
+.stat-card canvas{flex:none;width:120px;height:44px;display:block}
+@media (max-width:420px){.stat-card canvas{width:80px}}
+
+.feat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+@media (max-width:820px){.feat-row{grid-template-columns:1fr}}
+.feat-card{padding:22px 22px 20px}
+.feat-card .fc-head{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.feat-card .fc-head svg{width:18px;height:18px;stroke:var(--gold2);fill:none;stroke-width:1.6}
+.feat-card .fc-head span{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--sage)}
+.feat-card .fc-num{font-family:var(--serif);font-weight:500;font-variant-numeric:tabular-nums;font-size:26px;color:var(--ivory);margin-bottom:4px}
+.feat-card .fc-num em{font-style:normal;background:linear-gradient(120deg,#F0D68C,var(--gold) 55%,var(--gold3));-webkit-background-clip:text;background-clip:text;color:transparent}
+.feat-card .fc-sub{font-size:12.5px;color:var(--sage)}
+.feat-card a.fc-link{display:inline-flex;align-items:center;gap:5px;margin-top:14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold2);text-decoration:none}
+.feat-card a.fc-link svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+
+.activity-card{margin-top:16px;overflow:hidden}
+.activity-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px}
+.activity-head p{font-family:var(--sans);font-size:14px;font-weight:600;color:var(--ivory)}
+.activity-head a{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--sage);text-decoration:none;padding:7px 13px;border:1px solid var(--hair);border-radius:20px;transition:color .3s,border-color .3s}
+.activity-head a:hover{color:var(--gold2);border-color:var(--line)}
+.activity-table{border-top:1px solid var(--hair)}
+.activity-row{display:flex;align-items:center;gap:14px;padding:14px 22px;border-bottom:1px solid var(--hair)}
+.activity-row:last-child{border-bottom:none}
+.activity-row .tag{flex:none;font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;border-radius:4px;color:var(--gold2);background:rgba(212,175,55,.10);border:1px solid var(--line)}
+.activity-row .desc{flex:1;min-width:0;font-size:13.5px;color:var(--dim)}
+.activity-row .desc b{font-weight:600;color:var(--ivory)}
+.activity-row .time{flex:none;font-family:var(--mono);font-size:11px;color:var(--sage);white-space:nowrap}
+
+.section-title-row{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+.section-title-row h3{font-family:var(--serif);font-weight:500;font-size:20px;color:var(--ivory)}
+
 </style>
 </head>
 <body>
 <div class="atmos" aria-hidden="true"></div>
 <div class="grain" aria-hidden="true"></div>
-<div class="scrim" id="scrim" aria-hidden="true"></div>
 
-<aside class="sidebar" id="sidebar" data-screen-label="Sidebar">
-  <div class="sb-scroll">
-    <div class="sb-brand">
-      <a class="brand" href="#home" aria-label="SherwoodDAO — enter the forest">
-        <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4l8 16h-6v30h7l-9 10-9-10h7V20h-6z" fill="url(#bgS)"/><defs><linearGradient id="bgS" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F0D68C"/><stop offset="1" stop-color="#9C7A1E"/></linearGradient></defs></svg>
+<div id="marketing">
+  <nav class="mkt-nav" id="mktNav">
+    <div class="wrap mkt-nav-inner">
+      <a class="brand" href="#" id="mktBrand" aria-label="SherwoodDAO — home">
+        <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4l8 16h-6v30h7l-9 10-9-10h7V20h-6z" fill="url(#bgM)"/><defs><linearGradient id="bgM" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F0D68C"/><stop offset="1" stop-color="#9C7A1E"/></linearGradient></defs></svg>
         <b>Sherwood<i>DAO</i></b>
       </a>
-      <span class="chain-chip"><span class="live-dot"></span>Robinhood Chain · <b>4663</b></span>
+      <div class="mkt-links">
+        <a href="#mkt-liquidity">Liquidity</a>
+        <a href="#mkt-backing">Backing</a>
+        <a href="#mkt-policy">Policy</a>
+        <a href="#mkt-governance">Governance</a>
+        <a href="#mkt-faq">FAQ</a>
+        <a href="https://github.com/aidaonsui-collab/sherwood-dao" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+      <div class="mkt-cta"><button class="btn small" type="button" data-enter="overview">Enter App</button></div>
     </div>
-    <nav class="sb-group" aria-label="The Greenwood">
-      <div class="sb-label">The Greenwood</div>
-      <a class="sb-item" href="#home" data-route="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l4.6 6.4h-2.2l4.1 5.6H5.5l4.1-5.6H7.4L12 3z"/><path d="M12 15v5.5M8.5 20.5h7"/></svg>Enter the Forest<span class="n">I</span></a>
-      <a class="sb-item" href="#camp" data-route="camp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5c2.7 2.5 4.1 4.7 4.1 6.9a4.1 4.1 0 1 1-8.2 0c0-2.2 1.4-4.4 4.1-6.9z"/><path d="M5 20.5l14-4.5M5 16l14 4.5"/></svg>The Camp<span class="n">II</span></a>
-      <a class="sb-item" href="#heist" data-route="heist"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 19.5L19.5 4.5M14.9 4.5h4.6v4.6"/><path d="M19.5 19.5L4.5 4.5M9.1 4.5H4.5v4.6"/></svg>The Heist<span class="n">III</span></a>
-      <a class="sb-item" href="#vault" data-route="vault"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18.5V10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v8.5z"/><path d="M4 11.5h16"/><circle cx="12" cy="14.7" r="1.2"/><path d="M12 15.9v1.6"/></svg>The Vault<span class="n">IV</span></a>
-      <a class="sb-item" href="#treasury" data-route="treasury"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v17M8 20.5h8M5 6.5h14"/><path d="M6.5 6.5l-3 6.7a3.3 3.3 0 0 0 6 0zM17.5 6.5l-3 6.7a3.3 3.3 0 0 0 6 0z"/></svg>The Treasury<span class="n">V</span></a>
-    </nav>
-    <nav class="sb-group" aria-label="The Lore">
-      <div class="sb-label">The Lore</div>
-      <a class="sb-item" href="#ledger" data-route="ledger"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.3c-1.8-1.5-4.1-1.9-7.5-1.9v13.2c3.4 0 5.7.5 7.5 2 1.8-1.5 4.1-2 7.5-2V4.4c-3.4 0-5.7.4-7.5 1.9z"/><path d="M12 6.3v13.3"/></svg>The Ledger<span class="n">VI</span></a>
-      <a class="sb-item" href="#council" data-route="council"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 3v18"/><path d="M6.5 4.5H18l-2.8 3.5L18 11.5H6.5z"/></svg>Governance<span class="n">VII</span></a>
-      <a class="sb-item" href="#docs" data-route="docs"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 3.5h8L19 8v12.5H6.5z"/><path d="M14.5 3.5V8H19"/><path d="M9.5 12.5h5M9.5 16h5"/></svg>Docs &amp; About<span class="n">VIII</span></a>
-    </nav>
-    <div class="sb-foot">
-      <span class="concept-chip">CONCEPT · NOTHING DEPLOYED</span>
-      <p>Taken from the market makers, given to the holders.</p>
-      <span class="sigil">(🏹,🏹)</span>
-    </div>
-  </div>
-</aside>
+  </nav>
 
-<div class="app">
-  <header class="topbar" id="topbar">
-    <div class="tb-left">
-      <button class="icon-btn burger" id="burger" type="button" aria-label="Open navigation" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
-      <div class="crumb" id="crumb"><em>I.</em><span>Enter the Forest</span><i>· Overview</i></div>
+  <header class="hero" id="top">
+    <canvas id="bgGL" aria-hidden="true"></canvas>
+    <canvas id="bg2D" hidden aria-hidden="true"></canvas>
+    <div class="oak-wrap" id="oakWrap" aria-hidden="true">
+      <canvas id="oak"></canvas>
+      <canvas id="runes"></canvas>
     </div>
-    <div class="tb-right">
-      <span class="chain-chip tb-chain"><span class="live-dot"></span>Robinhood Chain</span>
-      <button class="icon-btn lantern" id="lanternBtn" type="button" aria-label="Light the lantern" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6.5V5a2 2 0 0 1 4 0v1.5"/><rect x="8" y="6.5" width="8" height="11" rx="2.2"/><circle cx="12" cy="12" r="1.6"/></svg></button>
-      <button class="btn small" id="walletBtn" type="button">Connect wallet</button>
+    <div class="hero-veil" aria-hidden="true"></div>
+
+    <div class="hero-inner" id="heroInner">
+      <p class="eyebrow h-in" style="--hd:.1s">A reserve currency of the greenwood <span class="gild">◆</span> Robinhood Chain 4663</p>
+      <div class="arrow-stage h-in" id="arrowStage" style="--hd:.25s" aria-hidden="true">
+        <canvas id="sparks"></canvas>
+        <canvas id="arrowGL"></canvas>
+        <svg class="arrow-svg-fallback" id="arrowSVG" style="display:none" viewBox="0 0 80 240"><defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F0D68C"/><stop offset=".5" stop-color="#D4AF37"/><stop offset="1" stop-color="#9C7A1E"/></linearGradient></defs><path d="M40 2l14 30h-9v140h-10V32h-9zM40 172l-16 24 12-2 4 44 4-44 12 2z" fill="url(#ag)"/></svg>
+      </div>
+      <h1 class="h-in" style="--hd:.4s">$WOOD is <span class="gild-i">Honest Money</span></h1>
+      <p class="tagline h-in" style="--hd:.55s">Treasury-backed reserve currency · Robinhood Chain</p>
+      <p class="lede h-in" style="--hd:.7s"><span class="lead-in">Backed by the real world.</span>&nbsp; Every $WOOD is minted against a treasury of tokenized T-bills, blue-chip stocks and the protocol's own trading liquidity — and the ledger is open. No pegs. No promises. A floor you can audit.</p>
+      <div class="cta-row h-in" style="--hd:.85s">
+        <button class="btn" type="button" data-enter="overview">Enter the Forest</button>
+        <a class="btn ghost" href="#mkt-faq">Read the docs</a>
+      </div>
+      <div class="hero-stats h-in" style="--hd:1s">
+        <div><div class="k">Treasury TVL</div><div class="v" data-count="4.21" data-dec="2" data-prefix="$" data-suffix="M">$4.21M</div></div>
+        <div><div class="k">WOOD price</div><div class="v" data-count="38.11" data-dec="2" data-prefix="$">$38.11</div></div>
+        <div><div class="k">Backing / WOOD</div><div class="v gold" data-count="31.42" data-dec="2" data-prefix="$">$31.42</div></div>
+        <div><div class="k">Staking APY</div><div class="v" data-count="1204" data-suffix="%">1,204%</div></div>
+        <div><div class="k">Range status</div><div class="v band"><span class="live-dot"></span>Inside band</div></div>
+      </div>
     </div>
+    <div class="scroll-cue" aria-hidden="true"><i></i>Descend</div>
   </header>
 
-  <main>
-    <!-- ============ I · ENTER THE FOREST ============ -->
-    <section class="panel" id="panel-home" data-screen-label="Enter the Forest">
-      <header class="hero">
-        <canvas id="bgGL" aria-hidden="true"></canvas>
-        <canvas id="bg2D" hidden aria-hidden="true"></canvas>
-        <div class="oak-wrap" id="oakWrap" aria-hidden="true">
-          <canvas id="oak"></canvas>
-          <canvas id="runes"></canvas>
-        </div>
-        <div class="hero-veil" aria-hidden="true"></div>
+  <div class="ticker" aria-label="Treasury ticker">
+    <div class="ticker-track" id="tickerTrack">
+      <span>TREASURY <b>$4.21M</b></span><span>BACKING <b>$31.42</b></span><span>SGOV <b>41.0%</b></span><span>USDG <b>22.0%</b></span><span>WOOD∕USDG POL <b>17.1%</b></span><span>tSPY <b>7.8%</b></span><span>tTSLA <b>7.0%</b></span><span>tAAPL <b>5.1%</b></span><span>STAKED <b>87.4%</b> (🏹,🏹)</span><span>FLOOR DEFENDED <b>10 JUN</b> — 4,210 WOOD REPURCHASED</span>
+    </div>
+  </div>
 
-        <div class="hero-inner" id="heroInner">
-          <p class="eyebrow h-in" style="--hd:.1s">A reserve currency of the greenwood <span class="gild">◆</span> Robinhood Chain 4663</p>
-          <div class="arrow-stage h-in" id="arrowStage" style="--hd:.25s" aria-hidden="true">
-            <canvas id="sparks"></canvas>
-            <canvas id="arrowGL"></canvas>
-            <svg class="arrow-svg-fallback" id="arrowSVG" style="display:none" viewBox="0 0 80 240"><defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F0D68C"/><stop offset=".5" stop-color="#D4AF37"/><stop offset="1" stop-color="#9C7A1E"/></linearGradient></defs><path d="M40 2l14 30h-9v140h-10V32h-9zM40 172l-16 24 12-2 4 44 4-44 12 2z" fill="url(#ag)"/></svg>
-          </div>
-          <h1 class="h-in" style="--hd:.4s">Sherwood <span class="gild-i">DAO</span></h1>
-          <p class="tagline h-in" style="--hd:.55s">Treasury-backed reserve currency · Robinhood Chain</p>
-          <p class="lede h-in" style="--hd:.7s"><span class="lead-in">Backed by the real world.</span>&nbsp; Every $WOOD is minted against a treasury of tokenized T-bills, blue-chip stocks and the protocol's own trading liquidity — and the ledger is open. No pegs. No promises. A floor you can audit.</p>
-          <div class="cta-row h-in" style="--hd:.85s">
-            <a class="btn" href="#heist">Bond into the treasury</a>
-            <a class="btn ghost" href="#camp">Stake at the Camp</a>
-          </div>
-          <div class="hero-stats h-in" style="--hd:1s">
-            <div><div class="k">Treasury TVL</div><div class="v" data-count="4.21" data-dec="2" data-prefix="$" data-suffix="M">$4.21M</div></div>
-            <div><div class="k">WOOD price</div><div class="v" data-count="38.11" data-dec="2" data-prefix="$">$38.11</div></div>
-            <div><div class="k">Backing / WOOD</div><div class="v gold" data-count="31.42" data-dec="2" data-prefix="$">$31.42</div></div>
-            <div><div class="k">Staking APY</div><div class="v" data-count="1204" data-suffix="%">1,204%</div></div>
-            <div><div class="k">Range status</div><div class="v band"><span class="live-dot"></span>Inside band</div></div>
+  <div class="stats-strip">
+    <div class="wrap inner">
+      <div class="cell"><div class="k">Treasury value</div><div class="v gold">$4,209,813</div></div>
+      <div class="cell"><div class="k">Liquid backing per WOOD</div><div class="v">$31.42</div></div>
+      <div class="cell"><div class="k">Operating since</div><div class="v">July 2026</div></div>
+    </div>
+  </div>
+
+  <!-- ============ Reliable Liquidity (POL) ============ -->
+  <section class="feature chapter" id="mkt-liquidity">
+    <div class="wrap">
+      <div class="split">
+        <div>
+          <div class="chap-head" data-rv><span class="chap-rule"></span><span class="chap-kicker">The Heist · Protocol-Owned Liquidity</span></div>
+          <h2 data-rv style="--d:80ms">Reliable <em>liquidity</em>.</h2>
+          <p class="copy" data-rv style="--d:160ms">Bonds sell $WOOD at a discount for the assets the treasury wants — stables, T-bills, tokenized stocks, and WOOD∕USDG LP itself. Every LP bond buys the forest its own liquidity, so no market maker is ever paid rent again.</p>
+          <p class="copy" data-rv style="--d:240ms">The treasury becomes its own market maker: 17.1% of it is already protocol-owned liquidity, able to hold depth through volatility that mercenary capital would flee.</p>
+          <div class="cta-row" data-rv style="--d:320ms">
+            <button class="btn" type="button" data-enter="heist">Try It Out</button>
+            <a class="btn ghost" href="#mkt-faq">Read the docs</a>
           </div>
         </div>
-        <div class="scroll-cue" aria-hidden="true"><i></i>Descend</div>
-      </header>
-
-      <div class="ticker" aria-label="Treasury ticker">
-        <div class="ticker-track" id="tickerTrack">
-          <span>TREASURY <b>$4.21M</b></span><span>BACKING <b>$31.42</b></span><span>SGOV <b>41.0%</b></span><span>USDG <b>22.0%</b></span><span>WOOD∕USDG POL <b>17.1%</b></span><span>tSPY <b>7.8%</b></span><span>tTSLA <b>7.0%</b></span><span>tAAPL <b>5.1%</b></span><span>STAKED <b>87.4%</b> (🏹,🏹)</span><span>FLOOR DEFENDED <b>10 JUN</b> — 4,210 WOOD REPURCHASED</span>
+        <div>
+          <div class="glass" style="padding:30px 30px 26px" data-rv style="--d:150ms">
+            <div class="ledger-side" style="margin-bottom:22px">
+              <div><div class="k">Open bonds</div><div class="v">3</div></div>
+              <div><div class="k">Best discount</div><div class="v">9.3%</div></div>
+              <div><div class="k">POL share</div><div class="v">17.1%</div></div>
+            </div>
+            <div class="alloc-bar" aria-hidden="true" style="height:10px">
+              <i style="--w:41%;background:#E8C670" class="grown"></i><i style="--w:22%;background:#D4AF37" class="grown"></i><i style="--w:17.1%;background:#9C7A1E" class="grown"></i><i style="--w:7.8%;background:#2E7D53" class="grown"></i><i style="--w:7%;background:#1E5C3C" class="grown"></i><i style="--w:5.1%;background:#14402A" class="grown"></i>
+            </div>
+            <p class="chart-note" style="margin-top:18px;text-align:left">Every bond deepens the floor. The treasury holds what it earns.</p>
+          </div>
         </div>
       </div>
+    </div>
+  </section>
 
-      <section class="paths">
-        <div class="wrap">
-          <div class="chap-head" data-rv><span class="chap-rule"></span><span class="chap-kicker">Choose your path</span></div>
-          <div class="paths-grid">
-            <a class="path glass" href="#camp" data-rv><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5c2.7 2.5 4.1 4.7 4.1 6.9a4.1 4.1 0 1 1-8.2 0c0-2.2 1.4-4.4 4.1-6.9z"/><path d="M5 20.5l14-4.5M5 16l14 4.5"/></svg><h3>The Camp</h3><p>Stake WOOD for sWOOD and split the spoils at every watch — APY shown next to its honest dilution.</p><span class="go">Stake<b>→</b></span></a>
-            <a class="path glass" href="#heist" data-rv style="--d:90ms"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 19.5L19.5 4.5M14.9 4.5h4.6v4.6"/><path d="M19.5 19.5L4.5 4.5M9.1 4.5H4.5v4.6"/></svg><h3>The Heist</h3><p>Bond stables, T-bills, tokenized stocks or LP for discounted WOOD.</p><span class="go">Bond<b>→</b></span></a>
-            <a class="path glass" href="#vault" data-rv style="--d:180ms"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18.5V10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v8.5z"/><path d="M4 11.5h16"/><circle cx="12" cy="14.7" r="1.2"/><path d="M12 15.9v1.6"/></svg><h3>The Vault</h3><p>Borrow USDG against the backing floor. Fixed rate, no price liquidations.</p><span class="go">Borrow<b>→</b></span></a>
-            <a class="path glass" href="#treasury" data-rv style="--d:270ms"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v17M8 20.5h8M5 6.5h14"/><path d="M6.5 6.5l-3 6.7a3.3 3.3 0 0 0 6 0zM17.5 6.5l-3 6.7a3.3 3.3 0 0 0 6 0z"/></svg><h3>The Treasury</h3><p>Every asset counted on-chain, every block — and the band that defends the floor.</p><span class="go">Audit<b>→</b></span></a>
+  <!-- ============ Accessible Backing (Vault) ============ -->
+  <section class="feature chapter" id="mkt-backing">
+    <div class="wrap">
+      <div class="split rev">
+        <div>
+          <div class="vault-panel glass" data-rv style="--d:150ms">
+            <div><div class="v"><em>95%</em> of backing</div><div class="k">Borrow up to<br>$29.85 / WOOD</div></div>
+            <div><div class="v">0.50<em>%</em></div><div class="k">Fixed APR<br>no expiry</div></div>
+            <div><div class="v"><em>Zero</em></div><div class="k">Price<br>liquidations</div></div>
           </div>
         </div>
-      </section>
-    </section>
+        <div>
+          <div class="chap-head" data-rv><span class="chap-rule"></span><span class="chap-kicker">The Vault · Accessible Backing</span></div>
+          <h2 data-rv style="--d:80ms">Accessible <em>backing</em>.</h2>
+          <p class="copy" data-rv style="--d:160ms">Because backing is real, you can borrow against it. The Vault lends USDG against staked $WOOD at the backing floor — fixed rate, no expiry, and no price liquidations: the loan is written against what the treasury holds, not against what the market fears.</p>
+          <p class="copy" data-rv style="--d:240ms">Sell nothing. Owe the Sheriff nothing.</p>
+          <div class="cta-row" data-rv style="--d:320ms">
+            <button class="btn" type="button" data-enter="vault">Borrow Now</button>
+            <a class="btn ghost" href="#mkt-faq">Read the docs</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <!-- ============ II · THE CAMP ============ -->
-    <section class="panel" id="panel-camp" data-screen-label="The Camp" hidden>
-      <section class="chapter">
-        <div class="wrap">
-          <div class="split">
-            <div>
-              <div class="chap-head" data-rv><span class="chap-num">II.</span><span class="chap-rule"></span><span class="chap-kicker">The Camp · Staking</span></div>
-              <h2 data-rv style="--d:80ms">Nock. Draw. <em>Hold</em>.</h2>
-              <p class="copy" data-rv style="--d:160ms">Stake $WOOD, receive sWOOD, and every eight hours — one <em>watch</em> — the camp divides the spoils. Rebases mint against treasury surplus, so the yield is honest and your share of the forest stays yours.</p>
-              <p class="copy" data-rv style="--d:240ms">(🏹,🏹) is not a promise that the price only rises. It is a promise that the ledger never lies.</p>
-              <div class="stake-card glass" data-rv style="--d:320ms">
-                <div class="stake-head"><span class="t">Stake $WOOD → sWOOD</span><span class="bal">Balance <b id="stakeBal">—</b></span></div>
-                <div class="stake-row">
-                  <div class="stake-input"><input id="stakeIn" inputmode="decimal" placeholder="0.00" aria-label="Amount of WOOD to stake"><button class="max-chip" id="maxChip" type="button">MAX</button></div>
-                  <button class="btn small" id="stakeBtn" type="button">Connect to stake</button>
-                </div>
-                <div class="stake-meta">
-                  <div>Receive <b>1 : 1 sWOOD</b></div>
-                  <div>Next watch <b id="cd2">--:--:--</b></div>
-                  <div>Rebase <b>0.23%</b></div>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div class="watch-card glass" data-rv style="--d:150ms">
-                <div class="watch-label"><span class="live-dot"></span>Next rebase</div>
-                <div class="watch-face">
-                  <svg viewBox="0 0 320 320" aria-hidden="true">
-                    <defs>
-                      <linearGradient id="gGrad" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0" stop-color="#F0D68C"/><stop offset="1" stop-color="#9C7A1E"/>
-                      </linearGradient>
-                      <filter id="wglow" x="-200%" y="-200%" width="500%" height="500%">
-                        <feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-                      </filter>
-                    </defs>
-                    <circle cx="160" cy="160" r="152" fill="none" stroke="rgba(232,198,112,.20)" stroke-width="1"/>
-                    <circle cx="160" cy="160" r="120" fill="none" stroke="rgba(200,214,204,.07)" stroke-width="1"/>
-                    <circle cx="160" cy="160" r="100" fill="none" stroke="rgba(200,214,204,.05)" stroke-width="1"/>
-                    <circle cx="160" cy="160" r="80" fill="none" stroke="rgba(200,214,204,.04)" stroke-width="1"/>
-                    <g id="wticks"></g>
-                    <circle id="warc" cx="160" cy="160" r="138" fill="none" stroke="url(#gGrad)" stroke-width="2.5" stroke-linecap="round" transform="rotate(-90 160 160)" stroke-dasharray="867.08" stroke-dashoffset="867.08"/>
-                    <g id="wtip" transform="rotate(0 160 160)"><circle cx="160" cy="22" r="3.6" fill="#F0D68C" filter="url(#wglow)"/></g>
-                  </svg>
-                  <div class="watch-center">
-                    <div class="countdown" id="cd" aria-live="off">--:--:--</div>
-                    <div class="watch-sub">until the <em id="watchname">third</em> watch ends</div>
-                    <div class="wdots" id="wdots" aria-hidden="true"><span></span><span></span><span></span></div>
-                  </div>
-                </div>
-                <div class="camp-stats">
-                  <div><div class="k">Rebase / watch</div><div class="v">0.23%</div></div>
-                  <div><div class="k">APY</div><div class="v">1,204%</div></div>
-                  <div><div class="k">Staked (🏹,🏹)</div><div class="v">87.4%</div></div>
-                </div>
-                <div class="truth-row">
-                  <button class="truth" id="truthBtn" type="button" aria-pressed="false"><span class="knob" aria-hidden="true"></span>Show it straight</button>
-                  <p id="apyLine">Three watches to a day, and the horn is blown at each.</p>
-                </div>
-              </div>
+  <!-- ============ Predictable Monetary Policy (RBS) ============ -->
+  <section class="feature chapter" id="mkt-policy">
+    <div class="wrap">
+      <div class="split">
+        <div>
+          <div class="chap-head" data-rv><span class="chap-rule"></span><span class="chap-kicker">The Greenwood Band · Range-Bound Stability</span></div>
+          <h2 data-rv style="--d:80ms">Predictable <em>monetary policy</em>.</h2>
+          <p class="copy" data-rv style="--d:160ms">Olympus let the premium wander unanchored in 2021 — and paid for it, a 95% collapse when the floor was untested. Sherwood tethers price to backing in both directions from day one: below the band the treasury bids with real reserves; far above it, it sells into strength.</p>
+          <p class="copy" data-rv style="--d:240ms">The floor was tested once — 10 June — and held. 4,210 WOOD repurchased with treasury reserves, no promises required.</p>
+          <div class="cta-row" data-rv style="--d:320ms">
+            <button class="btn" type="button" data-enter="overview">See It In Action</button>
+            <a class="btn ghost" href="#mkt-faq">Read the docs</a>
+          </div>
+        </div>
+        <div>
+          <div class="glass" style="padding:26px 28px" data-rv style="--d:150ms">
+            <div class="band-rules" style="grid-template-columns:1fr;background:none;border-top:none">
+              <div style="padding:0 0 18px;border-bottom:1px solid var(--hair)"><div class="k">BELOW THE BAND</div><p>The treasury bids with reserves — buying WOOD under backing is free money for the floor.</p></div>
+              <div style="padding:18px 0;border-bottom:1px solid var(--hair)"><div class="k">INSIDE THE BAND</div><p>Price roams free. The premium is the market's opinion; the backing is the contract's fact.</p></div>
+              <div style="padding:18px 0 0"><div class="k">ABOVE THE BAND</div><p>The treasury sells into strength, banking the premium as new reserves for the next winter.</p></div>
             </div>
           </div>
         </div>
-      </section>
-    </section>
+      </div>
+    </div>
+  </section>
 
-    <!-- ============ III · THE HEIST ============ -->
-    <section class="panel" id="panel-heist" data-screen-label="The Heist" hidden>
-      <section class="chapter heist-ch">
-        <div class="wrap">
-          <div class="chap-head" data-rv><span class="chap-num">III.</span><span class="chap-rule"></span><span class="chap-kicker">The Heist · Bonds</span></div>
-          <h2 data-rv style="--d:80ms">Steal from the market makers.<br>Give to the <em>holders</em>.</h2>
-          <p class="copy" data-rv style="--d:160ms">Bonds sell $WOOD at a discount for the assets the treasury wants — stables, T-bills, stocks, and LP. Every bond deepens the floor, and every LP bond buys the forest its own liquidity, so no market maker is ever paid rent again.</p>
-
-          <div class="posters" id="posters">
-            <article class="poster glass" data-rv>
-              <div class="wanted">WANTED</div>
-              <div class="for">for the war chest</div>
-              <h3>SGOV</h3>
-              <div class="disc">5.8%</div>
-              <div class="disc-label">bond discount</div>
-              <div class="rows">
-                <div><span>Vesting</span><b>15 watches · 5 days</b></div>
-                <div><span>Bond price</span><b>$29.60</b></div>
-                <div><span>Capacity</span><b>62% filled</b></div>
-              </div>
-              <div class="cap"><i style="--w:62%"></i></div>
-              <div class="reward">reward paid in <b>$WOOD</b></div>
-              <div class="stamp">OPEN</div>
-            </article>
-
-            <article class="poster glass" data-rv style="--d:100ms">
-              <div class="wanted">WANTED</div>
-              <div class="for">for the reserve</div>
-              <h3>USDG</h3>
-              <div class="disc">4.2%</div>
-              <div class="disc-label">bond discount</div>
-              <div class="rows">
-                <div><span>Vesting</span><b>15 watches · 5 days</b></div>
-                <div><span>Bond price</span><b>$30.10</b></div>
-                <div><span>Capacity</span><b>38% filled</b></div>
-              </div>
-              <div class="cap"><i style="--w:38%"></i></div>
-              <div class="reward">reward paid in <b>$WOOD</b></div>
-              <div class="stamp">OPEN</div>
-            </article>
-
-            <article class="poster glass" data-rv style="--d:200ms">
-              <div class="wanted">WANTED</div>
-              <div class="for">for the long hunt</div>
-              <h3>tTSLA</h3>
-              <div class="disc">7.1%</div>
-              <div class="disc-label">bond discount</div>
-              <div class="rows">
-                <div><span>Vesting</span><b>21 watches · 7 days</b></div>
-                <div><span>Bond price</span><b>$29.19</b></div>
-                <div><span>Capacity</span><b>81% filled</b></div>
-              </div>
-              <div class="cap"><i style="--w:81%"></i></div>
-              <div class="reward">reward paid in <b>$WOOD</b></div>
-              <div class="stamp">OPEN</div>
-            </article>
-
-            <article class="poster glass closed" data-rv style="--d:300ms">
-              <div class="wanted">WANTED</div>
-              <div class="for">for the deep pools</div>
-              <h3 style="font-size:25px">WOOD·USDG LP</h3>
-              <div class="disc">9.3%</div>
-              <div class="disc-label">bond discount</div>
-              <div class="rows">
-                <div><span>Vesting</span><b>21 watches · 7 days</b></div>
-                <div><span>Bond price</span><b>$28.57</b></div>
-                <div><span>Capacity</span><b>100% filled</b></div>
-              </div>
-              <div class="cap"><i style="--w:100%"></i></div>
-              <div class="reward">reward paid in <b>$WOOD</b></div>
-              <div class="stamp">SOLD OUT</div>
-            </article>
-          </div>
-        </div>
-      </section>
-    </section>
-
-    <!-- ============ IV · THE VAULT ============ -->
-    <section class="panel" id="panel-vault" data-screen-label="The Vault" hidden>
-      <section class="chapter">
-        <div class="wrap">
-          <div class="split rev">
-            <div>
-              <div class="vault-panel glass" data-rv style="--d:150ms">
-                <div><div class="v"><em>95%</em> of backing</div><div class="k">Borrow up to<br>$29.85 / WOOD</div></div>
-                <div><div class="v">0.50<em>%</em></div><div class="k">Fixed APR<br>no expiry</div></div>
-                <div><div class="v"><em>Zero</em></div><div class="k">Price<br>liquidations</div></div>
-              </div>
-            </div>
-            <div>
-              <div class="chap-head" data-rv><span class="chap-num">IV.</span><span class="chap-rule"></span><span class="chap-kicker">The Vault · Loans</span></div>
-              <h2 data-rv style="--d:80ms">Your bag is a <em>credit line</em>.</h2>
-              <p class="copy" data-rv style="--d:160ms">Because backing is real, you can borrow against it. The Vault lends USDG against staked $WOOD at the backing floor — fixed rate, no expiry, and <em>no price liquidations</em>: the loan is written against what the treasury holds, not against what the market fears.</p>
-              <p class="copy" data-rv style="--d:240ms">Sell nothing. Owe the Sheriff nothing.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-    </section>
-
-    <!-- ============ V · THE TREASURY ============ -->
-    <section class="panel" id="panel-treasury" data-screen-label="The Treasury" hidden>
-      <section class="chapter">
-        <div class="wrap">
-          <div class="chap-head" data-rv><span class="chap-num">V.</span><span class="chap-rule"></span><span class="chap-kicker">The Treasury · Proof of Reserve</span></div>
-          <h2 data-rv style="--d:80ms">Every arrow in the quiver, <em>counted</em>.</h2>
-          <p class="copy" data-rv style="--d:160ms">Olympus dreamed of a currency backed by assets. Sherwood's treasury simply <em>holds them</em>: tokenized T-bills paying real yield, equities settled on Robinhood Chain, and the protocol's own trading liquidity — the same assets carved as runes into the great oak.</p>
-          <p class="copy" data-rv style="--d:240ms">Backing per $WOOD is computed on-chain from live balances, dividend multipliers and oracle prices — not a dashboard's word. A contract's.</p>
-
-          <div class="glass" style="margin-top:56px" data-rv>
-            <div class="ledger-head">
-              <div class="big">
-                <div class="k"><span class="live-dot"></span>Treasury net assets · live</div>
-                <div class="v" data-count="4209813" data-prefix="$">$4,209,813</div>
-              </div>
-              <div class="ledger-side">
-                <div><div class="k">Backing / WOOD</div><div class="v">$31.42</div></div>
-                <div><div class="k">WOOD outstanding</div><div class="v">133,985</div></div>
-                <div><div class="k">Audit cadence</div><div class="v">every block</div></div>
-              </div>
-            </div>
-            <div class="alloc" id="alloc">
-              <div class="alloc-bar" aria-hidden="true">
-                <i style="--w:41%;--i:0;background:#E8C670"></i><i style="--w:22%;--i:1;background:#D4AF37"></i><i style="--w:17.1%;--i:2;background:#9C7A1E"></i><i style="--w:7.8%;--i:3;background:#2E7D53"></i><i style="--w:7%;--i:4;background:#1E5C3C"></i><i style="--w:5.1%;--i:5;background:#14402A"></i>
-              </div>
-              <div class="alloc-legend">
-                <span><span class="sw" style="background:#E8C670"></span>SGOV <b>41.0%</b></span>
-                <span><span class="sw" style="background:#D4AF37"></span>USDG <b>22.0%</b></span>
-                <span><span class="sw" style="background:#9C7A1E"></span>WOOD∕USDG POL <b>17.1%</b></span>
-                <span><span class="sw" style="background:#2E7D53"></span>tSPY <b>7.8%</b></span>
-                <span><span class="sw" style="background:#1E5C3C"></span>tTSLA <b>7.0%</b></span>
-                <span><span class="sw" style="background:#14402A"></span>tAAPL <b>5.1%</b></span>
-              </div>
-            </div>
-            <div class="table-scroll">
-              <table class="ledger">
-                <thead>
-                  <tr><th scope="col">Asset</th><th scope="col" class="num">Holdings</th><th scope="col" class="num">uiMultiplier</th><th scope="col" class="num">Value</th><th scope="col" class="num">Share</th></tr>
-                </thead>
-                <tbody>
-                  <tr><td class="asset"><b>SGOV</b><span class="note">tokenized 0–3mo T-bills</span><span class="addr">0x51aE…90Ve ↗</span></td><td class="num">17,150 sh</td><td class="num">1.00095752</td><td class="num">$1,726,489</td><td class="num">41.0%</td></tr>
-                  <tr><td class="asset"><b>USDG</b><span class="note">reserve stable</span><span class="addr">0x8aC1…44dF ↗</span></td><td class="num">926,014</td><td class="num">—</td><td class="num">$926,014</td><td class="num">22.0%</td></tr>
-                  <tr><td class="asset"><b>WOOD∕USDG</b><span class="note">protocol-owned liquidity · v4</span><span class="addr">0xP0L1…c4fE ↗</span></td><td class="num">1.9M LP</td><td class="num">—</td><td class="num">$719,900</td><td class="num">17.1%</td></tr>
-                  <tr><td class="asset"><b>tSPY</b><span class="note">S&amp;P 500 ETF</span><span class="addr">0x5pY0…11Aa ↗</span></td><td class="num">590 sh</td><td class="num">1.00000000</td><td class="num">$330,400</td><td class="num">7.8%</td></tr>
-                  <tr><td class="asset"><b>tTSLA</b><span class="note">Tesla, Inc.</span><span class="addr">0x7e5L…a0b2 ↗</span></td><td class="num">890 sh</td><td class="num">1.00000000</td><td class="num">$292,810</td><td class="num">7.0%</td></tr>
-                  <tr><td class="asset"><b>tAAPL</b><span class="note">Apple Inc.</span><span class="addr">0xAaP1…93Cd ↗</span></td><td class="num">1,020 sh</td><td class="num">1.00000000</td><td class="num">$214,200</td><td class="num">5.1%</td></tr>
-                  <tr class="total"><td class="asset"><b>Treasury total</b><span class="note">133,985 WOOD outstanding</span></td><td class="num"></td><td class="num"></td><td class="num">$4,209,813</td><td class="num">100%</td></tr>
-                </tbody>
-              </table>
-            </div>
-            <p class="ledger-foot">EVERY ENTRY VERIFIABLE ON-CHAIN · DIVIDENDS ACCRUE VIA uiMultiplier PER ERC-8056 · FIGURES ILLUSTRATIVE</p>
-          </div>
-
-          <div class="chap-head sub" data-rv><span class="chap-num">◆</span><span class="chap-rule"></span><span class="chap-kicker">The Greenwood Band · Range-Bound Stability</span></div>
-          <h2 data-rv style="--d:80ms">Price walks. Backing <em>marches</em>.</h2>
-          <p class="copy" data-rv style="--d:160ms">Olympus let the premium wander unanchored — and paid for it. Sherwood tethers price to backing in both directions from day one: below the band the treasury bids with real reserves; far above it, it sells into strength. The floor was tested once — 10 June — and held.</p>
-
-          <div class="chart-card glass" style="margin-top:56px" data-rv id="chartCard">
-            <div class="chart-head">
-              <span class="t"><span class="live-dot"></span>Price · Backing · 120 days</span>
-              <span class="key">
-                <i><span class="swatch" style="background:#F2EDE2"></span>Price</i>
-                <i><span class="swatch" style="background:#D4AF37"></span>Backing</i>
-                <i><span class="swatch" style="background:rgba(46,125,83,.75)"></span>RBS band</i>
-              </span>
-            </div>
-            <canvas id="chart" role="img" aria-label="Chart of WOOD market price against treasury backing per token, with the range-bound stability band. Price ends at 38.11 dollars, backing at 31.42 dollars. The floor was defended on 10 June."></canvas>
-            <div class="band-rules">
-              <div><div class="k">BELOW THE BAND</div><p>The treasury bids with reserves — buying WOOD under backing is free money for the floor.</p></div>
-              <div><div class="k">INSIDE THE BAND</div><p>Price roams free. The premium is the market's opinion; the backing is the contract's fact.</p></div>
-              <div><div class="k">ABOVE THE BAND</div><p>The treasury sells into strength, banking the premium as new reserves for the next winter.</p></div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </section>
-
-    <!-- ============ VI · THE LEDGER ============ -->
-    <section class="panel" id="panel-ledger" data-screen-label="The Ledger" hidden>
-      <section class="chapter">
-        <div class="wrap">
-          <div class="chap-head" data-rv><span class="chap-num">VI.</span><span class="chap-rule"></span><span class="chap-kicker">The Ledger · Tokenomics &amp; Lore</span></div>
-          <h2 data-rv style="--d:80ms">The tokenomics, sung <em>plainly</em>.</h2>
-          <p class="copy" data-rv style="--d:160ms">Supply, staking and the treasury — the numbers as they stand, the lesson they were built from, and every mechanism's ballad, each ending in a moral you can verify on-chain.</p>
-
-          <div class="hero-stats facts" data-rv style="--d:220ms">
-            <div><div class="k">WOOD outstanding</div><div class="v" data-count="133985">133,985</div></div>
-            <div><div class="k">Staked (🏹,🏹)</div><div class="v" data-count="87.4" data-dec="1" data-suffix="%">87.4%</div></div>
-            <div><div class="k">Protocol-owned liquidity</div><div class="v" data-count="17.1" data-dec="1" data-suffix="%">17.1%</div></div>
-            <div><div class="k">Backing / WOOD</div><div class="v gold" data-count="31.42" data-dec="2" data-prefix="$">$31.42</div></div>
-          </div>
-
-          <div class="chap-head sub" data-rv><span class="chap-num">◆</span><span class="chap-rule"></span><span class="chap-kicker">The Reckoning · What 2021 taught the forest</span></div>
-          <div class="reck glass" data-rv style="--d:100ms">
-            <div class="reck-head"><div class="o">Olympus · 2021</div><div class="s">Sherwood · Chain 4663</div></div>
-            <div class="reck-row"><div class="o">Treasury of stablecoins farming DeFi yield</div><div class="s">Tokenized T-bills, USDG, on-chain equities and protocol-owned liquidity — backing computed from <em>live balances × uiMultiplier × oracle price</em></div></div>
-            <div class="reck-row"><div class="o">Bonds for DAI and OHM–DAI LP</div><div class="s"><em>The Heist</em> — bonds accept USDG, SGOV, tokenized stocks and WOOD∕USDG LP</div></div>
-            <div class="reck-row"><div class="o">8-hour rebase epochs</div><div class="s"><em>The Camp</em> — same cadence; epochs are watches, APY shown next to its honest dilution reading</div></div>
-            <div class="reck-row"><div class="o">Price premium unanchored → −95%</div><div class="s"><em>Range-Bound Stability from launch</em> — the treasury bids below the band with reserves, sells above it</div></div>
-            <div class="reck-row"><div class="o">Cooler Loans bolted on as wind-down</div><div class="s"><em>The Vault at launch</em> — borrow USDG at 95% of backing, 0.50% fixed, no price liquidations</div></div>
-            <div class="reck-row sig"><div class="o">(3,3)</div><div class="s">(🏹,🏹)</div></div>
-          </div>
-
-          <div class="chap-head sub" data-rv><span class="chap-num">◆</span><span class="chap-rule"></span><span class="chap-kicker">The Ballads</span></div>
-          <div class="ballads-grid" style="margin-top:40px">
-            <article class="ballad glass" data-rv>
-              <h3>The Ballad of the Bond</h3>
-              <p class="verse">He brought the forest T-bills bright,<br>and laid them at the oak;<br>five days he waits, his WOOD then vests —<br>a discount for good folk.</p>
-              <p class="moral"><b>MORAL</b> — A bond trades a discount for time. The treasury keeps the principal forever.</p>
-            </article>
-            <article class="ballad glass" data-rv style="--d:120ms">
-              <h3>The Ballad of the Watch</h3>
-              <p class="verse">The horn is blown, the spoils are split,<br>three watches to the day;<br>who holds his ground keeps all his share —<br>the rest is APY.</p>
-              <p class="moral"><b>MORAL</b> — Rebases are emissions, not profit. What staking preserves is your fraction of the forest.</p>
-            </article>
-            <article class="ballad glass" data-rv style="--d:240ms">
-              <h3>The Ballad of the Floor</h3>
-              <p class="verse">The Sheriff sold the greenwood short<br>to break us at the bough;<br>the treasury bought his panic whole —<br>the floor is holding now.</p>
-              <p class="moral"><b>MORAL</b> — Below the band the treasury bids with real assets; far above, it sells. Price walks; backing marches.</p>
-            </article>
-          </div>
-        </div>
-      </section>
-    </section>
-
-    <!-- ============ VII · THE COUNCIL ============ -->
-    <section class="panel" id="panel-council" data-screen-label="Governance" hidden>
-      <section class="chapter">
-        <div class="wrap">
-          <div class="chap-head" data-rv><span class="chap-num">VII.</span><span class="chap-rule"></span><span class="chap-kicker">The Council · Governance</span></div>
-          <h2 data-rv style="--d:80ms">The forest votes with <em>drawn bows</em>.</h2>
-          <p class="copy" data-rv style="--d:160ms">Governance arrives with deployment. One staked bow, one voice — proposals nailed to the oak, quorum called by horn.</p>
-
-          <div class="council-card glass" data-rv style="--d:240ms">
+  <!-- ============ Governed On-Chain ============ -->
+  <section class="feature chapter" id="mkt-governance">
+    <div class="wrap">
+      <div class="split rev">
+        <div>
+          <div class="council-card glass" data-rv style="--d:150ms">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 3v18"/><path d="M6.5 4.5H18l-2.8 3.5L18 11.5H6.5z"/></svg>
             <h3>The Council has not yet convened.</h3>
             <p>When SherwoodDAO deploys, sWOOD becomes the voice of the greenwood — treasury mandates, bond capacities and the width of the band, all put to the camp.</p>
-            <button class="btn ghost small" id="charterBtn" type="button">Read the charter — soon</button>
             <span class="sigil">(🏹,🏹)</span>
           </div>
         </div>
-      </section>
-    </section>
-
-    <!-- ============ VIII · DOCS & ABOUT ============ -->
-    <section class="panel" id="panel-docs" data-screen-label="Docs &amp; About" hidden>
-      <section class="chapter">
-        <div class="wrap">
-          <div class="chap-head" data-rv><span class="chap-num">VIII.</span><span class="chap-rule"></span><span class="chap-kicker">The Charter · Docs &amp; About</span></div>
-          <h2 data-rv style="--d:80ms">What the forest is, in <em>plain speech</em>.</h2>
-
-          <div class="docs-grid">
-            <div>
-              <p class="copy" data-rv style="--d:160ms">SherwoodDAO is OlympusDAO's 2021 reserve-currency design rebuilt for Robinhood Chain with the seatbelts on from day one. Every $WOOD is minted against a treasury of real-world assets — tokenized T-bills, USDG and on-chain equities — and every figure on this page is computed from live balances, not promises.</p>
-              <p class="copy" data-rv style="--d:240ms">The 2021 flywheel failed at its unanchored premium. Sherwood tethers price to backing in both directions from launch: bonds fill the treasury, the treasury defends the band, the band disciplines the premium. Taken from the market makers, given to the holders.</p>
-              <p class="sigil-line" data-rv style="--d:320ms">(🏹,🏹) — I draw with the camp, not against it.</p>
-            </div>
-            <div class="about-card glass" data-rv style="--d:280ms">
-              <div class="t">The fine print</div>
-              <div class="row"><span class="k">Status</span><span class="v">Concept · nothing deployed</span></div>
-              <div class="row"><span class="k">Figures</span><span class="v">Illustrative</span></div>
-              <div class="row"><span class="k">Chain</span><span class="v">Robinhood Chain · 4663</span></div>
-              <div class="row"><span class="k">Rebase cadence</span><span class="v">3 watches / day · 8h</span></div>
-              <div class="row"><span class="k">Source</span><span class="v"><a href="https://github.com/aidaonsui-collab/sherwood-dao" target="_blank" rel="noopener">github ↗ sherwood-dao</a></span></div>
-              <p class="fine">SherwoodDAO is an independent protocol concept built for Robinhood Chain and is not affiliated with Robinhood Markets, Inc.</p>
-            </div>
+        <div>
+          <div class="chap-head" data-rv><span class="chap-rule"></span><span class="chap-kicker">The Council · Governance</span></div>
+          <h2 data-rv style="--d:80ms">Governed <em>on-chain</em>.</h2>
+          <p class="copy" data-rv style="--d:160ms">The forest votes with drawn bows. One staked bow, one voice — proposals nailed to the oak, quorum called by horn. Governance arrives with deployment; until then, the charter is public and the mandate is fixed.</p>
+          <div class="cta-row" data-rv style="--d:240ms">
+            <button class="btn" type="button" data-enter="council">View Proposals</button>
+            <button class="btn ghost" type="button" data-enter="council">Manage Delegation</button>
           </div>
         </div>
-      </section>
-    </section>
-  </main>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ How to Participate ============ -->
+  <section class="participate">
+    <div class="wrap">
+      <div class="chap-head" data-rv><span class="chap-rule"></span><span class="chap-kicker">How to Participate</span></div>
+      <h2 data-rv style="--d:80ms">Three ways into the <em>greenwood</em>.</h2>
+      <div class="paths-grid" style="margin-top:48px">
+        <a class="path glass" href="#" data-enter="camp" data-rv><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5c2.7 2.5 4.1 4.7 4.1 6.9a4.1 4.1 0 1 1-8.2 0c0-2.2 1.4-4.4 4.1-6.9z"/><path d="M5 20.5l14-4.5M5 16l14 4.5"/></svg><h3>Stake at the Camp</h3><p>Earn incentives while compounding your share of the forest via honest rebases.</p><span class="go">Stake<b>→</b></span></a>
+        <a class="path glass" href="#" data-enter="heist" data-rv style="--d:90ms"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 19.5L19.5 4.5M14.9 4.5h4.6v4.6"/><path d="M19.5 19.5L4.5 4.5M9.1 4.5H4.5v4.6"/></svg><h3>Provide Liquidity</h3><p>Bond stables, T-bills, tokenized stocks or LP for discounted WOOD.</p><span class="go">Bond<b>→</b></span></a>
+        <a class="path glass" href="#" data-enter="vault" data-rv style="--d:180ms"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18.5V10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v8.5z"/><path d="M4 11.5h16"/><circle cx="12" cy="14.7" r="1.2"/><path d="M12 15.9v1.6"/></svg><h3>Borrow Against Backing</h3><p>Access up to 95% of liquid backing at 0.50% fixed, no liquidations.</p><span class="go">Borrow<b>→</b></span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ The Reckoning (Olympus vs Sherwood) ============ -->
+  <section class="chapter">
+    <div class="wrap">
+      <div class="chap-head sub" data-rv><span class="chap-num">◆</span><span class="chap-rule"></span><span class="chap-kicker">The Reckoning · What 2021 taught the forest</span></div>
+      <h2 data-rv style="--d:80ms">The tokenomics, sung <em>plainly</em>.</h2>
+      <div class="reck glass" data-rv style="--d:100ms">
+        <div class="reck-head"><div class="o">Olympus · 2021</div><div class="s">Sherwood · Chain 4663</div></div>
+        <div class="reck-row"><div class="o">Treasury of stablecoins farming DeFi yield</div><div class="s">Tokenized T-bills, USDG, on-chain equities and protocol-owned liquidity — backing computed from <em>live balances × uiMultiplier × oracle price</em></div></div>
+        <div class="reck-row"><div class="o">Bonds for DAI and OHM–DAI LP</div><div class="s"><em>The Heist</em> — bonds accept USDG, SGOV, tokenized stocks and WOOD∕USDG LP</div></div>
+        <div class="reck-row"><div class="o">8-hour rebase epochs</div><div class="s"><em>The Camp</em> — same cadence; epochs are watches, APY shown next to its honest dilution reading</div></div>
+        <div class="reck-row"><div class="o">Price premium unanchored → −95%</div><div class="s"><em>Range-Bound Stability from launch</em> — the treasury bids below the band with reserves, sells above it</div></div>
+        <div class="reck-row"><div class="o">Cooler Loans bolted on as wind-down</div><div class="s"><em>The Vault at launch</em> — borrow USDG at 95% of backing, 0.50% fixed, no price liquidations</div></div>
+        <div class="reck-row sig"><div class="o">(3,3)</div><div class="s">(🏹,🏹)</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Ballads ============ -->
+  <section class="chapter">
+    <div class="wrap">
+      <div class="chap-head" data-rv><span class="chap-rule"></span><span class="chap-kicker">The Ballads</span></div>
+      <h2 data-rv style="--d:80ms">Every mechanism, its own <em>verse</em>.</h2>
+      <div class="ballads-grid" style="margin-top:48px">
+        <article class="ballad glass" data-rv>
+          <h3>The Ballad of the Bond</h3>
+          <p class="verse">He brought the forest T-bills bright,<br>and laid them at the oak;<br>five days he waits, his WOOD then vests —<br>a discount for good folk.</p>
+          <p class="moral"><b>MORAL</b> — A bond trades a discount for time. The treasury keeps the principal forever.</p>
+        </article>
+        <article class="ballad glass" data-rv style="--d:120ms">
+          <h3>The Ballad of the Watch</h3>
+          <p class="verse">The horn is blown, the spoils are split,<br>three watches to the day;<br>who holds his ground keeps all his share —<br>the rest is APY.</p>
+          <p class="moral"><b>MORAL</b> — Rebases are emissions, not profit. What staking preserves is your fraction of the forest.</p>
+        </article>
+        <article class="ballad glass" data-rv style="--d:240ms">
+          <h3>The Ballad of the Floor</h3>
+          <p class="verse">The Sheriff sold the greenwood short<br>to break us at the bough;<br>the treasury bought his panic whole —<br>the floor is holding now.</p>
+          <p class="moral"><b>MORAL</b> — Below the band the treasury bids with real assets; far above, it sells. Price walks; backing marches.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="faq" id="mkt-faq">
+    <div class="wrap">
+      <div class="chap-head" data-rv><span class="chap-rule"></span><span class="chap-kicker">FAQ</span></div>
+      <h2 data-rv style="--d:80ms">Plain answers, no <em>fine print</em>.</h2>
+      <div class="faq-list" data-rv style="--d:120ms">
+        <details class="faq-item">
+          <summary>What is SherwoodDAO?<span class="plus">+</span></summary>
+          <div class="a">A treasury-backed reserve currency for Robinhood Chain. Every <em>$WOOD</em> is minted against a treasury of tokenized T-bills, on-chain equities, and the protocol's own trading liquidity — OlympusDAO's 2021 design, rebuilt with the seatbelts on from day one.</div>
+        </details>
+        <details class="faq-item">
+          <summary>What's the goal?<span class="plus">+</span></summary>
+          <div class="a">A currency whose floor you can audit on-chain, not one you have to trust. Backing per WOOD is computed from live balances and oracle prices — a contract's word, not a dashboard's.</div>
+        </details>
+        <details class="faq-item">
+          <summary>Why is it needed?<span class="plus">+</span></summary>
+          <div class="a">Robinhood Chain settles tokenized stocks and T-bills natively. That's the unfair advantage 2021's forks never had: a treasury backed by the real world instead of stablecoins farming DeFi yield.</div>
+        </details>
+        <details class="faq-item">
+          <summary>Is WOOD a stablecoin?<span class="plus">+</span></summary>
+          <div class="a">No — it's a <em>flatcoin</em>. WOOD isn't pegged to $1; it's backed by at least $1 of treasury assets, and the Range-Bound Stability band keeps price tethered to that backing without pretending the price never moves.</div>
+        </details>
+        <details class="faq-item">
+          <summary>What backs WOOD?<span class="plus">+</span></summary>
+          <div class="a">SGOV (tokenized T-bills), USDG, tokenized equities (tSPY, tTSLA, tAAPL), and the protocol's own WOOD∕USDG liquidity — see <em>The Treasury</em> inside the app for the full, live, on-chain breakdown.</div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Closing CTA ============ -->
+  <section class="closing">
+    <div class="wrap">
+      <h2>Be smart, <em>draw the bow</em>.</h2>
+      <p>Taken from the market makers, given to the holders.</p>
+      <div class="cta-row"><button class="btn" type="button" data-enter="overview">Enter the Forest</button></div>
+    </div>
+  </section>
 
   <footer>
     <div class="wrap">
@@ -977,23 +934,24 @@ html[data-lantern] .topbar.scrolled{background:rgba(13,20,15,.75)}
           <p>Taken from the market makers, given to the holders.</p>
         </div>
         <div class="foot-col">
-          <h4>The Greenwood</h4>
-          <a href="#camp">The Camp</a>
-          <a href="#heist">The Heist</a>
-          <a href="#vault">The Vault</a>
-          <a href="#treasury">The Treasury</a>
+          <h4>Learn</h4>
+          <a href="#mkt-liquidity">Protocol-Owned Liquidity</a>
+          <a href="#mkt-backing">The Vault</a>
+          <a href="#mkt-policy">Range-Bound Stability</a>
+          <a href="#mkt-faq">FAQ</a>
         </div>
         <div class="foot-col">
-          <h4>The Lore</h4>
-          <a href="#ledger">The Ledger</a>
-          <a href="#council">Governance</a>
-          <a href="#docs">Docs &amp; About</a>
+          <h4>App</h4>
+          <a href="#" data-enter="overview">Overview</a>
+          <a href="#" data-enter="camp">Stake</a>
+          <a href="#" data-enter="heist">Bonds</a>
+          <a href="#" data-enter="council">Governance</a>
         </div>
         <div class="foot-col">
           <h4>Chain</h4>
-          <a href="#docs">Robinhood Chain · 4663</a>
+          <a href="#" data-enter="charter">Robinhood Chain · 4663</a>
           <a href="https://github.com/aidaonsui-collab/sherwood-dao" target="_blank" rel="noopener">Source ↗</a>
-          <a href="#treasury">$WOOD treasury</a>
+          <a href="#" data-enter="treasury">$WOOD treasury</a>
         </div>
       </div>
       <div class="foot-note">
@@ -1002,6 +960,409 @@ html[data-lantern] .topbar.scrolled{background:rgba(13,20,15,.75)}
       </div>
     </div>
   </footer>
+</div>
+
+<div class="app" id="appRoot" hidden>
+  <div class="scrim" id="scrim" aria-hidden="true"></div>
+
+  <div class="nav-shell">
+    <aside class="icon-rail" id="iconRail" data-screen-label="Icon rail">
+      <div class="icon-rail-inner">
+        <div class="rail-logo">
+          <a href="#" id="railBrand" aria-label="SherwoodDAO — exit to site">
+            <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4l8 16h-6v30h7l-9 10-9-10h7V20h-6z" fill="url(#bgS)"/><defs><linearGradient id="bgS" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F0D68C"/><stop offset="1" stop-color="#9C7A1E"/></linearGradient></defs></svg>
+          </a>
+        </div>
+        <nav class="rail-nav" id="railNav">
+          <button class="rail-item" type="button" data-section="overview"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13.5h5v7H4zM9.5 8h5v12.5h-5zM15 4h5v16.5h-5z"/></svg><span class="lbl">Overview</span></button>
+          <button class="rail-item" type="button" data-section="wood"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5c2.7 2.5 4.1 4.7 4.1 6.9a4.1 4.1 0 1 1-8.2 0c0-2.2 1.4-4.4 4.1-6.9z"/><path d="M5 20.5l14-4.5M5 16l14 4.5"/></svg><span class="lbl">WOOD</span></button>
+          <button class="rail-item" type="button" data-section="heist"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 19.5L19.5 4.5M14.9 4.5h4.6v4.6"/><path d="M19.5 19.5L4.5 4.5M9.1 4.5H4.5v4.6"/></svg><span class="lbl">Heist</span></button>
+          <button class="rail-item" type="button" data-section="vault"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18.5V10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v8.5z"/><path d="M4 11.5h16"/><circle cx="12" cy="14.7" r="1.2"/><path d="M12 15.9v1.6"/></svg><span class="lbl">Vault</span></button>
+          <button class="rail-item" type="button" data-section="gov"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 3v18"/><path d="M6.5 4.5H18l-2.8 3.5L18 11.5H6.5z"/></svg><span class="lbl">Council</span></button>
+        </nav>
+        <div class="rail-bottom">
+          <a href="https://github.com/aidaonsui-collab/sherwood-dao" target="_blank" rel="noopener" aria-label="Source on GitHub"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2-.2 4.5-1 4.5-4.5 0-1-.4-1.9-1-2.6.1-.3.4-1.4-.1-2.8 0 0-.9-.3-3 1a10 10 0 0 0-5.5 0c-2.1-1.3-3-1-3-1-.5 1.4-.2 2.5-.1 2.8-.6.7-1 1.6-1 2.6 0 3.5 2.5 4.3 4.5 4.5-.3.3-.5.7-.5 1.4v3.6"/></svg></a>
+        </div>
+      </div>
+    </aside>
+
+    <aside class="sub-panel" id="subPanel" data-screen-label="Sub navigation">
+      <h2 id="subTitle">Overview</h2>
+      <nav class="sub-nav" id="subNav"></nav>
+    </aside>
+
+    <div class="app-main">
+      <header class="topbar" id="topbar">
+        <div class="tb-left">
+          <button class="icon-btn burger" id="burger" type="button" aria-label="Open navigation" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+          <div class="crumb" id="crumb"><em>I.</em><span>Overview</span><i>· Dashboard</i></div>
+        </div>
+        <div class="tb-right">
+          <span class="chain-chip tb-chain"><span class="live-dot"></span>Robinhood Chain</span>
+          <button class="icon-btn lantern" id="lanternBtn" type="button" aria-label="Light the lantern" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6.5V5a2 2 0 0 1 4 0v1.5"/><rect x="8" y="6.5" width="8" height="11" rx="2.2"/><circle cx="12" cy="12" r="1.6"/></svg></button>
+          <button class="btn small" id="walletBtn" type="button">Connect wallet</button>
+        </div>
+      </header>
+
+      <main>
+        <!-- ============ OVERVIEW (dashboard) ============ -->
+        <section class="panel" id="panel-overview" data-screen-label="Overview">
+          <div class="wrap" style="padding-block:32px 60px">
+            <div class="dash-grid">
+              <div class="chart-card glass" data-rv id="chartCard">
+                <div class="chart-head">
+                  <span class="t"><span class="live-dot"></span>Price · Backing · 120 days</span>
+                  <span class="key">
+                    <i><span class="swatch" style="background:#F2EDE2"></span>Price</i>
+                    <i><span class="swatch" style="background:#D4AF37"></span>Backing</i>
+                    <i><span class="swatch" style="background:rgba(46,125,83,.75)"></span>RBS band</i>
+                  </span>
+                </div>
+                <canvas id="chart" role="img" aria-label="Chart of WOOD market price against treasury backing per token, with the range-bound stability band. Price ends at 38.11 dollars, backing at 31.42 dollars. The floor was defended on 10 June."></canvas>
+              </div>
+              <div class="dash-col">
+                <div class="stat-card glass">
+                  <div><div class="lbl">WOOD Price</div><div class="num-row"><span class="num">$38.11</span><span class="chg up">+21.3% · 7d</span></div></div>
+                  <canvas class="spark" data-seed="1" data-up="1"></canvas>
+                </div>
+                <div class="stat-card glass">
+                  <div><div class="lbl">Liquid Backing</div><div class="num-row"><span class="num">$31.42</span><span class="chg up">+13.8% · 7d</span></div></div>
+                  <canvas class="spark" data-seed="2" data-up="1"></canvas>
+                </div>
+                <div class="stat-card glass">
+                  <div><div class="lbl">WOOD Premium</div><div class="num-row"><span class="num">21.3%</span><span class="chg down">−4.1% · 7d</span></div></div>
+                  <canvas class="spark" data-seed="3" data-up="0"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <div class="feat-row">
+              <div class="feat-card glass">
+                <div class="fc-head"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18.5V10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v8.5z"/><path d="M4 11.5h16"/></svg><span>The Vault</span></div>
+                <div class="fc-num"><em>95%</em></div>
+                <div class="fc-sub">of backing borrowable · 0.50% fixed, no liquidations</div>
+                <a class="fc-link" href="#" data-enter="vault">Borrow<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+              </div>
+              <div class="feat-card glass">
+                <div class="fc-head"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 19.5L19.5 4.5M14.9 4.5h4.6v4.6"/></svg><span>The Heist</span></div>
+                <div class="fc-num"><em>9.3%</em></div>
+                <div class="fc-sub">best open bond discount · 3 wanted posters live</div>
+                <a class="fc-link" href="#" data-enter="heist">View bonds<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+              </div>
+              <div class="feat-card glass">
+                <div class="fc-head"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5c2.7 2.5 4.1 4.7 4.1 6.9a4.1 4.1 0 1 1-8.2 0c0-2.2 1.4-4.4 4.1-6.9z"/></svg><span>The Camp</span></div>
+                <div class="fc-num"><em>1,204%</em></div>
+                <div class="fc-sub">staking APY · 87.4% of supply staked (🏹,🏹)</div>
+                <a class="fc-link" href="#" data-enter="camp">Stake<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+              </div>
+            </div>
+
+            <div class="activity-card glass">
+              <div class="activity-head">
+                <p>Last Protocol Actions</p>
+                <a href="#" data-enter="treasury">View All<svg viewBox="0 0 24 24" width="12" height="12" style="stroke:currentColor;fill:none;stroke-width:2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+              </div>
+              <div class="activity-table">
+                <div class="activity-row"><span class="tag">Bond</span><span class="desc"><b>SGOV</b> bond filled — 2,140 WOOD vesting over 15 watches</span><span class="time">14m ago</span></div>
+                <div class="activity-row"><span class="tag">Rebase</span><span class="desc">Watch #1,847 closed — <b>0.23%</b> distributed to stakers</span><span class="time">2h ago</span></div>
+                <div class="activity-row"><span class="tag">Vault</span><span class="desc">Loan opened — <b>3,200 USDG</b> against staked WOOD</span><span class="time">5h ago</span></div>
+                <div class="activity-row"><span class="tag">Band</span><span class="desc">Treasury bid <b>410 WOOD</b> below the band — floor defended</span><span class="time">1d ago</span></div>
+                <div class="activity-row"><span class="tag">Bond</span><span class="desc"><b>WOOD∕USDG LP</b> bond sold out — 9.3% discount</span><span class="time">1d ago</span></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ OVERVIEW · TREASURY ============ -->
+        <section class="panel" id="panel-treasury" data-screen-label="Treasury" hidden>
+          <section class="chapter">
+            <div class="wrap">
+              <div class="chap-head" data-rv><span class="chap-rule"></span><span class="chap-kicker">Overview · Treasury</span></div>
+              <h2 data-rv style="--d:80ms">Every arrow in the quiver, <em>counted</em>.</h2>
+              <p class="copy" data-rv style="--d:160ms">Olympus dreamed of a currency backed by assets. Sherwood's treasury simply <em>holds them</em>: tokenized T-bills paying real yield, equities settled on Robinhood Chain, and the protocol's own trading liquidity.</p>
+              <p class="copy" data-rv style="--d:240ms">Backing per $WOOD is computed on-chain from live balances, dividend multipliers and oracle prices — not a dashboard's word. A contract's.</p>
+
+              <div class="glass" style="margin-top:40px" data-rv>
+                <div class="ledger-head">
+                  <div class="big">
+                    <div class="k"><span class="live-dot"></span>Treasury net assets · live</div>
+                    <div class="v" data-count="4209813" data-prefix="$">$4,209,813</div>
+                  </div>
+                  <div class="ledger-side">
+                    <div><div class="k">Backing / WOOD</div><div class="v">$31.42</div></div>
+                    <div><div class="k">WOOD outstanding</div><div class="v">133,985</div></div>
+                    <div><div class="k">Audit cadence</div><div class="v">every block</div></div>
+                  </div>
+                </div>
+                <div class="alloc" id="alloc">
+                  <div class="alloc-bar" aria-hidden="true">
+                    <i style="--w:41%;--i:0;background:#E8C670"></i><i style="--w:22%;--i:1;background:#D4AF37"></i><i style="--w:17.1%;--i:2;background:#9C7A1E"></i><i style="--w:7.8%;--i:3;background:#2E7D53"></i><i style="--w:7%;--i:4;background:#1E5C3C"></i><i style="--w:5.1%;--i:5;background:#14402A"></i>
+                  </div>
+                  <div class="alloc-legend">
+                    <span><span class="sw" style="background:#E8C670"></span>SGOV <b>41.0%</b></span>
+                    <span><span class="sw" style="background:#D4AF37"></span>USDG <b>22.0%</b></span>
+                    <span><span class="sw" style="background:#9C7A1E"></span>WOOD∕USDG POL <b>17.1%</b></span>
+                    <span><span class="sw" style="background:#2E7D53"></span>tSPY <b>7.8%</b></span>
+                    <span><span class="sw" style="background:#1E5C3C"></span>tTSLA <b>7.0%</b></span>
+                    <span><span class="sw" style="background:#14402A"></span>tAAPL <b>5.1%</b></span>
+                  </div>
+                </div>
+                <div class="table-scroll">
+                  <table class="ledger">
+                    <thead>
+                      <tr><th scope="col">Asset</th><th scope="col" class="num">Holdings</th><th scope="col" class="num">uiMultiplier</th><th scope="col" class="num">Value</th><th scope="col" class="num">Share</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td class="asset"><b>SGOV</b><span class="note">tokenized 0–3mo T-bills</span><span class="addr">0x51aE…90Ve ↗</span></td><td class="num">17,150 sh</td><td class="num">1.00095752</td><td class="num">$1,726,489</td><td class="num">41.0%</td></tr>
+                      <tr><td class="asset"><b>USDG</b><span class="note">reserve stable</span><span class="addr">0x8aC1…44dF ↗</span></td><td class="num">926,014</td><td class="num">—</td><td class="num">$926,014</td><td class="num">22.0%</td></tr>
+                      <tr><td class="asset"><b>WOOD∕USDG</b><span class="note">protocol-owned liquidity · v4</span><span class="addr">0xP0L1…c4fE ↗</span></td><td class="num">1.9M LP</td><td class="num">—</td><td class="num">$719,900</td><td class="num">17.1%</td></tr>
+                      <tr><td class="asset"><b>tSPY</b><span class="note">S&amp;P 500 ETF</span><span class="addr">0x5pY0…11Aa ↗</span></td><td class="num">590 sh</td><td class="num">1.00000000</td><td class="num">$330,400</td><td class="num">7.8%</td></tr>
+                      <tr><td class="asset"><b>tTSLA</b><span class="note">Tesla, Inc.</span><span class="addr">0x7e5L…a0b2 ↗</span></td><td class="num">890 sh</td><td class="num">1.00000000</td><td class="num">$292,810</td><td class="num">7.0%</td></tr>
+                      <tr><td class="asset"><b>tAAPL</b><span class="note">Apple Inc.</span><span class="addr">0xAaP1…93Cd ↗</span></td><td class="num">1,020 sh</td><td class="num">1.00000000</td><td class="num">$214,200</td><td class="num">5.1%</td></tr>
+                      <tr class="total"><td class="asset"><b>Treasury total</b><span class="note">133,985 WOOD outstanding</span></td><td class="num"></td><td class="num"></td><td class="num">$4,209,813</td><td class="num">100%</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <p class="ledger-foot">EVERY ENTRY VERIFIABLE ON-CHAIN · DIVIDENDS ACCRUE VIA uiMultiplier PER ERC-8056 · FIGURES ILLUSTRATIVE</p>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <!-- ============ WOOD · BALANCE ============ -->
+        <section class="panel" id="panel-balance" data-screen-label="My WOOD" hidden>
+          <section class="chapter">
+            <div class="wrap">
+              <div class="chap-head" data-rv><span class="chap-rule"></span><span class="chap-kicker">WOOD · Balance</span></div>
+              <h2 data-rv style="--d:80ms">Your bow, <em>counted</em>.</h2>
+              <p class="copy" data-rv style="--d:160ms">A ranger's balance — staked and liquid $WOOD, and what it's worth at the live backing price.</p>
+              <div class="glass" style="margin-top:32px;padding:30px 34px" data-rv style="--d:150ms">
+                <div class="ledger-side" style="gap:56px">
+                  <div><div class="k">Wallet</div><div class="v" id="balAddr">—</div></div>
+                  <div><div class="k">Liquid WOOD</div><div class="v" id="balLiquid">—</div></div>
+                  <div><div class="k">Staked sWOOD</div><div class="v" id="balStaked">—</div></div>
+                  <div><div class="k">Value</div><div class="v gold" id="balValue">—</div></div>
+                </div>
+              </div>
+              <p class="chart-note" style="text-align:left;margin-top:20px" id="balNote">Connect a wallet to see your balance. (This is a concept — no wallet can truly connect.)</p>
+            </div>
+          </section>
+        </section>
+
+        <!-- ============ WOOD · THE CAMP ============ -->
+        <section class="panel" id="panel-camp" data-screen-label="The Camp" hidden>
+          <section class="chapter">
+            <div class="wrap">
+              <div class="split">
+                <div>
+                  <div class="chap-head" data-rv><span class="chap-rule"></span><span class="chap-kicker">WOOD · The Camp</span></div>
+                  <h2 data-rv style="--d:80ms">Nock. Draw. <em>Hold</em>.</h2>
+                  <p class="copy" data-rv style="--d:160ms">Stake $WOOD, receive sWOOD, and every eight hours — one <em>watch</em> — the camp divides the spoils. Rebases mint against treasury surplus, so the yield is honest and your share of the forest stays yours.</p>
+                  <p class="copy" data-rv style="--d:240ms">(🏹,🏹) is not a promise that the price only rises. It is a promise that the ledger never lies.</p>
+                  <div class="stake-card glass" data-rv style="--d:320ms">
+                    <div class="stake-head"><span class="t">Stake $WOOD → sWOOD</span><span class="bal">Balance <b id="stakeBal">—</b></span></div>
+                    <div class="stake-row">
+                      <div class="stake-input"><input id="stakeIn" inputmode="decimal" placeholder="0.00" aria-label="Amount of WOOD to stake"><button class="max-chip" id="maxChip" type="button">MAX</button></div>
+                      <button class="btn small" id="stakeBtn" type="button">Connect to stake</button>
+                    </div>
+                    <div class="stake-meta">
+                      <div>Receive <b>1 : 1 sWOOD</b></div>
+                      <div>Next watch <b id="cd2">--:--:--</b></div>
+                      <div>Rebase <b>0.23%</b></div>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <div class="watch-card glass" data-rv style="--d:150ms">
+                    <div class="watch-label"><span class="live-dot"></span>Next rebase</div>
+                    <div class="watch-face">
+                      <svg viewBox="0 0 320 320" aria-hidden="true">
+                        <defs>
+                          <linearGradient id="gGrad" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0" stop-color="#F0D68C"/><stop offset="1" stop-color="#9C7A1E"/>
+                          </linearGradient>
+                          <filter id="wglow" x="-200%" y="-200%" width="500%" height="500%">
+                            <feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                          </filter>
+                        </defs>
+                        <circle cx="160" cy="160" r="152" fill="none" stroke="rgba(232,198,112,.20)" stroke-width="1"/>
+                        <circle cx="160" cy="160" r="120" fill="none" stroke="rgba(200,214,204,.07)" stroke-width="1"/>
+                        <circle cx="160" cy="160" r="100" fill="none" stroke="rgba(200,214,204,.05)" stroke-width="1"/>
+                        <circle cx="160" cy="160" r="80" fill="none" stroke="rgba(200,214,204,.04)" stroke-width="1"/>
+                        <g id="wticks"></g>
+                        <circle id="warc" cx="160" cy="160" r="138" fill="none" stroke="url(#gGrad)" stroke-width="2.5" stroke-linecap="round" transform="rotate(-90 160 160)" stroke-dasharray="867.08" stroke-dashoffset="867.08"/>
+                        <g id="wtip" transform="rotate(0 160 160)"><circle cx="160" cy="22" r="3.6" fill="#F0D68C" filter="url(#wglow)"/></g>
+                      </svg>
+                      <div class="watch-center">
+                        <div class="countdown" id="cd" aria-live="off">--:--:--</div>
+                        <div class="watch-sub">until the <em id="watchname">third</em> watch ends</div>
+                        <div class="wdots" id="wdots" aria-hidden="true"><span></span><span></span><span></span></div>
+                      </div>
+                    </div>
+                    <div class="camp-stats">
+                      <div><div class="k">Rebase / watch</div><div class="v">0.23%</div></div>
+                      <div><div class="k">APY</div><div class="v">1,204%</div></div>
+                      <div><div class="k">Staked (🏹,🏹)</div><div class="v">87.4%</div></div>
+                    </div>
+                    <div class="truth-row">
+                      <button class="truth" id="truthBtn" type="button" aria-pressed="false"><span class="knob" aria-hidden="true"></span>Show it straight</button>
+                      <p id="apyLine">Three watches to a day, and the horn is blown at each.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <!-- ============ THE HEIST ============ -->
+        <section class="panel" id="panel-heist" data-screen-label="The Heist" hidden>
+          <section class="chapter heist-ch">
+            <div class="wrap">
+              <div class="chap-head" data-rv><span class="chap-rule"></span><span class="chap-kicker">The Heist · Bonds</span></div>
+              <h2 data-rv style="--d:80ms">Steal from the market makers.<br>Give to the <em>holders</em>.</h2>
+              <p class="copy" data-rv style="--d:160ms">Bonds sell $WOOD at a discount for the assets the treasury wants — stables, T-bills, stocks, and LP. Every bond deepens the floor, and every LP bond buys the forest its own liquidity, so no market maker is ever paid rent again.</p>
+
+              <div class="posters" id="posters">
+                <article class="poster glass" data-rv>
+                  <div class="wanted">WANTED</div>
+                  <div class="for">for the war chest</div>
+                  <h3>SGOV</h3>
+                  <div class="disc">5.8%</div>
+                  <div class="disc-label">bond discount</div>
+                  <div class="rows">
+                    <div><span>Vesting</span><b>15 watches · 5 days</b></div>
+                    <div><span>Bond price</span><b>$29.60</b></div>
+                    <div><span>Capacity</span><b>62% filled</b></div>
+                  </div>
+                  <div class="cap"><i style="--w:62%"></i></div>
+                  <div class="reward">reward paid in <b>$WOOD</b></div>
+                  <div class="stamp">OPEN</div>
+                </article>
+
+                <article class="poster glass" data-rv style="--d:100ms">
+                  <div class="wanted">WANTED</div>
+                  <div class="for">for the reserve</div>
+                  <h3>USDG</h3>
+                  <div class="disc">4.2%</div>
+                  <div class="disc-label">bond discount</div>
+                  <div class="rows">
+                    <div><span>Vesting</span><b>15 watches · 5 days</b></div>
+                    <div><span>Bond price</span><b>$30.10</b></div>
+                    <div><span>Capacity</span><b>38% filled</b></div>
+                  </div>
+                  <div class="cap"><i style="--w:38%"></i></div>
+                  <div class="reward">reward paid in <b>$WOOD</b></div>
+                  <div class="stamp">OPEN</div>
+                </article>
+
+                <article class="poster glass" data-rv style="--d:200ms">
+                  <div class="wanted">WANTED</div>
+                  <div class="for">for the long hunt</div>
+                  <h3>tTSLA</h3>
+                  <div class="disc">7.1%</div>
+                  <div class="disc-label">bond discount</div>
+                  <div class="rows">
+                    <div><span>Vesting</span><b>21 watches · 7 days</b></div>
+                    <div><span>Bond price</span><b>$29.19</b></div>
+                    <div><span>Capacity</span><b>81% filled</b></div>
+                  </div>
+                  <div class="cap"><i style="--w:81%"></i></div>
+                  <div class="reward">reward paid in <b>$WOOD</b></div>
+                  <div class="stamp">OPEN</div>
+                </article>
+
+                <article class="poster glass closed" data-rv style="--d:300ms">
+                  <div class="wanted">WANTED</div>
+                  <div class="for">for the deep pools</div>
+                  <h3 style="font-size:25px">WOOD·USDG LP</h3>
+                  <div class="disc">9.3%</div>
+                  <div class="disc-label">bond discount</div>
+                  <div class="rows">
+                    <div><span>Vesting</span><b>21 watches · 7 days</b></div>
+                    <div><span>Bond price</span><b>$28.57</b></div>
+                    <div><span>Capacity</span><b>100% filled</b></div>
+                  </div>
+                  <div class="cap"><i style="--w:100%"></i></div>
+                  <div class="reward">reward paid in <b>$WOOD</b></div>
+                  <div class="stamp">SOLD OUT</div>
+                </article>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <!-- ============ THE VAULT ============ -->
+        <section class="panel" id="panel-vault" data-screen-label="The Vault" hidden>
+          <section class="chapter">
+            <div class="wrap">
+              <div class="split rev">
+                <div>
+                  <div class="vault-panel glass" data-rv style="--d:150ms">
+                    <div><div class="v"><em>95%</em> of backing</div><div class="k">Borrow up to<br>$29.85 / WOOD</div></div>
+                    <div><div class="v">0.50<em>%</em></div><div class="k">Fixed APR<br>no expiry</div></div>
+                    <div><div class="v"><em>Zero</em></div><div class="k">Price<br>liquidations</div></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="chap-head" data-rv><span class="chap-rule"></span><span class="chap-kicker">The Vault · Loans</span></div>
+                  <h2 data-rv style="--d:80ms">Your bag is a <em>credit line</em>.</h2>
+                  <p class="copy" data-rv style="--d:160ms">Because backing is real, you can borrow against it. The Vault lends USDG against staked $WOOD at the backing floor — fixed rate, no expiry, and <em>no price liquidations</em>: the loan is written against what the treasury holds, not against what the market fears.</p>
+                  <p class="copy" data-rv style="--d:240ms">Sell nothing. Owe the Sheriff nothing.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <!-- ============ THE COUNCIL ============ -->
+        <section class="panel" id="panel-council" data-screen-label="Governance" hidden>
+          <section class="chapter">
+            <div class="wrap">
+              <div class="chap-head" data-rv><span class="chap-rule"></span><span class="chap-kicker">The Council · Governance</span></div>
+              <h2 data-rv style="--d:80ms">The forest votes with <em>drawn bows</em>.</h2>
+              <p class="copy" data-rv style="--d:160ms">Governance arrives with deployment. One staked bow, one voice — proposals nailed to the oak, quorum called by horn.</p>
+
+              <div class="council-card glass" data-rv style="--d:240ms">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 3v18"/><path d="M6.5 4.5H18l-2.8 3.5L18 11.5H6.5z"/></svg>
+                <h3>The Council has not yet convened.</h3>
+                <p>When SherwoodDAO deploys, sWOOD becomes the voice of the greenwood — treasury mandates, bond capacities and the width of the band, all put to the camp.</p>
+                <button class="btn ghost small" id="charterLink" type="button" data-enter="charter">Read the charter</button>
+                <span class="sigil">(🏹,🏹)</span>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <!-- ============ THE CHARTER ============ -->
+        <section class="panel" id="panel-charter" data-screen-label="The Charter" hidden>
+          <section class="chapter">
+            <div class="wrap">
+              <div class="chap-head" data-rv><span class="chap-rule"></span><span class="chap-kicker">Governance · The Charter</span></div>
+              <h2 data-rv style="--d:80ms">What the forest is, in <em>plain speech</em>.</h2>
+
+              <div class="docs-grid">
+                <div>
+                  <p class="copy" data-rv style="--d:160ms">SherwoodDAO is OlympusDAO's 2021 reserve-currency design rebuilt for Robinhood Chain with the seatbelts on from day one. Every $WOOD is minted against a treasury of real-world assets — tokenized T-bills, USDG and on-chain equities — and every figure on this page is computed from live balances, not promises.</p>
+                  <p class="copy" data-rv style="--d:240ms">The 2021 flywheel failed at its unanchored premium. Sherwood tethers price to backing in both directions from launch: bonds fill the treasury, the treasury defends the band, the band disciplines the premium. Taken from the market makers, given to the holders.</p>
+                  <p class="sigil-line" data-rv style="--d:320ms">(🏹,🏹) — I draw with the camp, not against it.</p>
+                </div>
+                <div class="about-card glass" data-rv style="--d:280ms">
+                  <div class="t">The fine print</div>
+                  <div class="row"><span class="k">Status</span><span class="v">Concept · nothing deployed</span></div>
+                  <div class="row"><span class="k">Figures</span><span class="v">Illustrative</span></div>
+                  <div class="row"><span class="k">Chain</span><span class="v">Robinhood Chain · 4663</span></div>
+                  <div class="row"><span class="k">Rebase cadence</span><span class="v">3 watches / day · 8h</span></div>
+                  <div class="row"><span class="k">Source</span><span class="v"><a href="https://github.com/aidaonsui-collab/sherwood-dao" target="_blank" rel="noopener">github ↗ sherwood-dao</a></span></div>
+                  <p class="fine">SherwoodDAO is an independent protocol concept built for Robinhood Chain and is not affiliated with Robinhood Markets, Inc.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+  </div>
 </div>
 
 <div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
@@ -1034,9 +1395,9 @@ window.addEventListener("pointermove", function(e){
 }, {passive:true});
 window.addEventListener("scroll", function(){ S.sy = window.scrollY||0; }, {passive:true});
 
-/* ------- nav ------- */
-var topbar = document.getElementById("topbar");
-function navState(){ topbar.classList.toggle("scrolled", (window.scrollY||0) > 40); }
+/* ------- marketing nav scroll state ------- */
+var mktNav = document.getElementById("mktNav");
+function navState(){ if (mktNav) mktNav.classList.toggle("scrolled", (window.scrollY||0) > 40); }
 window.addEventListener("scroll", navState, {passive:true}); navState();
 
 /* ------- ticker duplicate for seamless loop ------- */
@@ -1436,7 +1797,7 @@ function sizeAll(){
 sizeAll();
 if (!RM){ rafId = requestAnimationFrame(loop); } else { renderOnce(); }
 var rto;
-window.addEventListener("resize", function(){ clearTimeout(rto); rto = setTimeout(function(){ sizeAll(); if(chartDone) drawChart(1); }, 160); });
+window.addEventListener("resize", function(){ clearTimeout(rto); rto = setTimeout(function(){ sizeAll(); if(chartDone) drawChart(1); drawSparklines(); }, 160); });
 document.addEventListener("visibilitychange", function(){
   if (document.hidden){ if(rafId) cancelAnimationFrame(rafId); rafId = null; }
   else if (!RM && !rafId){ rafId = requestAnimationFrame(loop); }
@@ -1459,6 +1820,8 @@ function animCount(el){
 var io = new IntersectionObserver(function(es){
   es.forEach(function(e){
     if (!e.isIntersecting) return;
+    if (e.target.dataset.revealed) { io.unobserve(e.target); return; }
+    e.target.dataset.revealed = "1";
     e.target.classList.add("in");
     if (e.target.dataset.count !== undefined) animCount(e.target);
     if (e.target.id === "chartCard") startChart();
@@ -1469,7 +1832,7 @@ var io = new IntersectionObserver(function(es){
 }, {threshold:0.16, rootMargin:"0px 0px -6% 0px"});
 document.querySelectorAll("[data-rv],[data-count],#alloc").forEach(function(el){ io.observe(el); });
 
-/* ------- chart ------- */
+/* ------- chart (Overview) ------- */
 var chart = document.getElementById("chart");
 var chartDone = false;
 function drawChart(prog){
@@ -1588,6 +1951,38 @@ function startChart(){
   })(t0);
 }
 
+/* ------- dashboard sparklines (stat cards) ------- */
+function drawSparklines(){
+  document.querySelectorAll("canvas.spark").forEach(function(cv){
+    var dpr = Math.min(window.devicePixelRatio||1,2);
+    var cw = cv.clientWidth, ch = cv.clientHeight;
+    if (!cw || !ch) return;
+    cv.width = cw*dpr; cv.height = ch*dpr;
+    var g = cv.getContext("2d");
+    g.setTransform(dpr,0,0,dpr,0,0);
+    g.clearRect(0,0,cw,ch);
+    var seed = +cv.dataset.seed || 1, up = cv.dataset.up === "1";
+    var r = mulberry32(seed*7919);
+    var N = 28, vals = [], v = 0.5;
+    for (var i=0;i<N;i++){ v += (r()-0.5)*0.16 + (up?0.012:-0.010); v = Math.max(0.06,Math.min(0.94,v)); vals.push(v); }
+    var col = up ? "#63B98A" : "#C97B6C";
+    function X(i){ return i/(N-1)*cw; }
+    function Y(vv){ return ch - vv*ch; }
+    var fill = g.createLinearGradient(0,0,0,ch);
+    fill.addColorStop(0, up ? "rgba(99,185,138,.22)" : "rgba(201,123,108,.22)");
+    fill.addColorStop(1, "rgba(0,0,0,0)");
+    g.beginPath();
+    for (i=0;i<N;i++){ i?g.lineTo(X(i),Y(vals[i])):g.moveTo(X(i),Y(vals[i])); }
+    g.lineTo(cw,ch); g.lineTo(0,ch); g.closePath();
+    g.fillStyle = fill; g.fill();
+    g.beginPath();
+    for (i=0;i<N;i++){ i?g.lineTo(X(i),Y(vals[i])):g.moveTo(X(i),Y(vals[i])); }
+    g.strokeStyle = col; g.lineWidth = 1.6; g.stroke();
+    g.fillStyle = col;
+    g.beginPath(); g.arc(X(N-1), Y(vals[N-1]), 2.2, 0, 7); g.fill();
+  });
+}
+
 /* ------- watch face ticks ------- */
 (function(){
   var g = document.getElementById("wticks");
@@ -1643,71 +2038,151 @@ if (tb && line){
 }
 
 
-/* ================= app shell: routing, sidebar, wallet, lantern ================= */
+/* ================= app shell: sections, routing, sidebar, wallet, lantern ================= */
+var SECTIONS = [
+  {id:"overview", label:"Overview", sidebarTitle:"Overview"},
+  {id:"wood", label:"WOOD", sidebarTitle:"WOOD"},
+  {id:"heist", label:"Heist", sidebarTitle:"The Heist"},
+  {id:"vault", label:"Vault", sidebarTitle:"The Vault"},
+  {id:"gov", label:"Council", sidebarTitle:"Governance"}
+];
 var ROUTES = {
-  home:{num:"I", name:"Enter the Forest", sub:"Overview"},
-  camp:{num:"II", name:"The Camp", sub:"Staking & rebases"},
-  heist:{num:"III", name:"The Heist", sub:"Bonds"},
-  vault:{num:"IV", name:"The Vault", sub:"Loans"},
-  treasury:{num:"V", name:"The Treasury", sub:"Proof of reserve"},
-  ledger:{num:"VI", name:"The Ledger", sub:"Tokenomics & lore"},
-  council:{num:"VII", name:"The Council", sub:"Governance"},
-  docs:{num:"VIII", name:"The Charter", sub:"Docs & about"}
+  overview:{name:"Overview", sub:"Dashboard", section:"overview"},
+  treasury:{name:"Treasury", sub:"Proof of reserve", section:"overview"},
+  balance:{name:"My WOOD", sub:"Balance", section:"wood"},
+  camp:{name:"The Camp", sub:"Staking & rebases", section:"wood"},
+  heist:{name:"The Heist", sub:"Bonds", section:"heist"},
+  vault:{name:"The Vault", sub:"Loans", section:"vault"},
+  council:{name:"The Council", sub:"Governance", section:"gov"},
+  charter:{name:"The Charter", sub:"Docs & about", section:"gov"}
 };
+var SECTION_ROMAN = {overview:"I", wood:"II", heist:"III", vault:"IV", gov:"V"};
 var panels = {};
 Object.keys(ROUTES).forEach(function(r){ panels[r] = document.getElementById("panel-"+r); });
-var navItems = Array.prototype.slice.call(document.querySelectorAll("[data-route]"));
 var crumb = document.getElementById("crumb");
-var sidebar = document.getElementById("sidebar"), scrim = document.getElementById("scrim");
+var iconRail = document.getElementById("iconRail");
+var subPanel = document.getElementById("subPanel"), subTitle = document.getElementById("subTitle"), subNav = document.getElementById("subNav");
 var burger = document.getElementById("burger");
-var current = null;
+var current = null, currentSection = null;
 
+var scrim = document.getElementById("scrim");
 function closeSidebar(){
-  sidebar.classList.remove("open");
-  scrim.classList.remove("on");
+  document.body.classList.remove("nav-open");
   document.body.classList.remove("no-scroll");
+  if (scrim) scrim.classList.remove("on");
   if (burger) burger.setAttribute("aria-expanded","false");
 }
+function renderSubNav(sectionId){
+  var sec = SECTIONS.filter(function(s){ return s.id===sectionId; })[0];
+  if (!sec) return;
+  subTitle.textContent = sec.sidebarTitle;
+  var items = Object.keys(ROUTES).filter(function(k){ return ROUTES[k].section===sectionId; });
+  subNav.innerHTML = items.map(function(k){
+    return '<a class="sub-item" data-route="'+k+'" href="#'+k+'">'+ROUTES[k].name+'</a>';
+  }).join("");
+  subNav.querySelectorAll(".sub-item").forEach(function(a){
+    a.addEventListener("click", function(e){ e.preventDefault(); location.hash = "#"+a.getAttribute("data-route"); });
+  });
+}
 function showRoute(r){
-  if (!ROUTES[r]) r = "home";
-  if (r === current){ closeSidebar(); return; }
-  current = r;
+  if (!ROUTES[r]) r = "overview";
+  var meta = ROUTES[r];
+  current = r; currentSection = meta.section;
   Object.keys(panels).forEach(function(k){
     var p = panels[k]; if (!p) return;
     if (k === r){ p.hidden = false; p.classList.remove("active"); void p.offsetWidth; p.classList.add("active"); }
     else { p.hidden = true; p.classList.remove("active"); }
   });
-  navItems.forEach(function(a){
-    var on = a.getAttribute("data-route") === r;
-    a.classList.toggle("active", on);
-    if (on) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current");
+  iconRail.querySelectorAll(".rail-item").forEach(function(btn){
+    btn.classList.toggle("active", btn.getAttribute("data-section")===meta.section);
   });
-  var m = ROUTES[r];
-  if (crumb) crumb.innerHTML = "<em>"+m.num+".</em><span>"+m.name+"</span><i>\u00B7 "+m.sub+"</i>";
-  document.title = "SherwoodDAO \u2014 " + m.name;
+  renderSubNav(meta.section);
+  subNav.querySelectorAll(".sub-item").forEach(function(a){
+    a.classList.toggle("active", a.getAttribute("data-route")===r);
+  });
+  crumb.innerHTML = "<em>"+SECTION_ROMAN[meta.section]+".</em><span>"+meta.name+"</span><i>· "+meta.sub+"</i>";
+  document.title = "SherwoodDAO — " + meta.name;
   closeSidebar();
   var de = document.documentElement;
   de.style.scrollBehavior = "auto";
   window.scrollTo(0,0);
   de.style.scrollBehavior = "";
-  navState();
-  requestAnimationFrame(function(){
-    if (r === "home") sizeAll();
-    if (r === "treasury" && chartDone) drawChart(1);
-  });
+  var activePanel = panels[r];
+  if (r === "overview"){ startChart(); drawSparklines(); }
+  if (r === "balance") renderBalance();
+  if (r === "treasury" || r === "overview") document.querySelectorAll("#alloc").forEach(function(el){ el.classList.add("grown"); });
+  if (r === "heist") document.querySelectorAll(".poster").forEach(function(el){ el.classList.add("grown"); });
+  /* App panels only gain real layout the first time they're un-hidden, which the
+     page-load IntersectionObserver can miss entirely (it registered them while an
+     ancestor was display:none). Force the reveal/count directly instead of relying
+     on the observer having caught it; guard with data-revealed so it only runs once. */
+  if (activePanel){
+    activePanel.querySelectorAll("[data-rv],[data-count]").forEach(function(el){
+      if (el.dataset.revealed) return;
+      el.dataset.revealed = "1";
+      el.classList.add("in");
+      io.unobserve(el);
+      if (el.dataset.count !== undefined) animCount(el);
+    });
+  }
 }
-function route(){ showRoute((location.hash||"#home").replace(/^#\/?/,"")); }
-window.addEventListener("hashchange", route);
-navItems.forEach(function(a){ a.addEventListener("click", function(){ if (a.getAttribute("data-route")===current) closeSidebar(); }); });
+function route(){ showRoute((location.hash||"#overview").replace(/^#\/?/,"")); }
+window.addEventListener("hashchange", function(){
+  var r = (location.hash||"").replace(/^#\/?/,"");
+  if (ROUTES[r]) showRoute(r);
+});
 
-/* mobile sidebar */
+/* rail clicks: go to that section's first route */
+iconRail.querySelectorAll(".rail-item").forEach(function(btn){
+  btn.addEventListener("click", function(){
+    var sid = btn.getAttribute("data-section");
+    var first = Object.keys(ROUTES).filter(function(k){ return ROUTES[k].section===sid; })[0];
+    location.hash = "#"+first;
+  });
+});
+
+/* mobile nav */
 if (burger) burger.addEventListener("click", function(){
-  var open = sidebar.classList.toggle("open");
-  scrim.classList.toggle("on", open);
+  var open = document.body.classList.toggle("nav-open");
   document.body.classList.toggle("no-scroll", open);
+  if (scrim) scrim.classList.toggle("on", open);
   burger.setAttribute("aria-expanded", open ? "true" : "false");
 });
 if (scrim) scrim.addEventListener("click", closeSidebar);
+document.addEventListener("keydown", function(e){
+  if (e.key === "Escape"){ closeSidebar(); closeGate(); }
+});
+
+/* ------- marketing <-> app view toggle ------- */
+function showApp(startRoute){
+  document.body.classList.add("app-mode");
+  showRoute(startRoute || "overview");
+  if (!location.hash || !ROUTES[location.hash.replace(/^#\/?/,"")]) {
+    history.replaceState(null, "", "#"+(startRoute||"overview"));
+  }
+}
+function showMarketing(){
+  document.body.classList.remove("app-mode");
+  closeSidebar();
+  history.replaceState(null, "", location.pathname+location.search);
+  requestAnimationFrame(function(){ sizeAll(); });
+}
+document.addEventListener("click", function(e){
+  var el = e.target.closest("[data-enter]");
+  if (!el) return;
+  e.preventDefault();
+  showApp(el.getAttribute("data-enter"));
+});
+var mktBrand = document.getElementById("mktBrand");
+if (mktBrand) mktBrand.addEventListener("click", function(e){ e.preventDefault(); window.scrollTo({top:0,behavior: RM?"auto":"smooth"}); });
+var railBrand = document.getElementById("railBrand");
+if (railBrand) railBrand.addEventListener("click", function(e){ e.preventDefault(); showMarketing(); });
+
+/* initial load: deep link into a known app route skips marketing */
+(function(){
+  var r = (location.hash||"").replace(/^#\/?/,"");
+  if (ROUTES[r]) showApp(r);
+})();
 
 /* toast */
 var toastEl = document.getElementById("toast"), toastT;
@@ -1737,14 +2212,28 @@ var gate = document.getElementById("gate");
 var walletBtn = document.getElementById("walletBtn");
 var stakeBtn = document.getElementById("stakeBtn"), stakeBal = document.getElementById("stakeBal"),
     stakeIn = document.getElementById("stakeIn"), maxChip = document.getElementById("maxChip");
-var ADDR = "0xD4AF\u20263700";
+var ADDR = "0xD4AF…3700";
 var ranger = false;
 try{ ranger = localStorage.getItem("sw-ranger")==="1"; }catch(e){}
 function renderWallet(){
   walletBtn.classList.toggle("connected", ranger);
   walletBtn.innerHTML = ranger ? '<span class="wallet-dot"></span>'+ADDR : "Connect wallet";
-  if (stakeBal) stakeBal.textContent = ranger ? "12.47 WOOD" : "\u2014";
+  if (stakeBal) stakeBal.textContent = ranger ? "12.47 WOOD" : "—";
   if (stakeBtn) stakeBtn.textContent = ranger ? "Nock & stake" : "Connect to stake";
+  renderBalance();
+}
+function renderBalance(){
+  var a=document.getElementById("balAddr"), l=document.getElementById("balLiquid"),
+      st=document.getElementById("balStaked"), v=document.getElementById("balValue"),
+      note=document.getElementById("balNote");
+  if (!a) return;
+  a.textContent = ranger ? ADDR : "— not connected";
+  l.textContent = ranger ? "4.20 WOOD" : "—";
+  st.textContent = ranger ? "12.47 sWOOD" : "—";
+  v.textContent = ranger ? "$523.98" : "—";
+  note.textContent = ranger
+    ? "Concept balance for the demo ranger. (🏹,🏹)"
+    : "Connect a wallet to see your balance. (This is a concept — no wallet can truly connect.)";
 }
 function openGate(){ gate.classList.add("open"); }
 function closeGate(){ gate.classList.remove("open"); }
@@ -1760,14 +2249,11 @@ document.getElementById("gateEnter").addEventListener("click", function(){
   ranger = true;
   try{ localStorage.setItem("sw-ranger","1"); }catch(e){}
   renderWallet(); closeGate();
-  toast("Welcome to the greenwood, ranger. (\uD83C\uDFF9,\uD83C\uDFF9)");
+  toast("Welcome to the greenwood, ranger. (🏹,🏹)");
 });
 document.getElementById("gateStay").addEventListener("click", closeGate);
 document.getElementById("gateX").addEventListener("click", closeGate);
 document.querySelector(".gate-backdrop").addEventListener("click", closeGate);
-document.addEventListener("keydown", function(e){
-  if (e.key === "Escape"){ closeSidebar(); closeGate(); }
-});
 
 /* stake widget (demo) */
 if (maxChip) maxChip.addEventListener("click", function(){
@@ -1778,13 +2264,11 @@ if (stakeBtn) stakeBtn.addEventListener("click", function(){
   if (!ranger){ openGate(); return; }
   var v = parseFloat(stakeIn.value);
   if (!v){ toast("Name a sum first, ranger."); return; }
-  toast("Concept only \u2014 no contracts are deployed. Your WOOD stays in the story.");
+  toast("Concept only — no contracts are deployed. Your WOOD stays in the story.");
 });
-var charterBtn = document.getElementById("charterBtn");
-if (charterBtn) charterBtn.addEventListener("click", function(){ toast("The charter is still being inked."); });
 
 renderWallet();
-route();
+drawSparklines();
 
 })();
 </script>
