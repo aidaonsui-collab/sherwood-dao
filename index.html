@@ -414,8 +414,8 @@ footer{padding:72px 0 40px;position:relative;border-top:1px solid var(--hair)}
     <div class="wrap">
       <div class="chap-head" data-rv><span class="chap-num">I.</span><span class="chap-rule"></span><span class="chap-kicker">The Ledger · Proof of Reserve</span></div>
       <h2 data-rv style="--d:80ms">Every arrow in the quiver, <em>counted</em>.</h2>
-      <p class="copy" data-rv style="--d:160ms">Olympus dreamed of a currency backed by assets. Sherwood's treasury simply <em>holds them</em>: tokenized T-bills paying real yield, equities settled on Robinhood, and the protocol's own trading liquidity — the same assets carved as runes into the great oak.</p>
-      <p class="copy" data-rv style="--d:240ms">Backing per $WOOD is computed on-chain from live balances, dividend multipliers and oracle prices — not a dashboard's word. A contract's.</p>
+      <p class="copy" data-rv style="--d:160ms">A currency should be backed by assets you can count. Sherwood's treasury simply <em>holds them</em>: tokenized T-bills paying real yield, equities settled on Robinhood, and the protocol's own trading liquidity — the same assets carved as runes into the great oak.</p>
+      <p class="copy" data-rv style="--d:240ms">Backing per $WOOD is computed from live balances, dividend multipliers and oracle prices — not a dashboard's word. A contract's.</p>
 
       <div class="glass" style="margin-top:56px" data-rv>
         <div class="ledger-head">
@@ -458,7 +458,7 @@ footer{padding:72px 0 40px;position:relative;border-top:1px solid var(--hair)}
             </tbody>
           </table>
         </div>
-        <p class="ledger-foot">Every entry verifiable on-chain · dividends accrue via uiMultiplier (ERC-8056) · figures illustrative</p>
+        <p class="ledger-foot">Every entry publicly verifiable · dividends accrue via uiMultiplier (ERC-8056) · figures illustrative</p>
       </div>
     </div>
   </section>
@@ -613,7 +613,7 @@ footer{padding:72px 0 40px;position:relative;border-top:1px solid var(--hair)}
     <div class="wrap">
       <div class="chap-head" data-rv><span class="chap-num">V.</span><span class="chap-rule"></span><span class="chap-kicker">The Greenwood Band · Range-Bound Stability</span></div>
       <h2 data-rv style="--d:80ms">Price walks. Backing <em>marches</em>.</h2>
-      <p class="copy" data-rv style="--d:160ms">Olympus let the premium wander unanchored — and paid for it. Sherwood tethers price to backing in both directions from day one: below the band the treasury bids with real reserves; far above it, it sells into strength. The floor was tested once — 10 June — and held.</p>
+      <p class="copy" data-rv style="--d:160ms">A premium left to wander is what breaks a reserve currency. Sherwood tethers price to backing in both directions from day one: below the band the treasury bids with real reserves; far above it, it sells into strength. The floor was tested once — 10 June — and held.</p>
 
       <div class="chart-card glass" style="margin-top:56px" data-rv id="chartCard">
         <div class="chart-head">
@@ -639,7 +639,7 @@ footer{padding:72px 0 40px;position:relative;border-top:1px solid var(--hair)}
     <div class="wrap">
       <div class="chap-head" data-rv><span class="chap-num">VI.</span><span class="chap-rule"></span><span class="chap-kicker">The Ballads · Docs</span></div>
       <h2 data-rv style="--d:80ms">The tokenomics, sung <em>plainly</em>.</h2>
-      <p class="copy" data-rv style="--d:160ms">Every mechanism in the protocol has a ballad, and every ballad ends in a moral you can verify on-chain.</p>
+      <p class="copy" data-rv style="--d:160ms">Every mechanism in the protocol has a ballad, and every ballad ends in a moral you can verify.</p>
 
       <div class="ballads-grid">
         <article class="ballad glass" data-rv>
@@ -1000,7 +1000,7 @@ function drawSparks(t){
 var oakCv = document.getElementById("oak"), runeCv = document.getElementById("runes");
 var OW = 1000, OH = 800;
 function drawTreePass(c, color, ox, oy){
-  var R = mulberry32(4663);
+  var R = mulberry32(2026);
   c.fillStyle = color;
   function clump(x,y){
     for (var j=0;j<3;j++){ c.beginPath(); c.arc(x+R()*24-12, y+R()*14-9, 4+R()*7, 0, 7); c.fill(); }
@@ -1162,7 +1162,7 @@ function drawChart(prog){
   chart.width = cw*dpr; chart.height = ch*dpr;
   var g = chart.getContext("2d");
   g.setTransform(dpr,0,0,dpr,0,0);
-  var N=120, r=mulberry32(4663);
+  var N=120, r=mulberry32(2026);
   var BACK_END=31.42, BACK_START=27.6, PRICE_END=38.11;
   var incs=[],cum=0,i;
   for (i=0;i<N;i++){ var v=Math.pow(r(),2)*(r()<0.12?3:1); incs.push(v); cum+=v; }
