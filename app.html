@@ -368,15 +368,14 @@ table.por tr.total .num{color:var(--gold)}
 .reck .rh .s{color:var(--gold)}
 .reck .rr>div{padding:14px 20px;font-size:13px;line-height:1.55;border-bottom:1px solid var(--hair)}
 .reck .rr:last-child>div{border-bottom:none}
-.reck .rr .o{color:var(--text-3)}
+.reck .rr .o{color:var(--text);font-weight:600}
 .reck .rr .s{color:var(--text-2)}
 .reck .rr .s em{font-style:normal;color:var(--text)}
 @media (max-width:620px){
   .reck .rh{display:none}
   .reck .rr{grid-template-columns:1fr}
   .reck .rr .o{border-bottom:none;padding-bottom:2px}
-  .reck .rr .o::before{content:"Olympus 2021 — ";color:var(--text-3)}
-  .reck .rr .s::before{content:"Sherwood — ";color:var(--gold)}
+  .reck .rr .o{color:var(--gold-soft);font-weight:600}
 }
 
 /* ---------- gate modal + toast ---------- */
@@ -692,8 +691,8 @@ table.por tr.total .num{color:var(--gold)}
       <div class="subpanel" data-sub="council:charter">
         <div class="charter-grid">
           <div class="card card-pad prose rv">
-            <p>SherwoodDAO is OlympusDAO's 2021 reserve-currency design rebuilt for Robinhood with the seatbelts on from day one. Every WOOD is minted against a treasury of real-world assets — tokenized T-bills, USDG and tokenized equities — and every figure is computed from live balances, not promises.</p>
-            <p>The 2021 flywheel failed at its unanchored premium. Sherwood tethers price to backing in both directions from launch: bonds fill the treasury, the treasury defends the band, the band disciplines the premium.</p>
+            <p>SherwoodDAO is a treasury-backed reserve currency. Every WOOD is minted against a treasury of real-world assets — tokenized T-bills, USDG and tokenized equities — and every figure on this page is computed from live balances, not promises.</p>
+            <p>Price is tethered to backing in both directions from launch: bonds fill the treasury, the treasury defends the band, and the band disciplines the premium. A floor you can audit — not one you have to trust.</p>
             <p class="sig">(🏹,🏹) — I draw with the camp, not against it.</p>
           </div>
           <div class="card card-pad kv rv" style="--d:.06s">
@@ -705,12 +704,12 @@ table.por tr.total .num{color:var(--gold)}
         </div>
 
         <div class="card reck rv" style="--d:.1s">
-          <div class="rh"><div class="o">Olympus · 2021</div><div class="s">Sherwood</div></div>
-          <div class="rr"><div class="o">Treasury of stablecoins farming DeFi yield</div><div class="s">Tokenized T-bills, USDG, tokenized equities and protocol-owned liquidity — backing from <em>live balances × multiplier × oracle price</em></div></div>
-          <div class="rr"><div class="o">Bonds for DAI and OHM–DAI LP</div><div class="s"><em>The Heist</em> — bonds accept USDG, SGOV, tokenized stocks and WOOD∕USDG LP</div></div>
-          <div class="rr"><div class="o">8-hour rebase epochs</div><div class="s"><em>The Camp</em> — same cadence, APY shown beside its honest dilution reading</div></div>
-          <div class="rr"><div class="o">Premium unanchored → −95%</div><div class="s"><em>Range-Bound Stability from launch</em> — treasury bids below the band, sells above it</div></div>
-          <div class="rr"><div class="o">Cooler Loans bolted on late</div><div class="s"><em>The Vault at launch</em> — borrow USDG at 95% of backing, 0.50% fixed, no price liquidations</div></div>
+          <div class="rh"><div class="o">Mechanism</div><div class="s">What it does</div></div>
+          <div class="rr"><div class="o">The Ledger</div><div class="s">A treasury of tokenized T-bills, USDG, tokenized equities and protocol-owned liquidity — backing computed from <em>live balances × multiplier × oracle price</em></div></div>
+          <div class="rr"><div class="o">The Heist</div><div class="s">Bonds accept USDG, SGOV, tokenized stocks and WOOD∕USDG LP — every bond deepens the treasury and buys the protocol its own liquidity</div></div>
+          <div class="rr"><div class="o">The Camp</div><div class="s">Stake WOOD for sWOOD; rebases every watch, with APY shown beside its honest dilution reading</div></div>
+          <div class="rr"><div class="o">The Band</div><div class="s">Range-Bound Stability from launch — the treasury bids below the band with reserves and sells above it, tethering price to backing</div></div>
+          <div class="rr"><div class="o">The Vault</div><div class="s">Borrow USDG at 95% of backing, 0.50% fixed, with no price liquidations</div></div>
         </div>
 
         <p class="fine-line" style="margin-top:16px">SherwoodDAO is an independent protocol concept built for Robinhood and is not affiliated with Robinhood Markets, Inc. Nothing on this page is deployed; all figures are illustrative.</p>
