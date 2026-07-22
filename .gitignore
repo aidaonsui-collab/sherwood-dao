@@ -1,1 +1,13 @@
 .vercel
+.DS_Store
+
+# Foundry
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+contracts/bindings/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
