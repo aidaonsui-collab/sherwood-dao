@@ -76,6 +76,7 @@ contract Heist {
     error InsufficientExcess();
     error BelowRfvFloor();
     error UnprofitableBond();
+    error QuoteNotReserve();
 
     constructor(address authority_, address wood_, address treasury_) {
         authority = Authority(authority_);
@@ -98,6 +99,14 @@ contract Heist {
         }
         if (quote == address(0) || oracle == address(0)) revert BadConfig();
         if (controlVariable < WAD || vestingTerm == 0) revert BadConfig(); // never list below $1
+        // Quote must be a Treasury reserve asset credited at FULL RFV (uiMultiplier == 1e18) and
+        // priced by the SAME oracle + decimals the bond values against. Otherwise the bond's USD
+        // valuation (full price) diverges from the reserves the deposit actually adds (haircut, or
+        // 0 if unregistered), silently minting WOOD against backing that never arrived.
+        (bool tEnabled, address tOracle, uint256 tMult, uint8 tDecimals) = treasury.assets(quote);
+        if (!tEnabled || tMult != WAD || tOracle != oracle || tDecimals != quoteDecimals) {
+            revert QuoteNotReserve();
+        }
         market = Market({
             quote: quote,
             oracle: oracle,

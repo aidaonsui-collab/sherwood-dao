@@ -36,6 +36,7 @@ contract Treasury {
     event Deposited(address indexed token, address indexed from, uint256 amount);
     event Withdrawn(address indexed token, address indexed to, uint256 amount);
     event WoodMintedFromExcess(address indexed to, uint256 amount);
+    event WoodBurned(uint256 amount);
 
     error ZeroAddress();
     error AssetNotEnabled();
@@ -187,5 +188,12 @@ contract Treasury {
         if (amount > excessReserves()) revert InsufficientExcess();
         wood.mint(to, amount);
         emit WoodMintedFromExcess(to, amount);
+    }
+
+    /// @notice Burn WOOD held by the Treasury (e.g. collateral recovered from a seized Vault loan)
+    ///         to reduce supply and restore backing per WOOD. Governor-gated.
+    function burnWood(uint256 amount) external onlyGovernor {
+        wood.burn(address(this), amount);
+        emit WoodBurned(amount);
     }
 }

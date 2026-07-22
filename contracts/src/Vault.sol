@@ -6,6 +6,7 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 import {Authority} from "./Authority.sol";
 import {Camp} from "./Camp.sol";
 import {sWOOD} from "./sWOOD.sol";
+import {WOOD} from "./WOOD.sol";
 import {Treasury} from "./Treasury.sol";
 
 /// @title Vault
@@ -24,6 +25,7 @@ contract Vault {
     Authority public immutable authority;
     Camp public immutable camp;
     sWOOD public immutable sWood;
+    WOOD public immutable wood;
     Treasury public immutable treasury;
     IERC20 public immutable usdg; // borrow asset, 18-dec assumed
 
@@ -56,23 +58,26 @@ contract Vault {
     event Repaid(address indexed user, uint256 amount, uint256 interestPortion);
     event InterestAccrued(address indexed user, uint256 interest);
     event ParamsSet(uint256 maxLtvBps, uint256 interestBps);
+    event Seized(address indexed user, uint256 shares, uint256 woodRecovered, uint256 debtWrittenOff);
 
     error ZeroAmount();
     error ExceedsLtv();
     error InsufficientCollateral();
     error BadParam();
+    error NotUnderwater();
 
     constructor(address authority_, address camp_, address treasury_, address usdg_) {
         authority = Authority(authority_);
         camp = Camp(camp_);
         sWood = Camp(camp_).sWood();
+        wood = Camp(camp_).wood();
         treasury = Treasury(treasury_);
         usdg = IERC20(usdg_);
     }
 
     // ── views ─────────────────────────────────────────────────────────────────
 
-    function _accrue(Position storage p) internal returns (uint256 interest) {
+    function _accrue(Position storage p, address account) internal returns (uint256 interest) {
         if (p.debt == 0 || p.lastAccrual == 0 || block.timestamp <= p.lastAccrual) {
             p.lastAccrual = block.timestamp;
             return 0;
@@ -84,7 +89,7 @@ contract Vault {
             p.debt += interest;
             totalDebt += interest;
             totalInterestAccrued += interest;
-            emit InterestAccrued(msg.sender, interest);
+            emit InterestAccrued(account, interest);
         }
         p.lastAccrual = block.timestamp;
     }
@@ -113,7 +118,7 @@ contract Vault {
     function deposit(uint256 shares) external {
         if (shares == 0) revert ZeroAmount();
         Position storage p = positions[msg.sender];
-        _accrue(p);
+        _accrue(p, msg.sender);
         IERC20(address(sWood)).safeTransferFrom(msg.sender, address(this), shares);
         p.collateralShares += shares;
         totalCollateralShares += shares;
@@ -124,7 +129,7 @@ contract Vault {
     function withdraw(uint256 shares) external {
         if (shares == 0) revert ZeroAmount();
         Position storage p = positions[msg.sender];
-        _accrue(p);
+        _accrue(p, msg.sender);
         if (shares > p.collateralShares) revert InsufficientCollateral();
         uint256 remaining = p.collateralShares - shares;
         if (p.debt > maxBorrowFor(remaining)) revert ExceedsLtv();
@@ -139,7 +144,7 @@ contract Vault {
     function borrow(uint256 amount) external {
         if (amount == 0) revert ZeroAmount();
         Position storage p = positions[msg.sender];
-        _accrue(p);
+        _accrue(p, msg.sender);
         if (p.debt + amount > maxBorrowFor(p.collateralShares)) revert ExceedsLtv();
         p.principal += amount;
         p.debt += amount;
@@ -152,7 +157,7 @@ contract Vault {
     function repay(uint256 amount) external {
         if (amount == 0) revert ZeroAmount();
         Position storage p = positions[msg.sender];
-        _accrue(p);
+        _accrue(p, msg.sender);
         if (amount > p.debt) amount = p.debt;
 
         uint256 interestOwed = p.debt - p.principal;
@@ -169,6 +174,35 @@ contract Vault {
         // 100% of repayment lands in Treasury reserves — protocol-owned, no platform split.
         usdg.safeTransferFrom(msg.sender, address(treasury), amount);
         emit Repaid(msg.sender, amount, interestPortion);
+    }
+
+    /// @notice Guardian: close an underwater position. The sWOOD collateral is unstaked to WOOD and
+    ///         sent to the Treasury (governor burns it via `Treasury.burnWood` to restore backing);
+    ///         the remaining debt is written off. Phase-1 recovery path — full disposal happens on the
+    ///         governance side, there is no open/partial liquidation market yet.
+    function seize(address user) external returns (uint256 woodRecovered) {
+        if (!authority.hasRole(authority.GUARDIAN(), msg.sender)) {
+            revert Authority.NotAuthorized(authority.GUARDIAN(), msg.sender);
+        }
+        Position storage p = positions[user];
+        _accrue(p, user);
+        uint256 shares = p.collateralShares;
+        if (shares == 0) revert InsufficientCollateral();
+        // Only positions whose debt has risen above what the collateral can back may be seized.
+        if (p.debt <= maxBorrowFor(shares)) revert NotUnderwater();
+
+        uint256 writtenOff = p.debt;
+        p.collateralShares = 0;
+        p.principal = 0;
+        p.debt = 0;
+        totalCollateralShares -= shares;
+        totalDebt -= writtenOff;
+
+        // Unstake the seized collateral to WOOD and hand it to the Treasury; governance burns it
+        // (`Treasury.burnWood`) to shrink supply and offset the reserves the defaulter withdrew.
+        woodRecovered = camp.unstake(shares);
+        IERC20(address(wood)).safeTransfer(address(treasury), woodRecovered);
+        emit Seized(user, shares, woodRecovered, writtenOff);
     }
 
     function setParams(uint256 maxLtvBps_, uint256 interestBps_) external {

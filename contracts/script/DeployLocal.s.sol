@@ -52,6 +52,15 @@ contract DeployLocal is Script {
         auth.grantRole(auth.GUARDIAN(), deployer);
         auth.grantRole(auth.REWARD_MANAGER(), deployer);
 
+        // ── Invariant: only the Treasury may mint WOOD. Camp/Heist mint solely through
+        //    treasury.mintWoodFromExcess (excess-capped); if either held WOOD_MINTER directly they
+        //    could mint unbacked WOOD and bypass the RFV cap. Fail the deploy if wiring is wrong. ──
+        require(auth.hasRole(auth.WOOD_MINTER(), address(treasury)), "wiring: treasury !WOOD_MINTER");
+        require(!auth.hasRole(auth.WOOD_MINTER(), address(camp)), "wiring: camp has WOOD_MINTER");
+        require(!auth.hasRole(auth.WOOD_MINTER(), address(heist)), "wiring: heist has WOOD_MINTER");
+        require(auth.hasRole(auth.REWARD_MANAGER(), address(camp)), "wiring: camp !REWARD_MANAGER");
+        require(auth.hasRole(auth.BOND_MANAGER(), address(heist)), "wiring: heist !BOND_MANAGER");
+
         treasury.registerAsset(address(usdg), address(usdgOracle), 1e18, 18);
         usdg.mint(deployer, 1_000_000 ether);
         usdg.approve(address(treasury), type(uint256).max);

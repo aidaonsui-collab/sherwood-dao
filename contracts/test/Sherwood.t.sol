@@ -328,4 +328,91 @@ contract SherwoodTest is Test {
         rangeBound.executeBid(100 ether);
         assertEq(usdg.balanceOf(address(rangeBound)), before + 100 ether);
     }
+
+    // ── Finding #1: bond quote must be a full-RFV treasury reserve w/ matching oracle ──────────
+
+    function test_heist_quoteMustBeFullRfvReserve_reverts() public {
+        uint256 minPrice = heist.rfvFloor() * (10_000 + heist.protocolMintBps()) / 10_000;
+        MockERC20 rando = new MockERC20("RANDO", "RND", 18);
+        MockOracle randoOracle = new MockOracle(1e18);
+
+        vm.startPrank(owner);
+
+        // (1) Unregistered quote → bond value would be credited $0 by the treasury → revert.
+        vm.expectRevert(Heist.QuoteNotReserve.selector);
+        heist.setMarket(address(rando), address(randoOracle), 18, 10_000 ether, minPrice, 1 days);
+
+        // (2) Registered but haircut (uiMultiplier 0.9e18) → deposit adds < bond USD value → revert.
+        treasury.registerAsset(address(rando), address(randoOracle), 0.9e18, 18);
+        vm.expectRevert(Heist.QuoteNotReserve.selector);
+        heist.setMarket(address(rando), address(randoOracle), 18, 10_000 ether, minPrice, 1 days);
+
+        // (3) Full RFV but bond oracle ≠ treasury oracle → valuations can diverge → revert.
+        treasury.setAsset(address(rando), true, address(randoOracle), 1e18);
+        MockOracle otherOracle = new MockOracle(1e18);
+        vm.expectRevert(Heist.QuoteNotReserve.selector);
+        heist.setMarket(address(rando), address(otherOracle), 18, 10_000 ether, minPrice, 1 days);
+
+        // (4) Enabled + full RFV + matching oracle & decimals → accepted.
+        heist.setMarket(address(rando), address(randoOracle), 18, 10_000 ether, minPrice, 1 days);
+        (address q,,,,,,,) = heist.market();
+        assertEq(q, address(rando));
+        vm.stopPrank();
+    }
+
+    // ── Finding #2: underwater loans can be seized; collateral recovered to treasury ───────────
+
+    function test_vault_seize_underwater_recoversCollateral() public {
+        vm.startPrank(alice);
+        camp.stake(10_000 ether);
+        camp.sWood().approve(address(vault), type(uint256).max);
+        vault.deposit(10_000 ether);
+        vault.borrow(100_000 ether); // backing $20 → max 190k → healthy
+        vm.stopPrank();
+
+        // Healthy position: seize reverts.
+        vm.prank(owner);
+        vm.expectRevert(Vault.NotUnderwater.selector);
+        vault.seize(alice);
+
+        // Crash USDG price → treasury RFV collapses → backing falls → position underwater.
+        // treasury USDG = 1.5M − 100k = 1.4M; @ $0.05 = 70k, + 500k SGOV = 570k / 100k supply = $5.7.
+        // maxBorrowFor(10k) = 10k × 5.7 × 0.95 = 54,150 < 100k debt → underwater.
+        usdgOracle.setPrice(0.05 ether);
+        assertLt(vault.maxBorrowFor(10_000 ether), 100_000 ether);
+
+        // Non-guardian cannot seize.
+        vm.prank(alice);
+        vm.expectRevert();
+        vault.seize(alice);
+
+        uint256 treasuryWoodBefore = wood.balanceOf(address(treasury));
+        uint256 supplyBefore = wood.totalSupply();
+
+        vm.prank(owner); // owner holds GUARDIAN
+        uint256 recovered = vault.seize(alice);
+
+        (uint256 col, uint256 principal, uint256 debt,) = vault.positions(alice);
+        assertEq(col, 0);
+        assertEq(principal, 0);
+        assertEq(debt, 0);
+        assertEq(vault.totalCollateralShares(), 0);
+        assertEq(recovered, 10_000 ether); // index 1:1, no rebase
+        assertEq(wood.balanceOf(address(treasury)) - treasuryWoodBefore, 10_000 ether);
+
+        // Governance burns the recovered WOOD → supply shrinks → backing restored for holders.
+        vm.prank(owner);
+        treasury.burnWood(10_000 ether);
+        assertEq(wood.totalSupply(), supplyBefore - 10_000 ether);
+    }
+
+    // ── Finding #3: mint-role invariant (Camp/Heist must NOT hold WOOD_MINTER) ─────────────────
+
+    function test_roleWiring_onlyTreasuryMintsWood() public view {
+        assertTrue(auth.hasRole(auth.WOOD_MINTER(), address(treasury)));
+        assertFalse(auth.hasRole(auth.WOOD_MINTER(), address(camp)));
+        assertFalse(auth.hasRole(auth.WOOD_MINTER(), address(heist)));
+        assertTrue(auth.hasRole(auth.REWARD_MANAGER(), address(camp)));
+        assertTrue(auth.hasRole(auth.BOND_MANAGER(), address(heist)));
+    }
 }
