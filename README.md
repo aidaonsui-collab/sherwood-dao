@@ -30,6 +30,9 @@ anvil &
 cd contracts && forge script script/DeployLocal.s.sol --rpc-url http://127.0.0.1:8545 --broadcast
 ```
 
+Live on Robinhood Chain testnet (46630) — addresses and a full exercise log in
+**[DEPLOYMENTS.md](./DEPLOYMENTS.md)**.
+
 ## Design (product)
 
 | Olympus 2021 | Sherwood |
