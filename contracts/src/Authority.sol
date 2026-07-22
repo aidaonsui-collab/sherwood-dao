@@ -2,11 +2,13 @@
 pragma solidity ^0.8.26;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {Ownable2Step} from "@openzeppelin/contracts/access/Ownable2Step.sol";
 
 /// @title Authority
 /// @notice Central role registry for SherwoodDAO. Owner (later: Council) grants/revokes roles;
-///         modules gate privileged calls with `onlyRole`.
-contract Authority is Ownable {
+///         modules gate privileged calls with `onlyRole`. Ownership transfer is two-step
+///         (`transferOwnership` → `acceptOwnership`) so a fat-fingered address can't brick governance.
+contract Authority is Ownable2Step {
     // ── role ids (bytes32 constants, not OZ AccessControl, to keep surface tiny) ──
     bytes32 public constant GOVERNOR = keccak256("GOVERNOR");
     bytes32 public constant GUARDIAN = keccak256("GUARDIAN");

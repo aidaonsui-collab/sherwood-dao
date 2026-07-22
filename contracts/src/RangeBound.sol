@@ -73,8 +73,9 @@ contract RangeBound {
 
     function spotPrice() public view returns (uint256) {
         if (address(woodSpotOracle) == address(0)) return 0;
-        (uint256 p,) = woodSpotOracle.latestPrice();
-        return p;
+        // Validated through the Treasury (non-zero + optional staleness) so a stale/dead spot feed
+        // can't drive band execution once real market oracles are wired.
+        return treasury.readPrice(address(woodSpotOracle));
     }
 
     /// @notice Guardian/keeper: spend up to `usdgAmount` of treasury USDG to buy WOOD at floor

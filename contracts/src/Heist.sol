@@ -6,7 +6,6 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 import {Authority} from "./Authority.sol";
 import {WOOD} from "./WOOD.sol";
 import {Treasury} from "./Treasury.sol";
-import {IPriceOracle} from "./interfaces/IPriceOracle.sol";
 
 /// @title Heist
 /// @notice Bond depository (Olympus-style reserve bonds).
@@ -168,7 +167,7 @@ contract Heist {
         if (!m.enabled) revert MarketDisabled();
         if (quoteAmount == 0) revert ZeroAmount();
 
-        (uint256 price,) = IPriceOracle(m.oracle).latestPrice();
+        uint256 price = treasury.readPrice(m.oracle);
         uint256 norm = quoteAmount;
         if (m.quoteDecimals < 18) norm = quoteAmount * (10 ** (18 - m.quoteDecimals));
         else if (m.quoteDecimals > 18) norm = quoteAmount / (10 ** (m.quoteDecimals - 18));
@@ -194,11 +193,16 @@ contract Heist {
         // Quote into Treasury first — raises reserves / excess.
         IERC20(m.quote).safeTransferFrom(msg.sender, address(treasury), quoteAmount);
 
+        // If the caller already holds a bond, deliver any vested WOOD before folding in the new one,
+        // so re-bonding never re-locks vesting the user already earned. (Mutates market.totalDebt.)
+        if (bonds[msg.sender].payout > 0) _claim(msg.sender);
+
         // Excess must cover full future mint (user + protocol).
         if (payout + protoShare > treasury.excessReserves()) revert InsufficientExcess();
 
+        // Read totalDebt fresh: the auto-claim above may have decremented it.
         market.capacity = m.capacity - payout;
-        market.totalDebt = m.totalDebt + payout;
+        market.totalDebt = market.totalDebt + payout;
 
         Bond storage b = bonds[msg.sender];
         uint256 outstanding = b.payout - b.vested;
@@ -213,9 +217,16 @@ contract Heist {
 
     /// @notice Claim linearly vested WOOD. Mints user share + protocol mint from excess.
     function claim() external returns (uint256 amount) {
-        Bond storage b = bonds[msg.sender];
-        amount = pendingPayout(msg.sender);
+        amount = _claim(msg.sender);
         if (amount == 0) revert NothingToClaim();
+    }
+
+    /// @dev Mints any vested WOOD (user share + protocol mint) from excess. Returns 0 (no revert)
+    ///      when nothing is vested, so it can be called opportunistically from `deposit`.
+    function _claim(address user) internal returns (uint256 amount) {
+        Bond storage b = bonds[user];
+        amount = pendingPayout(user);
+        if (amount == 0) return 0;
 
         uint256 protoAmount = protocolShareOf(amount);
         uint256 totalMint = amount + protoAmount;
@@ -226,11 +237,11 @@ contract Heist {
         if (market.totalDebt >= amount) market.totalDebt -= amount;
         else market.totalDebt = 0;
 
-        treasury.mintWoodFromExcess(msg.sender, amount);
+        treasury.mintWoodFromExcess(user, amount);
         if (protoAmount > 0) {
             // Protocol-owned WOOD held by Treasury (Olympus V1 DAO mint, lite).
             treasury.mintWoodFromExcess(address(treasury), protoAmount);
         }
-        emit BondClaimed(msg.sender, amount, protoAmount);
+        emit BondClaimed(user, amount, protoAmount);
     }
 }

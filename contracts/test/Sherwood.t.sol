@@ -415,4 +415,70 @@ contract SherwoodTest is Test {
         assertTrue(auth.hasRole(auth.REWARD_MANAGER(), address(camp)));
         assertTrue(auth.hasRole(auth.BOND_MANAGER(), address(heist)));
     }
+
+    // ── Low fixes: re-bond auto-claims vested WOOD (no vesting re-lock) ─────────────────────────
+
+    function test_heist_rebond_autoClaimsVested() public {
+        uint256 minPrice = heist.rfvFloor() * (10_000 + heist.protocolMintBps()) / 10_000;
+        // Price at a premium above the floor: the first deposit lifts backing (reserves up, no mint
+        // yet), so a market priced exactly at the floor would reject the second deposit before the
+        // auto-claim can run. Real markets carry headroom above the floor for the same reason.
+        uint256 price = minPrice * 2;
+        vm.prank(owner);
+        heist.setMarket(address(usdg), address(usdgOracle), 18, 100_000 ether, price, 1 days);
+
+        usdg.mint(bob, 2_000 ether);
+        vm.startPrank(bob);
+        usdg.approve(address(heist), type(uint256).max);
+        uint256 firstPayout = heist.deposit(1_000 ether);
+
+        // Halfway through the first bond's vest, bond again.
+        vm.warp(block.timestamp + 12 hours);
+        uint256 pendingBefore = heist.pendingPayout(bob);
+        assertApproxEqAbs(pendingBefore, firstPayout / 2, 1e15);
+
+        assertEq(wood.balanceOf(bob), 0); // nothing delivered yet
+        heist.deposit(1_000 ether); // re-bond → should auto-deliver the vested half
+
+        // The vested half was minted to bob instead of being re-locked on a fresh clock.
+        assertApproxEqAbs(wood.balanceOf(bob), firstPayout / 2, 1e15);
+        // Outstanding bond now = unvested remainder of bond 1 + full bond 2, freshly vesting.
+        (uint256 bondPayout, uint256 vested,,,) = heist.bonds(bob);
+        assertEq(vested, 0);
+        assertApproxEqAbs(bondPayout, firstPayout / 2 + firstPayout, 1e15);
+        vm.stopPrank();
+    }
+
+    // ── Low fixes: setAsset requires prior registration (else silently uncounted) ──────────────
+
+    function test_treasury_setAsset_unregistered_reverts() public {
+        MockERC20 rando = new MockERC20("RND", "RND", 18);
+        MockOracle o = new MockOracle(1e18);
+        vm.prank(owner);
+        vm.expectRevert(Treasury.AssetNotRegistered.selector);
+        treasury.setAsset(address(rando), true, address(o), 1e18);
+    }
+
+    // ── Low fixes: opt-in oracle staleness guard ───────────────────────────────────────────────
+
+    function test_treasury_stalePrice_guard() public {
+        vm.prank(owner);
+        treasury.setMaxPriceAge(1 hours);
+        assertGt(treasury.totalReserves(), 0); // fresh feeds
+
+        vm.warp(block.timestamp + 2 hours); // feeds now stale
+        vm.expectRevert(Treasury.StalePrice.selector);
+        treasury.totalReserves();
+
+        // Refresh both feeds → valuation works again.
+        usdgOracle.setPrice(1e18);
+        sgovOracle.setPrice(1e18);
+        assertGt(treasury.totalReserves(), 0);
+
+        // maxPriceAge = 0 disables the check entirely (Phase-1 default).
+        vm.prank(owner);
+        treasury.setMaxPriceAge(0);
+        vm.warp(block.timestamp + 100 hours);
+        assertGt(treasury.totalReserves(), 0);
+    }
 }

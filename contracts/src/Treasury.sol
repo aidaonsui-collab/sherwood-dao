@@ -31,8 +31,14 @@ contract Treasury {
     uint256 public constant BPS = 10_000;
     uint256 public constant WAD = 1e18;
 
+    /// @notice Max age (seconds) an oracle update may be before reads revert. 0 = disabled
+    ///         (Phase-1 default; the governor-pushed ManualOracle is intentionally static).
+    ///         Set this once real market feeds are wired so stale prices fail safe.
+    uint256 public maxPriceAge;
+
     event AssetRegistered(address indexed token, address oracle, uint256 uiMultiplier, uint8 decimals);
     event AssetUpdated(address indexed token, bool enabled, address oracle, uint256 uiMultiplier);
+    event MaxPriceAgeSet(uint256 maxPriceAge);
     event Deposited(address indexed token, address indexed from, uint256 amount);
     event Withdrawn(address indexed token, address indexed to, uint256 amount);
     event WoodMintedFromExcess(address indexed to, uint256 amount);
@@ -40,9 +46,11 @@ contract Treasury {
 
     error ZeroAddress();
     error AssetNotEnabled();
+    error AssetNotRegistered();
     error BadConfig();
     error InsufficientExcess();
     error TransferFailed();
+    error StalePrice();
 
     constructor(address authority_, address wood_) {
         if (authority_ == address(0) || wood_ == address(0)) revert ZeroAddress();
@@ -108,7 +116,9 @@ contract Treasury {
 
     function setAsset(address token, bool enabled, address oracle, uint256 uiMultiplier) external onlyGovernor {
         Asset storage a = assets[token];
-        if (a.oracle == address(0) && oracle == address(0)) revert BadConfig();
+        // Must already be in the registry (registerAsset pushes to assetList; setAsset only updates).
+        // Otherwise fields would be set but the asset never summed into totalReserves.
+        if (a.oracle == address(0)) revert AssetNotRegistered();
         if (oracle != address(0)) a.oracle = oracle;
         if (uiMultiplier != 0) {
             if (uiMultiplier > WAD) revert BadConfig();
@@ -122,7 +132,22 @@ contract Treasury {
         return assetList.length;
     }
 
+    /// @notice Governor: max oracle staleness in seconds (0 = disabled). Set when real feeds land.
+    function setMaxPriceAge(uint256 maxPriceAge_) external onlyGovernor {
+        maxPriceAge = maxPriceAge_;
+        emit MaxPriceAgeSet(maxPriceAge_);
+    }
+
     // ── valuation ─────────────────────────────────────────────────────────────
+
+    /// @notice Read + validate an oracle price: must be non-zero and, when `maxPriceAge` is set,
+    ///         fresh. Centralizes oracle policy for the Treasury, Heist and RangeBound.
+    function readPrice(address oracle) public view returns (uint256 price) {
+        uint256 ts;
+        (price, ts) = IPriceOracle(oracle).latestPrice();
+        if (price == 0) revert StalePrice();
+        if (maxPriceAge != 0 && block.timestamp > ts + maxPriceAge) revert StalePrice();
+    }
 
     /// @notice RFV of a single asset balance, 18-dec USD.
     function assetValue(address token) public view returns (uint256) {
@@ -130,7 +155,7 @@ contract Treasury {
         if (!a.enabled) return 0;
         uint256 bal = IERC20(token).balanceOf(address(this));
         if (bal == 0) return 0;
-        (uint256 price,) = IPriceOracle(a.oracle).latestPrice();
+        uint256 price = readPrice(a.oracle);
         // normalize balance to 18 decimals
         uint256 norm = bal;
         if (a.decimals < 18) norm = bal * (10 ** (18 - a.decimals));
