@@ -1,6 +1,77 @@
 # Deployments
 
-## Robinhood Chain testnet (46630) — Phase 1, redeploy 2 · 2026-07-22 · **CURRENT**
+## Robinhood Chain testnet (46630) — Phase 1, redeploy 3 · 2026-07-22 · **CURRENT**
+
+Redeploy off `protocol-phase1` `dfb0a34` to pick up the WOOD transfer tax (redeploy 2's WOOD
+predates `setTax`/`setTaxedPair` entirely). Same deployer, same isolated self-minted-mock-reserve
+setup as both prior deploys; reused the existing funded key (still ~0.0097 ETH).
+
+### Addresses (supersede both sets below — use these)
+
+| Contract | Address |
+| --- | --- |
+| Authority | `0xcF29D89F81E4C9e2E2678960806F9c5Ba7324578` |
+| WOOD | `0x7886826f4aC3AB78F5D145c08C484E167C6106E5` |
+| sWOOD | `0x2223c68dC24bD9C038eF4cA7369c388C3AF7fA7C` |
+| Treasury | `0x1ac9B7962C2282dBdf294c1dce87afC841d7f295` |
+| Camp | `0x1f3EDc3aCf01f8f3f86A2AC40E4C7d476169CAf4` |
+| Heist | `0x3581B4916F59564535D5E17428Ce89E9ff3f5947` |
+| Vault | `0xd7B2EF99F7AEFC183f4526f1EDCc6bbe41744997` |
+| RangeBound | `0xc55cbcEd4856b378b9ff8b1f7244C564e4ac6bD8` |
+| tUSDG (mock reserve) | `0x238EA4500dAA8dF21a8Aa65a71066790af7304a7` |
+| tSGOV (mock reserve) | `0x72bA4B2fADead2b1D958f8c69e5549F92282279A` |
+| tUSDG oracle | `0x279ab0c96D19Ed4AebDa915A69c4A0AaE6fb467D` |
+| tSGOV oracle | `0xBE04F35063825c3dcA0841571643C73008106215` |
+| WOOD spot oracle (RangeBound) | `0x74Ca433093E2A11a2FBB57d53039659273BEA6D2` |
+
+Chain ID 46630 · RPC `https://rpc.testnet.chain.robinhood.com` · initial backing $20.00/WOOD
+(200,000 reserves / 10,000 WOOD bootstrap) — identical starting state to both prior deploys.
+
+### Transfer tax + lock live proof
+
+1. Governor `setTaxedPair(pair, true)` — a fresh disposable address standing in for a real market
+   (no live WOOD pair exists on this chain yet; any address registered exercises the same code
+   path a real pair would).
+2. Governor `setTax(500, 6660, platform, treasury, lock=true)` — 5% tax, split 66.6% platform /
+   33.4% treasury (NET's observed ratio), **locked in the same call**. Confirmed on-chain:
+   `taxBps=500`, `platformFeeBps=6660`, `taxLocked=true`.
+3. **Sell** — deployer (holds 10,000 WOOD from the deploy bootstrap) transfers 4,000 WOOD to the
+   registered pair:
+
+   ```
+   tax        = 4,000 × 5%              = 200 WOOD
+   platform   = 200 × 66.6%             = 133.2 WOOD
+   treasury   = 200 − 133.2             =  66.8 WOOD
+   pair nets  = 4,000 − 200             = 3,800 WOOD
+   ```
+
+   Observed on-chain — pair balance, platform balance, treasury balance delta — **matched all
+   three exactly, to the wei**, on the first run (no script bugs this time).
+4. **Buy** — funded the pair address with a trace of ETH for gas, then had it sign its own
+   transfer of 1,000 WOOD to a fresh recipient:
+
+   ```
+   tax        = 1,000 × 5%              = 50 WOOD
+   platform   = 50 × 66.6%              = 33.3 WOOD  (cumulative: 166.5 WOOD)
+   treasury   = 50 − 33.3               = 16.7 WOOD
+   recipient nets = 1,000 − 50          = 950 WOOD
+   ```
+
+   Again matched exactly, to the wei.
+5. **Proved the lock is real, live** — attempted another `setTax` call (even just to zero
+   everything out) after locking. Reverted on-chain with the actual custom error:
+   `execution reverted, data: "0x64cdd97e": TaxLocked`. Not a `forge test` cheatcode result — a
+   real transaction, real revert, on a real RPC.
+6. **Proved `setTaxedPair` is deliberately NOT covered by the lock** — registered a second pair
+   address after locking; succeeded (`isTaxedPair(pair2) == true`). Matches the reference token's
+   own accepted behavior of leaving pair-listing open indefinitely even once the rate is frozen.
+
+Total cost for this full redeploy + 6-step exercise: ~0.0011 ETH, out of the 0.01 ETH original
+faucet drip (deployer now at ~0.0086 ETH remaining).
+
+---
+
+## Robinhood Chain testnet (46630) — Phase 1, redeploy 2 · 2026-07-22 · superseded
 
 Redeploy off `protocol-phase1` `0ff1e57` to pick up the founder-fee commit (the first testnet
 deploy predates `Heist.setFounderFee` — its Heist doesn't have it). Same deployer, same isolated
@@ -9,7 +80,7 @@ existing funded key rather than a fresh faucet claim, since it still held ample 
 
 Deploy script unchanged: `contracts/script/DeployTestnet.s.sol`.
 
-### Addresses (supersede the redeploy-1 set below — use these)
+### Addresses (superseded by redeploy 3 above — do not use)
 
 | Contract | Address |
 | --- | --- |
