@@ -10,7 +10,12 @@ import {Treasury} from "./Treasury.sol";
 
 /// @title Vault
 /// @notice Borrow a stable (USDG) against sWOOD collateral at the *backing floor*, not spot.
-///         max LTV 95% of RFV, fixed 0.50% APR, no price liquidations.
+///         max LTV 95% of RFV, fixed 0.50% APR (Olympus Cooler-style), no price liquidations.
+///
+///         Protocol revenue: 100% of interest is protocol-owned. Accrued interest increases
+///         borrower debt; on repay, USDG (principal + interest) returns to the Treasury as
+///         reserves — there is no separate platform wallet skim. Interest is repaid first.
+///
 ///         Phase-1: interest accrues; underwater positions can be repaid by guardian path only
 ///         (no open liquidation market yet).
 contract Vault {
@@ -27,12 +32,18 @@ contract Vault {
     uint256 public constant SECONDS_PER_YEAR = 365 days;
 
     uint256 public maxLtvBps = 9_500; // 95%
-    uint256 public interestBps = 50; // 0.50% APR
+    uint256 public interestBps = 50; // 0.50% APR — Cooler default
+
+    /// @notice Lifetime interest accrued into positions (protocol revenue metric).
+    uint256 public totalInterestAccrued;
+    /// @notice Lifetime interest actually repaid into Treasury.
+    uint256 public totalInterestRepaid;
 
     struct Position {
         uint256 collateralShares; // sWOOD shares locked
-        uint256 debt; // USDG principal+interest outstanding (18-dec)
-        uint256 lastAccrual; // timestamp
+        uint256 principal; // USDG principal outstanding
+        uint256 debt; // principal + accrued interest
+        uint256 lastAccrual;
     }
 
     mapping(address => Position) public positions;
@@ -42,13 +53,13 @@ contract Vault {
     event Deposited(address indexed user, uint256 shares);
     event Withdrawn(address indexed user, uint256 shares);
     event Borrowed(address indexed user, uint256 amount);
-    event Repaid(address indexed user, uint256 amount);
+    event Repaid(address indexed user, uint256 amount, uint256 interestPortion);
+    event InterestAccrued(address indexed user, uint256 interest);
     event ParamsSet(uint256 maxLtvBps, uint256 interestBps);
 
     error ZeroAmount();
     error ExceedsLtv();
     error InsufficientCollateral();
-    error InsufficientDebt();
     error BadParam();
 
     constructor(address authority_, address camp_, address treasury_, address usdg_) {
@@ -61,32 +72,33 @@ contract Vault {
 
     // ── views ─────────────────────────────────────────────────────────────────
 
-    function _accrue(Position storage p) internal {
+    function _accrue(Position storage p) internal returns (uint256 interest) {
         if (p.debt == 0 || p.lastAccrual == 0 || block.timestamp <= p.lastAccrual) {
             p.lastAccrual = block.timestamp;
-            return;
+            return 0;
         }
         uint256 dt = block.timestamp - p.lastAccrual;
-        // interest = debt * rate * dt / year
-        uint256 interest = p.debt * interestBps / BPS * dt / SECONDS_PER_YEAR;
+        // Compound on full debt (principal + prior interest), Cooler-style continuous accrual.
+        interest = p.debt * interestBps / BPS * dt / SECONDS_PER_YEAR;
         if (interest > 0) {
             p.debt += interest;
             totalDebt += interest;
+            totalInterestAccrued += interest;
+            emit InterestAccrued(msg.sender, interest);
         }
         p.lastAccrual = block.timestamp;
     }
 
     /// @notice Max USDG borrowable for `shares` of sWOOD at current backing floor.
     function maxBorrowFor(uint256 shares) public view returns (uint256) {
-        uint256 woodValue = camp.toWood(shares); // 18-dec WOOD
-        uint256 backing = treasury.backingPerWood(); // 18-dec USD per WOOD
+        uint256 woodValue = camp.toWood(shares);
+        uint256 backing = treasury.backingPerWood();
         uint256 rfv = woodValue * backing / WAD;
         return rfv * maxLtvBps / BPS;
     }
 
     function maxBorrow(address user) external view returns (uint256) {
         Position memory p = positions[user];
-        // view-path approximate interest
         uint256 debt = p.debt;
         if (debt > 0 && p.lastAccrual > 0 && block.timestamp > p.lastAccrual) {
             uint256 dt = block.timestamp - p.lastAccrual;
@@ -129,26 +141,34 @@ contract Vault {
         Position storage p = positions[msg.sender];
         _accrue(p);
         if (p.debt + amount > maxBorrowFor(p.collateralShares)) revert ExceedsLtv();
+        p.principal += amount;
         p.debt += amount;
         totalDebt += amount;
-        // Liquidity comes from Treasury USDG reserves
-        if (!authority.hasRole(authority.RESERVE_SPENDER(), address(this))) {
-            // Vault must be granted RESERVE_SPENDER; withdraw via treasury
-        }
         treasury.withdraw(address(usdg), msg.sender, amount);
         emit Borrowed(msg.sender, amount);
     }
 
+    /// @notice Repay USDG to Treasury. Interest is satisfied first (protocol revenue), then principal.
     function repay(uint256 amount) external {
         if (amount == 0) revert ZeroAmount();
         Position storage p = positions[msg.sender];
         _accrue(p);
         if (amount > p.debt) amount = p.debt;
+
+        uint256 interestOwed = p.debt - p.principal;
+        uint256 interestPortion = amount < interestOwed ? amount : interestOwed;
+        uint256 principalPortion = amount - interestPortion;
+
         p.debt -= amount;
+        if (principalPortion > 0) {
+            p.principal -= principalPortion;
+        }
         totalDebt -= amount;
-        // Return USDG to Treasury as reserves
+        totalInterestRepaid += interestPortion;
+
+        // 100% of repayment lands in Treasury reserves — protocol-owned, no platform split.
         usdg.safeTransferFrom(msg.sender, address(treasury), amount);
-        emit Repaid(msg.sender, amount);
+        emit Repaid(msg.sender, amount, interestPortion);
     }
 
     function setParams(uint256 maxLtvBps_, uint256 interestBps_) external {

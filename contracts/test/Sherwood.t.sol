@@ -170,35 +170,76 @@ contract SherwoodTest is Test {
         camp.rebase();
     }
 
-    // ── Heist ─────────────────────────────────────────────────────────────────
+    // ── Heist (Olympus-style RFV + protocol mint) ─────────────────────────────
 
     function test_heist_bond_vestsWood() public {
-        // Market: 1.05e18 control → 5% discount (more WOOD per USD)
+        // Backing = $20/WOOD, protocolMintBps = 10% → minPrice = 22e18
+        // Price at min → $1000 buys 1000/22 ≈ 45.4545 WOOD user, 4.545 protocol
+        uint256 minPrice = heist.rfvFloor() * (10_000 + heist.protocolMintBps()) / 10_000;
+        assertEq(minPrice, 22 ether);
+
         vm.prank(owner);
-        heist.setMarket(address(usdg), address(usdgOracle), 18, 10_000 ether, 1.05e18, 1 days);
+        heist.setMarket(address(usdg), address(usdgOracle), 18, 10_000 ether, minPrice, 1 days);
 
         usdg.mint(bob, 1_000 ether);
         vm.startPrank(bob);
         usdg.approve(address(heist), type(uint256).max);
         uint256 payout = heist.deposit(1_000 ether);
-        // $1000 * 1.05 = 1050 WOOD
-        assertEq(payout, 1_050 ether);
+        uint256 expected = uint256(1_000 ether) * 1e18 / minPrice;
+        assertEq(payout, expected);
 
         // Halfway through vest
         vm.warp(block.timestamp + 12 hours);
         uint256 pending = heist.pendingPayout(bob);
-        assertApproxEqAbs(pending, 525 ether, 1e15);
+        assertApproxEqAbs(pending, expected / 2, 1e15);
 
+        uint256 woodBeforeTreasury = wood.balanceOf(address(treasury));
         uint256 claimed = heist.claim();
-        assertApproxEqAbs(claimed, 525 ether, 1e15);
+        assertApproxEqAbs(claimed, expected / 2, 1e15);
         assertApproxEqAbs(wood.balanceOf(bob), claimed, 1e15);
+        // Protocol mint 10% of claim → Treasury
+        uint256 proto = claimed * heist.protocolMintBps() / 10_000;
+        assertApproxEqAbs(wood.balanceOf(address(treasury)) - woodBeforeTreasury, proto, 1e15);
 
         // Finish vest
         vm.warp(block.timestamp + 12 hours);
         uint256 claimed2 = heist.claim();
         assertGt(claimed2, 0);
-        assertApproxEqAbs(wood.balanceOf(bob), 1_050 ether, 1e15);
+        assertApproxEqAbs(wood.balanceOf(bob), expected, 1e15);
         vm.stopPrank();
+    }
+
+    function test_heist_belowRfvFloor_reverts() public {
+        // controlVariable $1 while backing is $20 → rejected
+        vm.prank(owner);
+        heist.setMarket(address(usdg), address(usdgOracle), 18, 10_000 ether, 1 ether, 1 days);
+
+        usdg.mint(bob, 1_000 ether);
+        vm.startPrank(bob);
+        usdg.approve(address(heist), type(uint256).max);
+        vm.expectRevert(Heist.BelowRfvFloor.selector);
+        heist.deposit(1_000 ether);
+        vm.stopPrank();
+    }
+
+    function test_heist_premium_grows_excess() public {
+        // Price well above min → fewer WOOD → larger RFV gap (protocol profit)
+        uint256 minPrice = heist.rfvFloor() * (10_000 + heist.protocolMintBps()) / 10_000;
+        uint256 premiumPrice = minPrice * 2; // 2× min
+        vm.prank(owner);
+        heist.setMarket(address(usdg), address(usdgOracle), 18, 10_000 ether, premiumPrice, 1 days);
+
+        uint256 excessBefore = treasury.excessReserves();
+        usdg.mint(bob, 1_000 ether);
+        vm.startPrank(bob);
+        usdg.approve(address(heist), type(uint256).max);
+        uint256 payout = heist.deposit(1_000 ether);
+        vm.stopPrank();
+
+        // After deposit: +1000 reserves, no mint yet → excess up by 1000
+        assertEq(treasury.excessReserves(), excessBefore + 1_000 ether);
+        // User WOOD owed is half of min-price case
+        assertEq(payout, uint256(1_000 ether) * 1e18 / premiumPrice);
     }
 
     // ── Vault ─────────────────────────────────────────────────────────────────
@@ -217,10 +258,41 @@ contract SherwoodTest is Test {
 
         vault.borrow(50_000 ether);
         assertEq(usdg.balanceOf(alice), 50_000 ether);
-        (uint256 col, uint256 debt,) = vault.positions(alice);
+        (uint256 col, uint256 principal, uint256 debt,) = vault.positions(alice);
         assertEq(col, 10_000 ether);
+        assertEq(principal, 50_000 ether);
         assertEq(debt, 50_000 ether);
         vm.stopPrank();
+    }
+
+    function test_vault_interest_repays_to_treasury() public {
+        vm.startPrank(alice);
+        camp.stake(10_000 ether);
+        camp.sWood().approve(address(vault), type(uint256).max);
+        vault.deposit(10_000 ether);
+        vault.borrow(10_000 ether);
+        vm.stopPrank();
+
+        // Accrue ~1 year of 0.50% on 10k = 50 USDG interest
+        vm.warp(block.timestamp + 365 days);
+
+        uint256 reservesBefore = usdg.balanceOf(address(treasury));
+        vm.startPrank(alice);
+        // Pull more USDG for interest repayment
+        // alice has 10k from borrow; needs ~50 more — mint to alice for test
+        vm.stopPrank();
+        usdg.mint(alice, 100 ether);
+        vm.startPrank(alice);
+        usdg.approve(address(vault), type(uint256).max);
+        vault.repay(type(uint256).max); // repay all
+        vm.stopPrank();
+
+        assertGt(vault.totalInterestAccrued(), 0);
+        assertGt(vault.totalInterestRepaid(), 0);
+        // Full principal+interest returned to treasury
+        assertGt(usdg.balanceOf(address(treasury)), reservesBefore);
+        (,, uint256 debt,) = vault.positions(alice);
+        assertEq(debt, 0);
     }
 
     function test_vault_borrowAboveLtv_reverts() public {

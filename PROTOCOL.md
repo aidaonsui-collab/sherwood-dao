@@ -45,20 +45,49 @@ backingPerWood    = totalReserves * 1e18 / totalSupply   (or 1e18 if supply = 0)
   - Mint reward WOOD into Camp; raise `index` so all stakers share pro-rata
 - sWOOD is **non-rebasing** (standard ERC20). UI should show `Camp.woodBalanceOf(user)`.
 
+## Protocol revenue (Olympus-shaped)
+
+Sherwood does **not** skim a separate platform wallet. Revenue is **protocol-owned** and thickens Treasury RFV (same DefiLlama framing as Olympus: fees ≈ revenue ≈ protocol revenue).
+
+| Stream | Mechanism | Default |
+| --- | --- | --- |
+| **Bond RFV profit** | Quote USD in − RFV of (user WOOD + protocol mint) out | Enforced: never sell below `max(backing, $1)` adjusted for protocol share |
+| **Bond protocol mint** | Extra WOOD minted to Treasury on each claim (V1 DAO mint, lite) | `protocolMintBps = 1000` (10%) |
+| **Vault interest** | Cooler-style borrow APR; repay → Treasury | `interestBps = 50` (0.50% APR), 100% to Treasury |
+| **Stake / unstake** | — | **0** |
+| **POL fees** (later) | Own WOOD/USDG LP NFT | 100% to Treasury |
+
+### Bond pricing (Heist)
+
+```
+floor          = max(backingPerWood, $1)
+minBondPrice   = floor * (1 + protocolMintBps / 10_000)
+controlVariable ≥ minBondPrice   // USD per WOOD, 18-dec
+userPayout     = quoteUSD / controlVariable
+protocolShare  = userPayout * protocolMintBps / 10_000
+require (userPayout + protocolShare) * floor ≤ quoteUSD
+```
+
+Higher `controlVariable` → fewer WOOD per USD → larger RFV gap (protocol profit).  
+**No discount bonds** (controlVariable may not sit below the RFV floor).
+
+On `claim`: mint `userPayout` to bonder and `protocolShare` to **Treasury** (held WOOD = protocol-owned inventory).
+
 ## The Heist (bonds)
 
 Single market in Phase 1:
 
 - Pay quote asset (e.g. USDG) → quote lands in **Treasury** (raises reserves)
-- Vest WOOD over `vestingTerm` with `controlVariable` (e.g. 1.05e18 ≈ 5% discount)
-- WOOD minted from excess **on claim**, not on deposit
+- Vest user WOOD over `vestingTerm`; mint from excess **on claim**
+- See protocol revenue table above for pricing + protocol mint
 
 ## The Vault
 
 - Collateral: sWOOD shares  
 - Debt asset: USDG (from Treasury reserves; Vault holds `RESERVE_SPENDER`)  
 - Max LTV: **95% of RFV** (`backingPerWood * woodValue`), **not** spot  
-- Interest: **0.50% APR** fixed, continuous on touch  
+- Interest: **0.50% APR** fixed, continuous on touch; **interest repaid first**, 100% to Treasury  
+- Metrics: `totalInterestAccrued` / `totalInterestRepaid`  
 - No price liquidations in Phase 1 (guardian/owner operational path only)
 
 ## Range-bound stability

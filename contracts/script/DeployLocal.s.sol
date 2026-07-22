@@ -60,7 +60,10 @@ contract DeployLocal is Script {
         // Bootstrap circulating WOOD
         treasury.mintWoodFromExcess(deployer, 50_000 ether);
 
-        heist.setMarket(address(usdg), address(usdgOracle), 18, 20_000 ether, 1.05e18, 5 days);
+        // Bond price ≥ RFV floor * (1 + protocolMintBps). Fresh deploy: backing = 1e6/50k = $20.
+        uint256 floor = treasury.backingPerWood();
+        uint256 minBondPrice = floor * (10_000 + heist.protocolMintBps()) / 10_000;
+        heist.setMarket(address(usdg), address(usdgOracle), 18, 20_000 ether, minBondPrice, 5 days);
         rangeBound.setSpotOracle(address(woodSpot));
 
         vm.stopBroadcast();

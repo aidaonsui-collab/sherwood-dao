@@ -11,8 +11,8 @@
 | **WOOD** | Reserve currency ERC20; mint only via Treasury from excess RFV |
 | **Treasury** | Holds USDG / SGOV / equities / POL; reports `totalReserves`, `excessReserves`, `backingPerWood` |
 | **Camp** | Stake WOOD → sWOOD shares; 8-hour *watches* mint from excess |
-| **Heist** | Bond a quote asset → vest discounted WOOD |
-| **Vault** | Borrow USDG at 95% of **backing** (not spot), 0.50% APR |
+| **Heist** | Bond a quote asset → vest WOOD at ≥ RFV price; 10% protocol mint to Treasury |
+| **Vault** | Borrow USDG at 95% of **backing** (not spot), 0.50% APR → Treasury |
 | **RangeBound** | Skeleton: bid/ask when spot leaves the band around backing |
 | **Authority** | Central roles (governor / guardian / minters) |
 
