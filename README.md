@@ -8,7 +8,7 @@
 
 | Module | What it is |
 | --- | --- |
-| **WOOD** | Reserve currency ERC20; mint only via Treasury from excess RFV |
+| **WOOD** | Reserve currency ERC20; mint only via Treasury from excess RFV. Optional buy/sell tax on registered pairs only (off by default, lockable permanently once set) |
 | **Treasury** | Holds USDG / SGOV / equities / POL; reports `totalReserves`, `excessReserves`, `backingPerWood` |
 | **Camp** | Stake WOOD → sWOOD shares; 8-hour *watches* mint from excess |
 | **Heist** | Bond a quote asset → vest WOOD at ≥ RFV price; 10% protocol mint (optional disclosed founder-fee split, off by default — 100% Treasury) |

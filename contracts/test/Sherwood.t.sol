@@ -541,6 +541,140 @@ contract SherwoodTest is Test {
 
     // ── Low fixes: opt-in oracle staleness guard ───────────────────────────────────────────────
 
+    // ── WOOD transfer tax: disclosed, opt-in buy/sell tax on registered pairs only ──────────────
+
+    function test_wood_tax_defaultsOff_noTaxOnAnyTransfer() public {
+        address pair = makeAddr("pair");
+        vm.prank(owner);
+        wood.setTaxedPair(pair, true); // pair registered, but taxBps is still 0
+
+        vm.prank(alice);
+        wood.transfer(pair, 10_000 ether);
+        assertEq(wood.balanceOf(pair), 10_000 ether); // full amount, no skim
+    }
+
+    function test_wood_tax_appliesOnBuyAndSell_matchesNetRatio() public {
+        address pair = makeAddr("pair");
+        address platform = makeAddr("platform");
+        vm.startPrank(owner);
+        wood.setTaxedPair(pair, true);
+        // 5% total tax, split 66.6% platform / 33.4% treasury — reproduces NET's observed
+        // 3.33%/1.67% (of the transfer) ratio when taxBps = 500.
+        wood.setTax(500, 6_660, platform, address(treasury), false);
+        vm.stopPrank();
+
+        // Sell: alice → pair.
+        uint256 sellAmount = 10_000 ether;
+        uint256 sellTax = sellAmount * 500 / 10_000;
+        uint256 sellPlatform = sellTax * 6_660 / 10_000;
+        uint256 sellTreasury = sellTax - sellPlatform;
+
+        uint256 treasuryBefore = wood.balanceOf(address(treasury));
+        vm.prank(alice);
+        wood.transfer(pair, sellAmount);
+
+        assertEq(wood.balanceOf(pair), sellAmount - sellTax);
+        assertEq(wood.balanceOf(platform), sellPlatform);
+        assertEq(wood.balanceOf(address(treasury)) - treasuryBefore, sellTreasury);
+
+        // Buy: pair → bob (pair now holds sellAmount - sellTax from the leg above).
+        uint256 buyAmount = 3_000 ether;
+        uint256 buyTax = buyAmount * 500 / 10_000;
+        uint256 buyPlatform = buyTax * 6_660 / 10_000;
+        uint256 buyTreasury = buyTax - buyPlatform;
+
+        uint256 platformBefore = wood.balanceOf(platform);
+        uint256 treasuryBefore2 = wood.balanceOf(address(treasury));
+        vm.prank(pair);
+        wood.transfer(bob, buyAmount);
+
+        assertEq(wood.balanceOf(bob), buyAmount - buyTax);
+        assertEq(wood.balanceOf(platform) - platformBefore, buyPlatform);
+        assertEq(wood.balanceOf(address(treasury)) - treasuryBefore2, buyTreasury);
+    }
+
+    function test_wood_tax_skipsMintAndBurn() public {
+        address pair = makeAddr("pair");
+        address platform = makeAddr("platform");
+        vm.startPrank(owner);
+        wood.setTaxedPair(pair, true);
+        wood.setTax(500, 6_660, platform, address(treasury), false);
+        vm.stopPrank();
+
+        // Mint straight to the registered pair address itself — from == address(0), must skip tax.
+        vm.prank(address(treasury));
+        wood.mint(pair, 5_000 ether);
+        assertEq(wood.balanceOf(pair), 5_000 ether); // no skim taken off a mint
+
+        // Burn from the pair — to == address(0), must also skip tax.
+        vm.prank(address(treasury));
+        wood.burn(pair, 2_000 ether);
+        assertEq(wood.balanceOf(pair), 3_000 ether);
+        assertEq(wood.balanceOf(platform), 0);
+    }
+
+    function test_wood_tax_skipsPlainWalletTransfer() public {
+        // Tax enabled, but neither alice nor bob is a registered pair — plain P2P transfer untaxed.
+        address pair = makeAddr("pair");
+        address platform = makeAddr("platform");
+        vm.startPrank(owner);
+        wood.setTaxedPair(pair, true);
+        wood.setTax(500, 6_660, platform, address(treasury), false);
+        vm.stopPrank();
+
+        vm.prank(alice);
+        wood.transfer(bob, 1_000 ether);
+        assertEq(wood.balanceOf(bob), 1_000 ether);
+        assertEq(wood.balanceOf(platform), 0);
+    }
+
+    function test_wood_setTax_governorOnly_reverts() public {
+        vm.prank(bob);
+        vm.expectRevert();
+        wood.setTax(500, 5_000, bob, address(treasury), false);
+    }
+
+    function test_wood_setTax_badConfig_reverts() public {
+        uint256 tooHigh = wood.MAX_TAX_BPS() + 1; // read before expectRevert — it's a separate call
+        vm.startPrank(owner);
+        vm.expectRevert(WOOD.BadConfig.selector);
+        wood.setTax(tooHigh, 5_000, bob, address(treasury), false); // > MAX_TAX_BPS
+
+        vm.expectRevert(WOOD.BadConfig.selector);
+        wood.setTax(500, 10_001, bob, address(treasury), false); // platformFeeBps > BPS
+
+        vm.expectRevert(WOOD.BadConfig.selector);
+        wood.setTax(500, 5_000, address(0), address(treasury), false); // taxBps > 0, zero platform wallet
+
+        vm.expectRevert(WOOD.BadConfig.selector);
+        wood.setTax(500, 5_000, bob, address(0), false); // taxBps > 0, zero treasury wallet
+        vm.stopPrank();
+    }
+
+    function test_wood_setTax_locksPermanently() public {
+        address platform = makeAddr("platform");
+        vm.startPrank(owner);
+        // Lock in the same call that sets the real config — matches NET's one-shot-at-genesis shape.
+        wood.setTax(500, 6_660, platform, address(treasury), true);
+        assertTrue(wood.taxLocked());
+        assertEq(wood.taxBps(), 500);
+
+        vm.expectRevert(WOOD.TaxLocked.selector);
+        wood.setTax(0, 0, address(0), address(0), false); // even disabling it is blocked once locked
+        vm.stopPrank();
+
+        // setTaxedPair is deliberately NOT covered by the lock — new markets can still be listed,
+        // matching NET's own accepted "guardian can add new AMM pairs" behavior.
+        vm.prank(owner);
+        wood.setTaxedPair(makeAddr("newPair"), true);
+    }
+
+    function test_wood_setTaxedPair_governorOnly_reverts() public {
+        vm.prank(bob);
+        vm.expectRevert();
+        wood.setTaxedPair(makeAddr("pair"), true);
+    }
+
     function test_treasury_stalePrice_guard() public {
         vm.prank(owner);
         treasury.setMaxPriceAge(1 hours);

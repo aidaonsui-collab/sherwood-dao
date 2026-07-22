@@ -47,11 +47,10 @@ backingPerWood    = totalReserves * 1e18 / totalSupply   (or 1e18 if supply = 0)
 
 ## Protocol revenue (Olympus-shaped)
 
-Sherwood does **not** skim revenue to an undisclosed platform wallet, and there is no *automatic*
-fee to anyone — every stream below lands 100% in the Treasury by default. Heist bonds are the one
-exception with an **opt-in, governor-set, fully on-chain-disclosed** founder-fee split (off by
-default) — see below. Nothing is hidden: the split, the recipient, and every resulting mint are
-all public state and public events.
+Sherwood does **not** skim revenue to an *undisclosed* platform wallet — every stream below lands
+100% in the Treasury unless a governor has explicitly opted into one of two disclosed, on-chain,
+off-by-default exceptions: the Heist founder fee, and the WOOD transfer tax. Nothing is hidden:
+every split, every recipient, and every resulting mint or skim is public state and a public event.
 
 | Stream | Mechanism | Default |
 | --- | --- | --- |
@@ -59,7 +58,38 @@ all public state and public events.
 | **Bond protocol mint** | Extra WOOD minted on each claim (V1 DAO mint, lite); split between Treasury and an optional disclosed founder fee | `protocolMintBps = 1000` (10% of user payout); `founderFeeBps = 0` (0% of that 10% — i.e. 100% to Treasury) |
 | **Vault interest** | Cooler-style borrow APR; repay → Treasury | `interestBps = 50` (0.50% APR), 100% to Treasury, no founder-fee split |
 | **Stake / unstake** | — | **0** |
+| **WOOD transfer tax** | Buy/sell tax on transfers into/out of a registered pair only; split between Treasury and a platform wallet | `taxBps = 0` (disabled); wallet-to-wallet transfers, staking, and protocol mint/burn are never taxed regardless |
 | **POL fees** (later) | Own WOOD/USDG LP NFT | 100% to Treasury |
+
+### Transfer tax (WOOD only)
+
+`WOOD.setTax(taxBps, platformFeeBps, platformWallet, treasuryWallet, lock)` (governor-only)
+applies a tax to transfers where **either side is a registered `isTaxedPair`** — i.e. buys and
+sells against a listed market — and nowhere else: plain wallet-to-wallet transfers, `Camp`
+stake/unstake, and every protocol mint or burn (both have one side at `address(0)`) skip it
+unconditionally, by construction, not by exemption list. `taxBps` is capped at `MAX_TAX_BPS =
+2000` (20%) as a hard ceiling regardless of what governance sets — a seatbelt against a
+confiscatory rate, not a target. `platformFeeBps` is a share **of the tax itself** (10,000 = the
+whole tax to platform), and a non-zero `taxBps` requires both `platformWallet` and
+`treasuryWallet` to be real addresses in the same call — so a rate can never go live pointed at an
+unset address (which would otherwise burn the skim into the zero address unnoticed). Default
+`taxBps = 0`: no tax anywhere, matching the shipped "no platform wallet" behavior exactly. Every
+taxed transfer emits `TransferTaxed(from, to, tax, platformAmount, treasuryAmount)` alongside the
+ordinary `Transfer` events — the split is always independently verifiable from an explorer.
+
+**Locking:** passing `lock = true` freezes `taxBps`/`platformFeeBps`/both wallets permanently —
+`setTax` reverts on every call after that, forever, with no unlock path. This is deliberately
+stricter than the founder fee (which stays governor-adjustable indefinitely): it matches a
+comparable live token's actual on-chain shape, where the rate has no setter at all after genesis
+and is fixed forever. `setTaxedPair` is intentionally *not* covered by the lock — new markets can
+always be listed even after the rate itself is frozen, matching that same reference token's
+accepted, disclosed behavior (its guardian can still extend the tax to newly listed pairs
+indefinitely). Until locked, `setTax` can be called repeatedly — useful for iterating during
+testnet rollout before committing to a final rate on mainnet.
+
+`setTaxedPair` has no live-pool validation (unlike Heist's bond quote check) — Sherwood has no
+deployed WOOD market yet, so there's nothing on-chain to validate a pair address against. The
+governor registers the real pair once one exists.
 
 ### Founder fee (Heist only)
 
