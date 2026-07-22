@@ -47,15 +47,32 @@ backingPerWood    = totalReserves * 1e18 / totalSupply   (or 1e18 if supply = 0)
 
 ## Protocol revenue (Olympus-shaped)
 
-Sherwood does **not** skim a separate platform wallet. Revenue is **protocol-owned** and thickens Treasury RFV (same DefiLlama framing as Olympus: fees ≈ revenue ≈ protocol revenue).
+Sherwood does **not** skim revenue to an undisclosed platform wallet, and there is no *automatic*
+fee to anyone — every stream below lands 100% in the Treasury by default. Heist bonds are the one
+exception with an **opt-in, governor-set, fully on-chain-disclosed** founder-fee split (off by
+default) — see below. Nothing is hidden: the split, the recipient, and every resulting mint are
+all public state and public events.
 
 | Stream | Mechanism | Default |
 | --- | --- | --- |
 | **Bond RFV profit** | Quote USD in − RFV of (user WOOD + protocol mint) out | Enforced: never sell below `max(backing, $1)` adjusted for protocol share |
-| **Bond protocol mint** | Extra WOOD minted to Treasury on each claim (V1 DAO mint, lite) | `protocolMintBps = 1000` (10%) |
-| **Vault interest** | Cooler-style borrow APR; repay → Treasury | `interestBps = 50` (0.50% APR), 100% to Treasury |
+| **Bond protocol mint** | Extra WOOD minted on each claim (V1 DAO mint, lite); split between Treasury and an optional disclosed founder fee | `protocolMintBps = 1000` (10% of user payout); `founderFeeBps = 0` (0% of that 10% — i.e. 100% to Treasury) |
+| **Vault interest** | Cooler-style borrow APR; repay → Treasury | `interestBps = 50` (0.50% APR), 100% to Treasury, no founder-fee split |
 | **Stake / unstake** | — | **0** |
 | **POL fees** (later) | Own WOOD/USDG LP NFT | 100% to Treasury |
+
+### Founder fee (Heist only)
+
+`Heist.setFounderFee(recipient, bps)` (governor-only) splits the *existing* bond protocol mint —
+it does not add a new one. `bps` is a share **of the protocol mint itself** (0–10,000), so it
+stays valid at any `protocolMintBps` value: `founderAmount = protocolShare * founderFeeBps /
+10_000`, `treasuryAmount = protocolShare − founderAmount`. Total protocol-side dilution
+(`protocolMintBps` of user payout) is identical whether this is enabled or not — only the
+destination of that fixed share changes. `bps = 0` (the shipped default) sends 100% to Treasury,
+matching pre-founder-fee behavior exactly. A non-zero `bps` requires a real `recipient`; setting
+both back to zero disables it. Every claim emits `BondClaimed(user, userAmount, treasuryAmount,
+founderAmount)` — the split is always independently verifiable from an explorer, not just trusted
+from a dashboard.
 
 ### Bond pricing (Heist)
 
@@ -108,7 +125,17 @@ Single market in Phase 1:
 | `BOND_MANAGER` | Heist |
 | `WOOD_MINTER` | Treasury (only path that mints WOOD) |
 
-Owner of Authority is the bootstrap admin; later transfer to Council.
+Owner of Authority is the bootstrap admin; later transfer to Council (`Authority` is
+`Ownable2Step`, so transfer requires the new owner to `acceptOwnership()`).
+
+**The owner implicitly holds every role** (`Authority.hasRole` returns `true` for the owner
+regardless of the role checked), including `RESERVE_SPENDER` — so the owner can currently call
+`Treasury.withdraw(token, to, amount)` directly, with no excess-reserves check, no cap, no
+timelock, no multisig. This is a standard trusted-admin pattern for a Phase-1 protocol with no
+external depositors, and it's how the owner would realistically extract value pre-launch — but
+it is in direct tension with "protocol-owned, not owner-owned" once anyone else has deposited
+real reserves. Before that point, this needs to become a timelock and/or multisig, or the
+`RESERVE_SPENDER`/`GOVERNOR` roles need to be split off the raw `owner()` bypass in `hasRole`.
 
 ## Explicitly deferred
 

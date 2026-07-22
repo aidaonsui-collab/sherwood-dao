@@ -18,7 +18,14 @@ import {Treasury} from "./Treasury.sol";
 ///         Protocol revenue (two layers, both Olympus-shaped):
 ///           1) RFV gap: quoteUSD − (payout + protocolShare) * floor ≥ 0  → excess reserves grow
 ///           2) Protocol mint: protocolShare = payout * protocolMintBps / 10_000
-///              minted to the Treasury on each claim (V1 DAO mint, lite default 10%)
+///              minted on each claim (V1 DAO mint, lite default 10%)
+///
+///         Founder fee (disclosed, opt-in, off by default): `founderFeeBps` splits protocolShare
+///         itself — NOT an additional mint — between founderFeeRecipient and the Treasury. Total
+///         protocol-side dilution (protocolMintBps of user payout) is identical either way; this
+///         only changes where that fixed share lands. Governor-set, fully on-chain, both the split
+///         and every mint are visible in `BondClaimed`. Default founderFeeBps = 0 → 100% Treasury,
+///         matching the "no platform wallet" behavior this protocol shipped with.
 ///
 ///         Capacity tracks user-facing WOOD only; excess must cover user + protocol mint at claim.
 contract Heist {
@@ -55,17 +62,29 @@ contract Heist {
     uint256 public constant BPS = 10_000;
     uint256 public constant MAX_PROTOCOL_MINT_BPS = 10_000; // hard cap = classic V1 100% match
 
-    /// @notice Share of each claimed user payout additionally minted to Treasury (default 10%).
+    /// @notice Share of each claimed user payout additionally minted (default 10%).
     uint256 public protocolMintBps = 1_000;
+
+    /// @notice Share of the protocol mint (NOT of user payout) routed to `founderFeeRecipient`
+    ///         instead of Treasury. In bps of protocolShare, so it stays valid at any
+    ///         protocolMintBps — 10_000 = the entire protocol share, never more. Default 0.
+    uint256 public founderFeeBps;
+    /// @notice Disclosed fee recipient. `setFounderFee` guarantees this is a real address
+    ///         whenever founderFeeBps > 0.
+    address public founderFeeRecipient;
 
     event MarketSet(
         address quote, address oracle, uint256 capacity, uint256 controlVariable, uint256 vestingTerm
     );
     event ProtocolMintBpsSet(uint256 bps);
+    event FounderFeeSet(address indexed recipient, uint256 bps);
     event BondCreated(
         address indexed user, uint256 payout, uint256 protocolShare, uint256 vestingEnd, uint256 pricePaid
     );
-    event BondClaimed(address indexed user, uint256 userAmount, uint256 protocolAmount);
+    /// @param treasuryAmount + `founderAmount` always sum to the protocol share (== protocolShareOf(userAmount)).
+    event BondClaimed(
+        address indexed user, uint256 userAmount, uint256 treasuryAmount, uint256 founderAmount
+    );
 
     error MarketDisabled();
     error ZeroAmount();
@@ -133,6 +152,21 @@ contract Heist {
         if (bps > MAX_PROTOCOL_MINT_BPS) revert BadConfig();
         protocolMintBps = bps;
         emit ProtocolMintBpsSet(bps);
+    }
+
+    /// @notice Governor: set the disclosed founder-fee split of the protocol mint. `bps` is a
+    ///         share OF protocolShare (not of user payout) — 10_000 = the whole protocol share
+    ///         goes to `recipient`, 0 = disabled (all-Treasury, the shipped default). A non-zero
+    ///         bps requires a real recipient; clearing back to disabled requires zeroing both.
+    function setFounderFee(address recipient, uint256 bps) external {
+        if (!authority.hasRole(authority.GOVERNOR(), msg.sender)) {
+            revert Authority.NotAuthorized(authority.GOVERNOR(), msg.sender);
+        }
+        if (bps > BPS) revert BadConfig();
+        if (bps > 0 && recipient == address(0)) revert BadConfig();
+        founderFeeBps = bps;
+        founderFeeRecipient = recipient;
+        emit FounderFeeSet(recipient, bps);
     }
 
     // ── views ─────────────────────────────────────────────────────────────────
@@ -238,10 +272,19 @@ contract Heist {
         else market.totalDebt = 0;
 
         treasury.mintWoodFromExcess(user, amount);
-        if (protoAmount > 0) {
+
+        // Split the (unchanged) protocol share between the disclosed founder fee and Treasury.
+        // setFounderFee guarantees founderFeeBps > 0 implies a real recipient, so bps alone
+        // determines the split here.
+        uint256 founderAmount = protoAmount * founderFeeBps / BPS;
+        uint256 treasuryAmount = protoAmount - founderAmount;
+        if (treasuryAmount > 0) {
             // Protocol-owned WOOD held by Treasury (Olympus V1 DAO mint, lite).
-            treasury.mintWoodFromExcess(address(treasury), protoAmount);
+            treasury.mintWoodFromExcess(address(treasury), treasuryAmount);
         }
-        emit BondClaimed(user, amount, protoAmount);
+        if (founderAmount > 0) {
+            treasury.mintWoodFromExcess(founderFeeRecipient, founderAmount);
+        }
+        emit BondClaimed(user, amount, treasuryAmount, founderAmount);
     }
 }

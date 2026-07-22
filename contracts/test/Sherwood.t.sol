@@ -408,6 +408,86 @@ contract SherwoodTest is Test {
 
     // ── Finding #3: mint-role invariant (Camp/Heist must NOT hold WOOD_MINTER) ─────────────────
 
+    // ── Founder fee: disclosed split of the (unchanged) protocol mint ──────────────────────────
+
+    function test_heist_founderFee_splitsProtocolMintWithoutChangingTotal() public {
+        address founder = makeAddr("founder");
+        vm.prank(owner);
+        heist.setFounderFee(founder, 3_000); // 30% of the protocol share, 70% stays with Treasury
+
+        uint256 minPrice = heist.rfvFloor() * (10_000 + heist.protocolMintBps()) / 10_000;
+        vm.prank(owner);
+        heist.setMarket(address(usdg), address(usdgOracle), 18, 10_000 ether, minPrice * 2, 1 days);
+
+        usdg.mint(bob, 1_000 ether);
+        vm.startPrank(bob);
+        usdg.approve(address(heist), type(uint256).max);
+        uint256 payout = heist.deposit(1_000 ether);
+        vm.warp(block.timestamp + 1 days);
+
+        uint256 treasuryWoodBefore = wood.balanceOf(address(treasury));
+        uint256 claimed = heist.claim();
+        vm.stopPrank();
+
+        uint256 expectedProto = claimed * heist.protocolMintBps() / 10_000;
+        uint256 expectedFounder = expectedProto * 3_000 / 10_000;
+        uint256 expectedTreasury = expectedProto - expectedFounder;
+
+        assertEq(claimed, payout);
+        assertEq(wood.balanceOf(founder), expectedFounder);
+        assertEq(wood.balanceOf(address(treasury)) - treasuryWoodBefore, expectedTreasury);
+        // Total protocol-side mint is IDENTICAL to the no-founder-fee case — only the destination
+        // of the existing protocolMintBps cut changed, not its size.
+        assertEq(expectedFounder + expectedTreasury, expectedProto);
+    }
+
+    function test_heist_founderFee_defaultsToAllTreasury() public {
+        // No setFounderFee call at all — founderFeeBps=0, recipient=address(0) out of the box.
+        uint256 minPrice = heist.rfvFloor() * (10_000 + heist.protocolMintBps()) / 10_000;
+        vm.prank(owner);
+        heist.setMarket(address(usdg), address(usdgOracle), 18, 10_000 ether, minPrice * 2, 1 days);
+
+        usdg.mint(bob, 1_000 ether);
+        vm.startPrank(bob);
+        usdg.approve(address(heist), type(uint256).max);
+        heist.deposit(1_000 ether);
+        vm.warp(block.timestamp + 1 days);
+        uint256 treasuryWoodBefore = wood.balanceOf(address(treasury));
+        uint256 claimed = heist.claim();
+        vm.stopPrank();
+
+        uint256 expectedProto = claimed * heist.protocolMintBps() / 10_000;
+        assertEq(wood.balanceOf(address(treasury)) - treasuryWoodBefore, expectedProto);
+    }
+
+    function test_heist_setFounderFee_governorOnly_reverts() public {
+        vm.prank(bob);
+        vm.expectRevert();
+        heist.setFounderFee(bob, 1_000);
+    }
+
+    function test_heist_setFounderFee_badConfig_reverts() public {
+        vm.startPrank(owner);
+        vm.expectRevert(Heist.BadConfig.selector);
+        heist.setFounderFee(bob, 10_001); // > BPS
+
+        vm.expectRevert(Heist.BadConfig.selector);
+        heist.setFounderFee(address(0), 1); // bps > 0 with no recipient
+        vm.stopPrank();
+    }
+
+    function test_heist_setFounderFee_clearBackToDisabled() public {
+        address founder = makeAddr("founder");
+        vm.startPrank(owner);
+        heist.setFounderFee(founder, 5_000);
+        assertEq(heist.founderFeeBps(), 5_000);
+
+        heist.setFounderFee(address(0), 0);
+        vm.stopPrank();
+        assertEq(heist.founderFeeBps(), 0);
+        assertEq(heist.founderFeeRecipient(), address(0));
+    }
+
     function test_roleWiring_onlyTreasuryMintsWood() public view {
         assertTrue(auth.hasRole(auth.WOOD_MINTER(), address(treasury)));
         assertFalse(auth.hasRole(auth.WOOD_MINTER(), address(camp)));
