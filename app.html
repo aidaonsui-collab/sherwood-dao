@@ -8,6 +8,7 @@
 <meta property="og:title" content="SherwoodDAO — Backed by the real world">
 <meta property="og:description" content="A treasury-backed reserve currency for Robinhood. (🏹,🏹)">
 <meta property="og:type" content="website">
+<meta name="robots" content="noindex,follow">
 <title>SherwoodDAO — Overview</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230F1712'/%3E%3Cpath d='M32 12l6 12h-4.4v20H39l-7 8-7-8h5.4V24H26z' fill='%23D8B85A'/%3E%3C/svg%3E">
 <style>
@@ -30,7 +31,7 @@
 
   --text:#ECEFEA;
   --text-2:#9DAFA1;
-  --text-3:#6D7E71;
+  --text-3:#7E9184;
 
   --gold:#D8B85A;
   --gold-soft:#E7CE86;
@@ -139,7 +140,7 @@ img,svg,canvas{max-width:100%;display:block}
 .wallet{display:inline-flex;align-items:center;gap:8px}
 .wallet.on{background:var(--surface);color:var(--text);border:1px solid var(--border);font-weight:500;font-family:var(--mono);font-size:13px;padding:8px 13px;border-radius:var(--r-xs)}
 .wallet.on:hover{background:var(--surface-2)}
-.burger{display:none;width:38px;height:38px;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:var(--r-xs);background:var(--surface);color:var(--text-2);cursor:pointer}
+.burger{display:none;width:44px;height:44px;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:var(--r-xs);background:var(--surface);color:var(--text-2);cursor:pointer}
 .burger svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round}
 
 /* ---------- content + panels ---------- */
@@ -156,7 +157,7 @@ img,svg,canvas{max-width:100%;display:block}
 
 /* segmented control (sub-tabs) */
 .seg{display:inline-flex;gap:3px;padding:3px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:22px}
-.seg button{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--text-2);background:transparent;border:none;cursor:pointer;padding:7px 15px;border-radius:7px;transition:color .2s,background .2s}
+.seg button{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--text-2);background:transparent;border:none;cursor:pointer;padding:10px 16px;border-radius:7px;transition:color .2s,background .2s}
 .seg button:hover{color:var(--text)}
 .seg button.on{color:var(--text);background:var(--surface-3)}
 .subpanel{display:none}
@@ -262,10 +263,10 @@ table.por tr.total .num{color:var(--gold)}
 .io-field .lab{display:flex;justify-content:space-between;font-size:12px;color:var(--text-3);margin-bottom:7px}
 .io-field .lab b{color:var(--text-2);font-weight:500}
 .io-field .in{display:flex;align-items:center;gap:10px}
-.io-field input{flex:1;min-width:0;background:none;border:none;outline:none;color:var(--text);font-family:var(--mono);font-size:22px;font-weight:500;padding:0}
+.io-field input{flex:1;min-width:0;background:none;border:none;color:var(--text);font-family:var(--mono);font-size:22px;font-weight:500;padding:0}
 .io-field input::placeholder{color:var(--text-3)}
 .io-field .unit{font-size:14px;color:var(--text-2);font-weight:600}
-.max{font-family:var(--sans);font-size:11px;font-weight:600;color:var(--gold-soft);border:1px solid var(--border);background:var(--surface);border-radius:6px;padding:5px 8px;cursor:pointer;transition:border-color .2s}
+.max{font-family:var(--sans);font-size:11px;font-weight:600;color:var(--gold-soft);border:1px solid var(--border);background:var(--surface);border-radius:6px;min-height:44px;padding:0 12px;display:inline-flex;align-items:center;cursor:pointer;transition:border-color .2s}
 .max:hover{border-color:var(--border-2)}
 .io-arrow{display:flex;justify-content:center;color:var(--text-3);margin:-4px 0}
 .io-arrow svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6}
@@ -292,7 +293,7 @@ table.por tr.total .num{color:var(--gold)}
 .note-card{margin-top:16px}
 .note-card .nh{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
 .note-card .nh .t{font-size:14px;font-weight:600;color:var(--text)}
-.toggle{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-2);background:none;border:none;cursor:pointer}
+.toggle{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-2);background:none;border:none;cursor:pointer;padding:11px 4px;margin:-11px -4px}
 .toggle .sw{width:34px;height:20px;border-radius:20px;background:var(--surface-3);border:1px solid var(--border);position:relative;transition:background .25s}
 .toggle .sw::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--text-2);transition:transform .25s,background .25s}
 .toggle[aria-pressed="true"] .sw{background:rgba(216,184,90,.28)}
@@ -345,7 +346,8 @@ table.por tr.total .num{color:var(--gold)}
 .empty h3{font-size:20px}
 .empty p{font-size:14px;color:var(--text-2);max-width:46ch;line-height:1.6}
 .prop-preview{margin-top:16px;display:flex;flex-direction:column;gap:10px}
-.prop{display:flex;align-items:center;gap:14px;padding:16px 18px;opacity:.55}
+/* draft state is carried by the DRAFT badge + "Opens at deployment", not by opacity */
+.prop{display:flex;align-items:center;gap:14px;padding:16px 18px}
 .prop .badge{font-size:10.5px;font-weight:600;letter-spacing:.03em;color:var(--text-3);border:1px solid var(--border);border-radius:6px;padding:3px 8px;text-transform:uppercase;font-family:var(--mono)}
 .prop .pt{font-size:14px;color:var(--text-2);font-weight:500}
 .prop .pm{margin-left:auto;font-size:12.5px;color:var(--text-3)}
@@ -387,7 +389,7 @@ table.por tr.total .num{color:var(--gold)}
 .gate-card h3{font-size:20px;margin-bottom:8px}
 .gate-card p{font-size:13.5px;color:var(--text-2);line-height:1.6}
 .gate-actions{display:flex;flex-direction:column;gap:9px;margin-top:22px}
-.gate-x{position:absolute;top:12px;right:12px;width:30px;height:30px;border:none;background:none;color:var(--text-3);cursor:pointer;border-radius:7px}
+.gate-x{position:absolute;top:12px;right:12px;width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;color:var(--text-3);cursor:pointer;border-radius:7px}
 .gate-x:hover{background:var(--surface-2);color:var(--text)}
 .gate-x svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round}
 @keyframes pop{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
@@ -413,9 +415,50 @@ table.por tr.total .num{color:var(--gold)}
   .stat-row{grid-template-columns:1fr}
 }
 
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* Reduced motion, restated last on purpose: `.subpanel.on .rv` further up has equal
+   specificity and would otherwise win on source order, defeating the preference
+   on the app's own default route. */
+@media (prefers-reduced-motion:reduce){
+  .panel.active .rv,.subpanel.on .rv{animation:none!important;opacity:1!important;transform:none!important}
+}
+
+/* ---------- glossary ---------- */
+.gloss{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:0 34px;margin:4px 0 0}
+.gloss>div{display:flex;gap:12px;align-items:baseline;border-top:1px solid var(--hair);padding:13px 0}
+.gloss dt{font-weight:600;color:var(--text);white-space:nowrap;font-size:14px}
+.gloss dd{margin:0;font-size:13.5px;color:var(--text-2);line-height:1.55}
+
+/* ---------- skip link ---------- */
+.skip{position:absolute;left:-9999px;top:0;z-index:300;background:var(--surface-2);color:var(--text);border:1px solid var(--border-2);border-radius:var(--r-xs);padding:12px 18px;font-size:14px;font-weight:600;text-decoration:none}
+.skip:focus{left:12px;top:12px}
+
+/* ---------- field validation & consequence preview ---------- */
+.io-field.err{border-color:rgba(208,138,106,.55);box-shadow:inset 0 0 0 1px rgba(208,138,106,.32)}
+.field-err{margin:10px 0 0;font-size:12.5px;line-height:1.5;color:var(--down);display:flex;gap:7px;align-items:flex-start}
+.field-err svg{width:14px;height:14px;flex:none;margin-top:2px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round}
+.field-err[hidden],.io-preview[hidden]{display:none}
+.io-preview{margin:10px 0 0;font-size:12.5px;line-height:1.55;color:var(--text-2)}
+.io-preview b{color:var(--text);font-variant-numeric:tabular-nums}
+.max[disabled]{color:var(--text-3);border-color:var(--hair);cursor:not-allowed}
+
+/* ---------- brand signature mark (inline SVG, not emoji) ---------- */
+.bowsig{display:inline-flex;align-items:center;gap:.06em;white-space:nowrap;vertical-align:-.08em}
+.bowsig svg{width:.95em;height:.95em;flex:none;fill:currentColor;stroke:none}
+
 </style>
+<noscript><style>
+  /* Without JS the hash router never runs — show every panel instead of a blank shell. */
+  .panel,.panel[hidden]{display:block!important}
+  /* sub-tabs are router-driven too, so Treasury and Charter would otherwise stay dark */
+  .subpanel{display:block!important}
+  .panel .rv{opacity:1!important;transform:none!important;animation:none!important}
+</style></noscript>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
+<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute"><symbol id="bowmark" viewBox="0 0 64 64"><path d="M32 12l6 12h-4.4v20H39l-7 8-7-8h5.4V24H26z"/></symbol></svg>
 <div class="scrim" id="scrim" aria-hidden="true"></div>
 
 <aside class="sidebar" id="sidebar" data-screen-label="Sidebar">
@@ -431,6 +474,8 @@ table.por tr.total .num{color:var(--gold)}
     <a class="sb-item" href="#vault" data-route="vault"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14" rx="2.2"/><path d="M4 10.5h16"/><circle cx="12" cy="14.6" r="1.4"/><path d="M12 16v1.8"/></svg>Vault</a>
     <div class="sb-sec">Governance</div>
     <a class="sb-item" href="#council" data-route="council"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9l8-4.5L20 9"/><path d="M5.5 9.5v8M9.5 9.5v8M14.5 9.5v8M18.5 9.5v8"/><path d="M3.5 20.5h17"/></svg>Council</a>
+    <div class="sb-sec">Reference</div>
+    <a class="sb-item" href="#glossary" data-route="glossary"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5h9.5a3 3 0 0 1 3 3v12H8a3 3 0 0 0-3 3z"/><path d="M5 4.5v18"/><path d="M17.5 7.5H19v12h-1.5"/></svg>Glossary</a>
   </nav>
   <div class="sb-foot">
     <span class="concept"><i></i>Concept · nothing deployed</span>
@@ -442,7 +487,7 @@ table.por tr.total .num{color:var(--gold)}
 <div class="app">
   <header class="topbar" id="topbar">
     <button class="burger" id="burger" type="button" aria-label="Open navigation" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
-    <span class="tb-title" id="tbTitle">Overview</span>
+    <h1 class="tb-title" id="tbTitle" tabindex="-1">Overview</h1>
     <span class="tb-sub" id="tbSub">Protocol dashboard</span>
     <div class="tb-right">
       <span class="tb-net"><span class="dot"></span>Robinhood</span>
@@ -450,22 +495,22 @@ table.por tr.total .num{color:var(--gold)}
     </div>
   </header>
 
-  <div class="content">
+  <div class="content" id="main" role="main" tabindex="-1">
     <!-- ===================== OVERVIEW ===================== -->
-    <section class="panel" id="panel-overview" data-screen-label="Overview">
+    <section class="panel active" id="panel-overview" data-screen-label="Overview">
       <div class="seg" role="tablist" aria-label="Overview views">
-        <button data-subtab="overview:dashboard" class="on" role="tab" type="button">Dashboard</button>
-        <button data-subtab="overview:treasury" role="tab" type="button">Treasury</button>
+        <button id="tab-ov-dash" aria-controls="tp-ov-dash" data-subtab="overview:dashboard" class="on" role="tab" type="button" aria-selected="true" tabindex="0">Dashboard</button>
+        <button id="tab-ov-tre" aria-controls="tp-ov-tre" data-subtab="overview:treasury" role="tab" type="button" aria-selected="false" tabindex="-1">Treasury</button>
       </div>
 
       <!-- Dashboard -->
-      <div class="subpanel on" data-sub="overview:dashboard">
+      <div class="subpanel on" data-sub="overview:dashboard" id="tp-ov-dash" role="tabpanel" aria-labelledby="tab-ov-dash">
         <div class="dash">
           <div class="stat-row">
-            <div class="stat rv"><div class="k">WOOD price</div><div class="v tnum" data-count="38.11" data-dec="2" data-prefix="$">$38.11</div><div class="trend up"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 15l7-7 7 7"/></svg>2.4% <span class="muted">· 24h</span></div></div>
-            <div class="stat rv" style="--d:.05s"><div class="k">Backing / WOOD</div><div class="v gold tnum" data-count="31.42" data-dec="2" data-prefix="$">$31.42</div><div class="trend up"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 15l7-7 7 7"/></svg>0.6% <span class="muted">· 24h</span></div></div>
-            <div class="stat rv" style="--d:.1s"><div class="k">Premium</div><div class="v tnum" data-count="1.21" data-dec="2" data-suffix="×">1.21×</div><div class="trend"><span class="muted">price ÷ backing</span></div></div>
-            <div class="stat rv" style="--d:.15s"><div class="k">Treasury</div><div class="v tnum" data-count="4.21" data-dec="2" data-prefix="$" data-suffix="M">$4.21M</div><div class="trend up"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 15l7-7 7 7"/></svg>1.9% <span class="muted">· 7d</span></div></div>
+            <div class="stat rv"><div class="k">WOOD price</div><div class="v tnum" data-count="38.11" data-dec="2" data-prefix="$">$38.11</div><div class="trend up"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 15l7-7 7 7"/></svg><span class="sr-only">up </span>2.4% <span class="muted">· 24h</span></div></div>
+            <div class="stat rv" style="--d:.05s"><div class="k">Backing / WOOD</div><div class="v gold tnum" data-count="31.42" data-dec="2" data-prefix="$">$31.42</div><div class="trend up"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 15l7-7 7 7"/></svg><span class="sr-only">up </span>0.6% <span class="muted">· 24h</span></div></div>
+            <div class="stat rv" style="--d:.1s"><div class="k">Premium</div><div class="v tnum" data-count="1.21" data-dec="2" data-suffix="×">1.21×</div><div class="trend"><span class="muted">price ÷ backing · +21.3%</span></div></div>
+            <div class="stat rv" style="--d:.15s"><div class="k">Treasury</div><div class="v tnum" data-count="4.21" data-dec="2" data-prefix="$" data-suffix="M">$4.21M</div><div class="trend up"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 15l7-7 7 7"/></svg><span class="sr-only">up </span>1.9% <span class="muted">· 7d</span></div></div>
           </div>
 
           <div class="dash-mid">
@@ -507,7 +552,7 @@ table.por tr.total .num{color:var(--gold)}
       </div>
 
       <!-- Treasury -->
-      <div class="subpanel" data-sub="overview:treasury">
+      <div class="subpanel" data-sub="overview:treasury" id="tp-ov-tre" role="tabpanel" aria-labelledby="tab-ov-tre">
         <div class="tre-top">
           <div class="stat rv"><div class="k"><span class="dot" style="display:inline-block;vertical-align:-1px;margin-right:5px"></span>Treasury net assets · live</div><div class="v tnum" data-count="4209813" data-prefix="$">$4,209,813</div></div>
           <div class="stat rv" style="--d:.05s"><div class="k">Backing / WOOD</div><div class="v gold tnum">$31.42</div></div>
@@ -531,7 +576,7 @@ table.por tr.total .num{color:var(--gold)}
 
         <div class="card card-pad rv" style="--d:.15s;margin-top:16px">
           <div class="card-h"><span class="t">Proof of reserve</span><span class="meta">figures illustrative</span></div>
-          <div class="table-scroll">
+          <div class="table-scroll" tabindex="0" role="region" aria-label="Proof of reserve, scrollable">
             <table class="por">
               <thead><tr><th>Asset</th><th class="num">Holdings</th><th class="num">uiMultiplier</th><th class="num">Value</th><th class="num">Share</th></tr></thead>
               <tbody>
@@ -559,14 +604,14 @@ table.por tr.total .num{color:var(--gold)}
             <div><div class="k">Staked</div><div class="v tnum" id="balStaked">— <small>sWOOD</small></div></div>
             <div><div class="k">Value</div><div class="v tnum" id="balValue">—</div></div>
           </div>
-          <div class="seg" style="margin-bottom:14px" id="stakeSeg">
-            <button class="on" data-stakemode="stake" type="button">Stake</button>
-            <button data-stakemode="unstake" type="button">Unstake</button>
+          <div class="seg" style="margin-bottom:14px" id="stakeSeg" role="radiogroup" aria-label="Stake or unstake">
+            <button class="on" data-stakemode="stake" type="button" role="radio" aria-checked="true" tabindex="0">Stake</button>
+            <button data-stakemode="unstake" type="button" role="radio" aria-checked="false" tabindex="-1">Unstake</button>
           </div>
           <div class="stake-io">
             <div class="io-field">
               <div class="lab"><span id="ioFromLabel">Stake</span><span>Balance <b id="stakeBal">—</b></span></div>
-              <div class="in"><input id="stakeIn" inputmode="decimal" placeholder="0.00" aria-label="Amount"><span class="unit" id="ioFromUnit">WOOD</span><button class="max" id="maxChip" type="button">MAX</button></div>
+              <div class="in"><input id="stakeIn" inputmode="decimal" placeholder="0.00" aria-label="Amount to stake" aria-describedby="stakeErr"><span class="unit" id="ioFromUnit">WOOD</span><button class="max" id="maxChip" type="button">MAX</button></div>
             </div>
             <div class="io-arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></div>
             <div class="io-field">
@@ -574,6 +619,8 @@ table.por tr.total .num{color:var(--gold)}
               <div class="in"><input id="stakeOut" inputmode="decimal" placeholder="0.00" aria-label="You receive" readonly><span class="unit" id="ioToUnit">sWOOD</span></div>
             </div>
           </div>
+          <p class="field-err" id="stakeErr" role="alert" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v5M12 16.5v.5M10.3 3.9 2.6 17.4A1.9 1.9 0 0 0 4.3 20.3h15.4a1.9 1.9 0 0 0 1.7-2.9L13.7 3.9a1.9 1.9 0 0 0-3.4 0Z"/></svg><span id="stakeErrText"></span></p>
+          <p class="io-preview" id="stakePreview" hidden></p>
           <div class="stake-meta">
             <div>Next watch <b id="cd2" class="tnum">--:--:--</b></div>
             <div>Rebase <b>0.23%</b></div>
@@ -595,7 +642,7 @@ table.por tr.total .num{color:var(--gold)}
                 </svg>
                 <div class="watch-center">
                   <div class="countdown" id="cd">--:--:--</div>
-                  <div class="watch-sub">until the <em id="watchname">third</em> watch</div>
+                  <div class="watch-sub">until the <em id="watchname">third</em> watch ends</div>
                   <div class="wdots" id="wdots" aria-hidden="true"><span></span><span></span><span></span></div>
                 </div>
               </div>
@@ -608,8 +655,8 @@ table.por tr.total .num{color:var(--gold)}
           </div>
 
           <div class="card card-pad note-card rv" style="--d:.14s">
-            <div class="nh"><span class="t">How the APY works</span><button class="toggle" id="truthBtn" type="button" aria-pressed="true"><span class="sw"></span>Honest reading</button></div>
-            <p id="apyLine">APY is emissions, not profit: rebases dilute every unstaked holder while your staked share of supply stays roughly constant. The real return is the treasury compounding underneath — staking simply keeps your fraction of the forest whole.</p>
+            <div class="nh"><span class="t">How the APY works</span><button class="toggle" id="truthBtn" type="button" aria-pressed="true" aria-controls="apyLine"><span class="sw"></span>Honest reading</button></div>
+            <p id="apyLine" aria-live="polite">APY is emissions, not profit: rebases dilute every unstaked holder while your staked share of supply stays roughly constant. The real return is the treasury compounding underneath — staking simply keeps your fraction of the forest whole.</p>
           </div>
         </div>
       </div>
@@ -618,10 +665,10 @@ table.por tr.total .num{color:var(--gold)}
     <!-- ===================== HEIST / BONDS ===================== -->
     <section class="panel" id="panel-heist" data-screen-label="Heist" hidden>
       <div class="bond-grid">
-        <article class="bond rv"><div class="bond-top"><span class="wanted">Wanted · war chest</span><span class="pill open">Open</span></div><h3>SGOV</h3><div class="sub">Tokenized T-bills</div><div class="disc"><span class="n tnum">5.8%</span><span class="l">discount</span></div><div class="rows"><div><span>Vesting</span><b>5 days</b></div><div><span>Bond price</span><b>$29.60</b></div><div><span>Capacity</span><b>62%</b></div></div><div class="cap"><i style="--w:62%"></i></div><div class="cap-label">Paid in WOOD on full vest</div><button class="btn subtle block sm bond-cta" type="button">Bond SGOV</button></article>
-        <article class="bond rv" style="--d:.06s"><div class="bond-top"><span class="wanted">Wanted · reserve</span><span class="pill open">Open</span></div><h3>USDG</h3><div class="sub">Reserve stablecoin</div><div class="disc"><span class="n tnum">4.2%</span><span class="l">discount</span></div><div class="rows"><div><span>Vesting</span><b>5 days</b></div><div><span>Bond price</span><b>$30.10</b></div><div><span>Capacity</span><b>38%</b></div></div><div class="cap"><i style="--w:38%"></i></div><div class="cap-label">Paid in WOOD on full vest</div><button class="btn subtle block sm bond-cta" type="button">Bond USDG</button></article>
-        <article class="bond rv" style="--d:.12s"><div class="bond-top"><span class="wanted">Wanted · long hunt</span><span class="pill open">Open</span></div><h3>tTSLA</h3><div class="sub">Tesla, Inc.</div><div class="disc"><span class="n tnum">7.1%</span><span class="l">discount</span></div><div class="rows"><div><span>Vesting</span><b>7 days</b></div><div><span>Bond price</span><b>$29.19</b></div><div><span>Capacity</span><b>81%</b></div></div><div class="cap"><i style="--w:81%"></i></div><div class="cap-label">Paid in WOOD on full vest</div><button class="btn subtle block sm bond-cta" type="button">Bond tTSLA</button></article>
-        <article class="bond closed rv" style="--d:.18s"><div class="bond-top"><span class="wanted">Wanted · deep pools</span><span class="pill closed">Sold out</span></div><h3>WOOD∕USDG</h3><div class="sub">Protocol-owned liquidity</div><div class="disc"><span class="n tnum" style="color:var(--text)">9.3%</span><span class="l">discount</span></div><div class="rows"><div><span>Vesting</span><b>7 days</b></div><div><span>Bond price</span><b>$28.57</b></div><div><span>Capacity</span><b>100%</b></div></div><div class="cap"><i style="--w:100%"></i></div><div class="cap-label">Filled — next tranche soon</div><button class="btn subtle block sm" type="button" disabled>Sold out</button></article>
+        <article class="bond rv"><div class="bond-top"><span class="wanted">Wanted · war chest</span><span class="pill open">Open</span></div><h3>SGOV</h3><div class="sub">Tokenized T-bills</div><div class="disc"><span class="n tnum">5.8%</span><span class="l">discount</span></div><div class="rows"><div><span>Vesting</span><b>15 watches · 5 days</b></div><div><span>Bond price</span><b>$29.60</b></div><div><span>Capacity</span><b>62%</b></div></div><div class="cap"><i style="--w:62%"></i></div><div class="cap-label">Paid in WOOD on full vest</div><button class="btn subtle block sm bond-cta" type="button">Bond SGOV</button></article>
+        <article class="bond rv" style="--d:.06s"><div class="bond-top"><span class="wanted">Wanted · reserve</span><span class="pill open">Open</span></div><h3>USDG</h3><div class="sub">Reserve stablecoin</div><div class="disc"><span class="n tnum">4.2%</span><span class="l">discount</span></div><div class="rows"><div><span>Vesting</span><b>15 watches · 5 days</b></div><div><span>Bond price</span><b>$30.10</b></div><div><span>Capacity</span><b>38%</b></div></div><div class="cap"><i style="--w:38%"></i></div><div class="cap-label">Paid in WOOD on full vest</div><button class="btn subtle block sm bond-cta" type="button">Bond USDG</button></article>
+        <article class="bond rv" style="--d:.12s"><div class="bond-top"><span class="wanted">Wanted · long hunt</span><span class="pill open">Open</span></div><h3>tTSLA</h3><div class="sub">Tesla, Inc.</div><div class="disc"><span class="n tnum">7.1%</span><span class="l">discount</span></div><div class="rows"><div><span>Vesting</span><b>21 watches · 7 days</b></div><div><span>Bond price</span><b>$29.19</b></div><div><span>Capacity</span><b>81%</b></div></div><div class="cap"><i style="--w:81%"></i></div><div class="cap-label">Paid in WOOD on full vest</div><button class="btn subtle block sm bond-cta" type="button">Bond tTSLA</button></article>
+        <article class="bond closed rv" style="--d:.18s"><div class="bond-top"><span class="wanted">Wanted · deep pools</span><span class="pill closed">Sold out</span></div><h3>WOOD∕USDG</h3><div class="sub">Protocol-owned liquidity</div><div class="disc"><span class="n tnum" style="color:var(--text)">9.3%</span><span class="l">discount</span></div><div class="rows"><div><span>Vesting</span><b>21 watches · 7 days</b></div><div><span>Bond price</span><b>$28.57</b></div><div><span>Capacity</span><b>100%</b></div></div><div class="cap"><i style="--w:100%"></i></div><div class="cap-label">Filled — next tranche soon</div><button class="btn subtle block sm" type="button" disabled>Sold out</button></article>
       </div>
     </section>
 
@@ -638,8 +685,8 @@ table.por tr.total .num{color:var(--gold)}
           <div class="card-h"><span class="t">Borrow against your WOOD</span></div>
           <div class="stake-io">
             <div class="io-field">
-              <div class="lab"><span>Collateral</span><span>Staked <b>—</b></span></div>
-              <div class="in"><input id="vaultIn" inputmode="decimal" placeholder="0.00" aria-label="Collateral amount"><span class="unit">sWOOD</span></div>
+              <div class="lab"><span>Collateral</span><span>Staked <b id="vaultStaked">—</b></span></div>
+              <div class="in"><input id="vaultIn" inputmode="decimal" placeholder="0.00" aria-label="Collateral amount in sWOOD" aria-describedby="vaultErr"><span class="unit">sWOOD</span></div>
             </div>
             <div class="io-arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></div>
             <div class="io-field">
@@ -647,6 +694,8 @@ table.por tr.total .num{color:var(--gold)}
               <div class="in"><input id="vaultOut" inputmode="decimal" placeholder="0.00" aria-label="Borrowable" readonly><span class="unit">USDG</span></div>
             </div>
           </div>
+          <p class="field-err" id="vaultErr" role="alert" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v5M12 16.5v.5M10.3 3.9 2.6 17.4A1.9 1.9 0 0 0 4.3 20.3h15.4a1.9 1.9 0 0 0 1.7-2.9L13.7 3.9a1.9 1.9 0 0 0-3.4 0Z"/></svg><span id="vaultErrText"></span></p>
+          <p class="io-preview" id="vaultPreview" hidden></p>
           <div class="stake-meta">
             <div>Rate <b>0.50% fixed</b></div>
             <div>Term <b>Open-ended</b></div>
@@ -667,13 +716,36 @@ table.por tr.total .num{color:var(--gold)}
     </section>
 
     <!-- ===================== COUNCIL ===================== -->
+    <!-- ===================== GLOSSARY ===================== -->
+    <section class="panel" id="panel-glossary" data-screen-label="Glossary" hidden>
+      <div class="card card-pad rv">
+        <div class="card-h"><span class="t">The forest, translated</span></div>
+        <p class="fine-line" style="margin:0 0 4px">Every lore term paired with the plain one it stands for. The landing page teaches this language; this is where to check it.</p>
+        <dl class="gloss">
+          <div><dt>Watch</dt><dd>One eight-hour rebase epoch. Three to a day.</dd></div>
+          <div><dt>Rebase</dt><dd>The per-watch emission that mints new WOOD to stakers.</dd></div>
+          <div><dt>The Camp</dt><dd>Staking. Stake WOOD, receive sWOOD.</dd></div>
+          <div><dt>sWOOD</dt><dd>Staked WOOD. Your claim on the camp's share.</dd></div>
+          <div><dt>The Heist</dt><dd>Bonds. Buy WOOD at a discount with assets the treasury wants.</dd></div>
+          <div><dt>The Vault</dt><dd>Loans. Borrow USDG against your backing floor.</dd></div>
+          <div><dt>The Band</dt><dd>Range-bound stability. The corridor price is held within.</dd></div>
+          <div><dt>Backing</dt><dd>Treasury assets divided by WOOD outstanding. The floor.</dd></div>
+          <div><dt>Premium</dt><dd>How far market price sits above backing.</dd></div>
+          <div><dt>POL</dt><dd>Protocol-owned liquidity. The forest owns its own market.</dd></div>
+          <div><dt>uiMultiplier</dt><dd>The on-chain accrual factor for dividend-bearing tokenised assets.</dd></div>
+          <div><dt>Ranger</dt><dd>A visitor in demo mode. Nothing here is deployed.</dd></div>
+          <div><dt>The Sheriff</dt><dd>Whoever is betting against the floor.</dd></div>
+        </dl>
+      </div>
+    </section>
+
     <section class="panel" id="panel-council" data-screen-label="Council" hidden>
       <div class="seg" role="tablist" aria-label="Council views">
-        <button data-subtab="council:governance" class="on" role="tab" type="button">Governance</button>
-        <button data-subtab="council:charter" role="tab" type="button">Charter</button>
+        <button id="tab-co-gov" aria-controls="tp-co-gov" data-subtab="council:governance" class="on" role="tab" type="button" aria-selected="true" tabindex="0">Governance</button>
+        <button id="tab-co-cha" aria-controls="tp-co-cha" data-subtab="council:charter" role="tab" type="button" aria-selected="false" tabindex="-1">Charter</button>
       </div>
 
-      <div class="subpanel on" data-sub="council:governance">
+      <div class="subpanel on" data-sub="council:governance" id="tp-co-gov" role="tabpanel" aria-labelledby="tab-co-gov">
         <div class="card rv">
           <div class="empty">
             <div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9l8-4.5L20 9"/><path d="M5.5 9.5v8M9.5 9.5v8M14.5 9.5v8M18.5 9.5v8"/><path d="M3.5 20.5h17"/></svg></div>
@@ -688,12 +760,12 @@ table.por tr.total .num{color:var(--gold)}
         </div>
       </div>
 
-      <div class="subpanel" data-sub="council:charter">
+      <div class="subpanel" data-sub="council:charter" id="tp-co-cha" role="tabpanel" aria-labelledby="tab-co-cha">
         <div class="charter-grid">
           <div class="card card-pad prose rv">
             <p>SherwoodDAO is a treasury-backed reserve currency. Every WOOD is minted against a treasury of real-world assets — tokenized T-bills, USDG and tokenized equities — and every figure on this page is computed from live balances, not promises.</p>
             <p>Price is tethered to backing in both directions from launch: bonds fill the treasury, the treasury defends the band, and the band disciplines the premium. A floor you can audit — not one you have to trust.</p>
-            <p class="sig">(🏹,🏹) — I draw with the camp, not against it.</p>
+            <p class="sig"><span class="bowsig" role="img" aria-label="(arrow, arrow)">(<svg aria-hidden="true"><use href="#bowmark"/></svg>,<svg aria-hidden="true"><use href="#bowmark"/></svg>)</span> — I draw with the camp, not against it.</p>
           </div>
           <div class="card card-pad kv rv" style="--d:.06s">
             <div class="row"><span class="k">Status</span><span class="v">Concept · nothing deployed</span></div>
@@ -800,10 +872,10 @@ function drawChart(prog){
     if (gv<ymin||gv>ymax) continue;
     g.strokeStyle="rgba(255,255,255,0.05)"; g.lineWidth=1;
     g.beginPath(); g.moveTo(padL,Y(gv)); g.lineTo(cw-padR,Y(gv)); g.stroke();
-    g.fillStyle="#6D7E71"; g.textAlign="right"; g.fillText("$"+gv,padL-9,Y(gv));
+    g.fillStyle="#7E9184"; g.textAlign="right"; g.fillText("$"+gv,padL-9,Y(gv));
   }
   var months=[{i:0,l:"22 Mar"},{i:40,l:"May"},{i:80,l:"Jun"},{i:119,l:"20 Jul"}];
-  g.textAlign="center"; g.fillStyle="#6D7E71"; g.font="9.5px 'Geist Mono',Menlo,monospace";
+  g.textAlign="center"; g.fillStyle="#7E9184"; g.font="9.5px 'Geist Mono',Menlo,monospace";
   months.forEach(function(m){ g.fillText(m.l, Math.max(padL+18,Math.min(cw-26,X(m.i))), ch-9); });
 
   var pe = prog<1 ? (1-Math.pow(1-prog,3)) : 1;
@@ -901,7 +973,8 @@ function tickWatch(){
   if (wtip) wtip.setAttribute("transform","rotate("+(frac*360).toFixed(2)+" 160 160)");
   if (wdots){ var ds=wdots.children; for (var i=0;i<3;i++) ds[i].classList.toggle("on", i===blk); }
 }
-tickWatch(); setInterval(tickWatch,1000);
+/* skip ticks while the tab is hidden — the rAF loop already does this, the timer did not */
+tickWatch(); setInterval(function(){ if (!document.hidden) tickWatch(); },1000);
 
 /* ---------- honesty toggle ---------- */
 var tb=document.getElementById("truthBtn"), line=document.getElementById("apyLine");
@@ -911,7 +984,7 @@ if (tb && line){
   tb.addEventListener("click", function(){
     var on = tb.getAttribute("aria-pressed")==="true";
     tb.setAttribute("aria-pressed", on?"false":"true");
-    tb.lastChild.textContent = on ? "Read the lore" : "Honest reading";
+    /* the accessible name stays constant; aria-pressed alone carries state */
     line.textContent = on ? LORE : TRUTH;
   });
 }
@@ -919,12 +992,13 @@ if (tb && line){
 /* ================= routing ================= */
 var ROUTES = {
   overview:{title:"Overview", subs:["dashboard","treasury"], subLabel:{dashboard:"Protocol dashboard", treasury:"Proof of reserve"}},
-  wood:{title:"WOOD", sub:"Staking & rebases"},
+  wood:{title:"WOOD", sub:"The Camp · staking & rebases"},
   heist:{title:"Heist", sub:"Bonds"},
   vault:{title:"Vault", sub:"Loans"},
-  council:{title:"Council", subs:["governance","charter"], subLabel:{governance:"Governance", charter:"Charter & about"}}
+  council:{title:"Council", subs:["governance","charter"], subLabel:{governance:"Governance", charter:"Charter & about"}},
+  glossary:{title:"Glossary", sub:"The forest, translated"}
 };
-var ALIAS = {home:"overview", camp:"wood", ledger:"council/charter", docs:"council/charter", treasury:"overview/treasury", charter:"council/charter", "":"overview"};
+var ALIAS = {home:"overview", camp:"wood", ledger:"council/charter", docs:"council/charter", treasury:"overview/treasury", charter:"council/charter", terms:"glossary", help:"glossary", "":"overview"};
 var panels={}; Object.keys(ROUTES).forEach(function(r){ panels[r]=document.getElementById("panel-"+r); });
 var navItems=[].slice.call(document.querySelectorAll("[data-route]"));
 var tbTitle=document.getElementById("tbTitle"), tbSub=document.getElementById("tbSub");
@@ -942,7 +1016,10 @@ function showSub(route, sub){
   if (meta.subs.indexOf(sub)<0) sub=meta.subs[0];
   var panel=panels[route];
   [].forEach.call(panel.querySelectorAll("[data-subtab]"), function(b){
-    b.classList.toggle("on", b.getAttribute("data-subtab")===route+":"+sub);
+    var on = b.getAttribute("data-subtab")===route+":"+sub;
+    b.classList.toggle("on", on);
+    b.setAttribute("aria-selected", on?"true":"false");
+    b.tabIndex = on ? 0 : -1;
   });
   [].forEach.call(panel.querySelectorAll(".subpanel"), function(sp){
     var on = sp.getAttribute("data-sub")===route+":"+sub;
@@ -952,14 +1029,28 @@ function showSub(route, sub){
   if (tbSub) tbSub.textContent = meta.subLabel[sub]||"";
   return sub;
 }
-function closeSidebar(){
+/* a closed off-canvas drawer that is still tabbable puts ~8 invisible stops before the burger */
+function syncSidebarInert(){
+  if (!sidebar) return;
+  var mobile = window.matchMedia("(max-width:1000px)").matches;
+  sidebar.inert = !!(mobile && !sidebar.classList.contains("open"));
+}
+function closeSidebar(restoreFocus){
+  var was = sidebar.classList.contains("open");
   sidebar.classList.remove("open"); scrim.classList.remove("on");
   document.body.classList.remove("no-scroll");
-  if (burger) burger.setAttribute("aria-expanded","false");
+  if (burger){ burger.setAttribute("aria-expanded","false"); burger.setAttribute("aria-label","Open navigation"); }
+  syncSidebarInert();
+  if (was && restoreFocus && burger) burger.focus();
 }
 function showRoute(route, sub){
-  if (!ROUTES[route]) route="overview";
+  /* own-property test: bare ROUTES[route] matches inherited Object.prototype keys
+     ("constructor", "toString", "__proto__"…), which are truthy, so the fallback
+     never fired and panels[route] then resolved to a function instead of an element */
+  if (!Object.prototype.hasOwnProperty.call(ROUTES, route)) route="overview";
   var meta=ROUTES[route];
+  var isFirst = (current===null);
+  var routeChanged = (current!==route);
   current=route;
   Object.keys(panels).forEach(function(k){
     var p=panels[k]; if (!p) return;
@@ -978,10 +1069,16 @@ function showRoute(route, sub){
   closeSidebar();
   var de=document.documentElement; de.style.scrollBehavior="auto"; window.scrollTo(0,0); de.style.scrollBehavior="";
   onScroll();
+  /* Announce a genuine route change by moving focus to the page heading — but ONLY when the
+     top-level route changed. On a sub-tab switch this would pull focus out of the tablist,
+     which breaks roving arrow-key navigation after a single keypress. */
+  if (!isFirst && routeChanged && tbTitle) tbTitle.focus();
 }
 function parseHash(){
   var h=(location.hash||"").replace(/^#\/?/,"");
-  if (ALIAS[h]!==undefined) h=ALIAS[h];
+  /* own-property test only: bare ALIAS[h] matches Object.prototype keys ("constructor",
+     "toString", "__proto__"…) and returns a function, which then throws on h.split() */
+  if (Object.prototype.hasOwnProperty.call(ALIAS, h)) h=ALIAS[h];
   var parts=h.split("/");
   return {route:parts[0]||"overview", sub:parts[1]};
 }
@@ -995,6 +1092,20 @@ document.querySelectorAll("[data-subtab]").forEach(function(b){
     location.hash = "#"+parts[0]+"/"+parts[1];
   });
 });
+/* roving arrow-key navigation for the segmented tablists */
+document.querySelectorAll('[role="tablist"],[role="radiogroup"]').forEach(function(tl){
+  tl.addEventListener("keydown", function(e){
+    if (e.key!=="ArrowRight" && e.key!=="ArrowLeft" && e.key!=="Home" && e.key!=="End") return;
+    var tabs=[].slice.call(tl.querySelectorAll('[role="tab"],[role="radio"]'));
+    var i=tabs.indexOf(document.activeElement); if (i<0) return;
+    e.preventDefault();
+    var n = e.key==="Home" ? 0
+          : e.key==="End" ? tabs.length-1
+          : (i + (e.key==="ArrowRight"?1:-1) + tabs.length) % tabs.length;
+    tabs[n].focus(); tabs[n].click();
+  });
+});
+
 var charterBtn=document.getElementById("charterBtn");
 if (charterBtn) charterBtn.addEventListener("click", function(){ location.hash="#council/charter"; });
 
@@ -1009,8 +1120,25 @@ if (burger) burger.addEventListener("click", function(){
   scrim.classList.toggle("on", open);
   document.body.classList.toggle("no-scroll", open);
   burger.setAttribute("aria-expanded", open?"true":"false");
+  burger.setAttribute("aria-label", open?"Close navigation":"Open navigation");
+  syncSidebarInert();
+  if (open){ var f0=sidebar.querySelector(".sb-item"); if (f0) f0.focus(); }
+  else burger.focus();
 });
-if (scrim) scrim.addEventListener("click", closeSidebar);
+if (scrim) scrim.addEventListener("click", function(){ closeSidebar(true); });
+/* keep Tab inside the drawer while it is open on mobile */
+if (sidebar) sidebar.addEventListener("keydown", function(e){
+  if (e.key!=="Tab" || !sidebar.classList.contains("open")) return;
+  if (!window.matchMedia("(max-width:1000px)").matches) return;
+  var f=[].slice.call(sidebar.querySelectorAll("a[href],button"))
+          .filter(function(el){ return !el.disabled && el.offsetParent!==null; });
+  if (!f.length) return;
+  var first=f[0], last=f[f.length-1];
+  if (e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+});
+window.addEventListener("resize", syncSidebarInert, {passive:true});
+syncSidebarInert();
 
 /* resize chart */
 var rto; window.addEventListener("resize", function(){ clearTimeout(rto); rto=setTimeout(function(){ if (chartDone) drawChart(1); }, 160); });
@@ -1033,9 +1161,43 @@ function renderWallet(){
   if (stakeBal) stakeBal.textContent = ranger ? (stakeMode==="stake"?"12.47":"84.00") : "—";
   if (stakeBtn) stakeBtn.textContent = ranger ? (stakeMode==="stake"?"Stake WOOD":"Unstake sWOOD") : "Connect to stake";
   if (vaultBtn) vaultBtn.textContent = ranger ? "Borrow USDG" : "Connect to borrow";
+  var vs=document.getElementById("vaultStaked"); if (vs) vs.textContent = ranger ? "84.00" : "—";
+  /* an affordance whose only possible outcome is an invalid value is worse than no affordance */
+  if (maxChip) maxChip.disabled = !ranger;
+  /* ...and a field that previews un-submittable fiction is the same mistake in another shape */
+  [document.getElementById("stakeIn"), document.getElementById("vaultIn")].forEach(function(el){
+    if (!el) return;
+    el.readOnly = !ranger;
+    el.placeholder = ranger ? "0.00" : "Connect to enter an amount";
+  });
 }
-function openGate(){ gate.classList.add("open"); }
-function closeGate(){ gate.classList.remove("open"); }
+var gateLastFocus=null;
+function gateFocusables(){
+  return [].slice.call(gate.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])'))
+           .filter(function(el){ return !el.disabled && el.offsetParent!==null; });
+}
+function openGate(){
+  gateLastFocus = document.activeElement;
+  gate.classList.add("open");
+  document.body.classList.add("no-scroll");   /* the page used to scroll behind the modal */
+  var pref = document.getElementById("gateEnter"), f = gateFocusables();
+  if (pref) pref.focus(); else if (f.length) f[0].focus();
+}
+function closeGate(){
+  if (!gate.classList.contains("open")) return;
+  gate.classList.remove("open");
+  document.body.classList.remove("no-scroll");
+  if (gateLastFocus && gateLastFocus.focus) gateLastFocus.focus();
+  gateLastFocus = null;
+}
+/* keep Tab inside the dialog while it is open */
+gate.addEventListener("keydown", function(e){
+  if (e.key!=="Tab" || !gate.classList.contains("open")) return;
+  var f=gateFocusables(); if (!f.length) return;
+  var first=f[0], last=f[f.length-1];
+  if (e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+});
 walletBtn.addEventListener("click", function(){
   if (ranger){ ranger=false; try{ localStorage.setItem("sw-ranger","0"); }catch(e){} renderWallet(); toast("You slip back into the trees."); }
   else openGate();
@@ -1047,7 +1209,7 @@ document.getElementById("gateEnter").addEventListener("click", function(){
 document.getElementById("gateStay").addEventListener("click", closeGate);
 document.getElementById("gateX").addEventListener("click", closeGate);
 document.querySelector(".gate-bg").addEventListener("click", closeGate);
-document.addEventListener("keydown", function(e){ if (e.key==="Escape"){ closeSidebar(); closeGate(); } });
+document.addEventListener("keydown", function(e){ if (e.key==="Escape"){ closeSidebar(true); closeGate(); } });
 
 /* ---------- stake widget ---------- */
 var stakeMode="stake";
@@ -1056,29 +1218,158 @@ var ioFromLabel=document.getElementById("ioFromLabel"), ioFromUnit=document.getE
 function applyStakeMode(){
   if (stakeMode==="stake"){ ioFromLabel.textContent="Stake"; ioFromUnit.textContent="WOOD"; ioToLabel.textContent="Receive"; ioToUnit.textContent="sWOOD"; }
   else { ioFromLabel.textContent="Unstake"; ioFromUnit.textContent="sWOOD"; ioToLabel.textContent="Receive"; ioToUnit.textContent="WOOD"; }
+  /* the balance ceiling just changed, so any entered amount is no longer meaningful */
+  if (stakeIn){ stakeIn.value=""; fieldErr(stakeIn, stakeErr, null); }
+  if (stakeOut) stakeOut.value="";
+  if (stakePreview) stakePreview.hidden=true;
+  if (stakeIn) stakeIn.setAttribute("aria-label", "Amount to " + stakeMode);
   renderWallet();
 }
 [].forEach.call(document.querySelectorAll("#stakeSeg button"), function(b){
   b.addEventListener("click", function(){
-    [].forEach.call(document.querySelectorAll("#stakeSeg button"), function(x){ x.classList.remove("on"); });
-    b.classList.add("on"); stakeMode=b.getAttribute("data-stakemode"); applyStakeMode();
+    [].forEach.call(document.querySelectorAll("#stakeSeg button"), function(x){
+      x.classList.remove("on"); x.setAttribute("aria-checked","false"); x.tabIndex=-1;
+    });
+    b.classList.add("on"); b.setAttribute("aria-checked","true"); b.tabIndex=0;
+    stakeMode=b.getAttribute("data-stakemode"); applyStakeMode();
   });
 });
-if (stakeIn) stakeIn.addEventListener("input", function(){ if (stakeOut) stakeOut.value=stakeIn.value; });
-if (maxChip) maxChip.addEventListener("click", function(){ stakeIn.value = ranger ? (stakeMode==="stake"?"12.47":"84.00") : "0.00"; if (stakeOut) stakeOut.value=stakeIn.value; stakeIn.focus(); });
+/* ---------- numeric field helpers ----------
+   Guardrails first (prevent the bad value), plain-language recovery second
+   (say what is wrong, say the fix, keep the user's work, return focus).      */
+function sanitizeNum(s){
+  s = String(s).replace(/[^0-9.]/g, "");          // digits and one separator only
+  var i = s.indexOf(".");
+  if (i > -1) s = s.slice(0, i+1) + s.slice(i+1).replace(/\./g, "");
+  return s;
+}
+function fieldErr(input, errEl, msg){
+  var wrap = (input && input.closest) ? input.closest(".io-field") : null;
+  var txt  = errEl ? errEl.querySelector("span") : null;
+  if (msg){
+    if (txt) txt.textContent = msg; else if (errEl) errEl.textContent = msg;
+    if (errEl) errEl.hidden = false;
+    if (wrap) wrap.classList.add("err");
+    if (input) input.setAttribute("aria-invalid","true");
+  } else {
+    if (errEl) errEl.hidden = true;
+    if (txt) txt.textContent = "";
+    if (wrap) wrap.classList.remove("err");
+    if (input) input.removeAttribute("aria-invalid");
+  }
+}
+function clockNow(){ var e=document.getElementById("cd2"); return e ? e.textContent : "--:--:--"; }
+
+/* ---------- stake widget ---------- */
+var stakeErr=document.getElementById("stakeErr"), stakePreview=document.getElementById("stakePreview");
+function stakeBalance(){ return ranger ? (stakeMode==="stake" ? 12.47 : 84.00) : 0; }
+function stakeUnitFrom(){ return stakeMode==="stake" ? "WOOD" : "sWOOD"; }
+function stakeUnitTo(){ return stakeMode==="stake" ? "sWOOD" : "WOOD"; }
+function renderStakePreview(){
+  if (!stakeIn) return;
+  var v = parseFloat(stakeIn.value);
+  if (!isFinite(v) || v <= 0){
+    if (stakeOut) stakeOut.value = "";
+    if (stakePreview) stakePreview.hidden = true;
+    return;
+  }
+  if (stakeOut) stakeOut.value = v.toFixed(2);
+  if (stakePreview){
+    stakePreview.innerHTML = "Receive <b>" + v.toFixed(2) + " " + stakeUnitTo() + "</b> · ≈ <b>$" +
+      (v * 38.11).toFixed(2) + "</b> at today's price · first rebase in <b>" + clockNow() + "</b>";
+    stakePreview.hidden = false;
+  }
+}
+if (stakeIn) stakeIn.addEventListener("input", function(){
+  var raw = stakeIn.value;
+  var clean = sanitizeNum(raw), bal = stakeBalance(), v = parseFloat(clean);
+  var note = /-/.test(raw) ? "Amounts cannot be negative."
+           : /[eE]/.test(raw) ? "Enter a plain number, not scientific notation." : null;
+  if (ranger && isFinite(v) && v > bal){
+    clean = bal.toFixed(2);
+    fieldErr(stakeIn, stakeErr, "Capped at your balance of " + bal.toFixed(2) + " " + stakeUnitFrom() + ".");
+  } else {
+    /* say what was removed — a silently substituted number is plausible enough to be submitted */
+    fieldErr(stakeIn, stakeErr, note);
+  }
+  if (clean !== stakeIn.value) stakeIn.value = clean;
+  renderStakePreview();
+});
+if (maxChip) maxChip.addEventListener("click", function(){
+  if (!ranger) return;                             // disabled anyway; belt and braces
+  stakeIn.value = stakeBalance().toFixed(2);
+  fieldErr(stakeIn, stakeErr, null);
+  renderStakePreview();
+  stakeIn.focus();
+});
 if (stakeBtn) stakeBtn.addEventListener("click", function(){
   if (!ranger){ openGate(); return; }
-  if (!parseFloat(stakeIn.value)){ toast("Name a sum first, ranger."); return; }
+  var v = parseFloat(stakeIn.value);
+  if (!isFinite(v) || v <= 0){
+    fieldErr(stakeIn, stakeErr, "Enter an amount greater than zero to " + (stakeMode==="stake"?"stake":"unstake") + ".");
+    stakeIn.focus(); return;
+  }
+  if (v > stakeBalance()){
+    fieldErr(stakeIn, stakeErr, "You have " + stakeBalance().toFixed(2) + " " + stakeUnitFrom() + ". Lower the amount, or press MAX.");
+    stakeIn.focus(); return;
+  }
+  fieldErr(stakeIn, stakeErr, null);
   toast("Concept only — no contracts are deployed. Your WOOD stays in the story.");
 });
 
 /* ---------- vault widget ---------- */
 var vaultIn=document.getElementById("vaultIn"), vaultOut=document.getElementById("vaultOut");
-if (vaultIn) vaultIn.addEventListener("input", function(){ var v=parseFloat(vaultIn.value)||0; if (vaultOut) vaultOut.value = v ? (v*29.849).toFixed(2) : ""; });
+var vaultErr=document.getElementById("vaultErr"), vaultPreview=document.getElementById("vaultPreview");
+function vaultBalance(){ return ranger ? 84.00 : 0; }
+function renderVaultPreview(){
+  if (!vaultIn) return;
+  var v = parseFloat(vaultIn.value);
+  if (!isFinite(v) || v <= 0){
+    if (vaultOut) vaultOut.value = "";
+    if (vaultPreview) vaultPreview.hidden = true;
+    return;
+  }
+  var usdg = v * 29.849;
+  if (vaultOut) vaultOut.value = usdg.toFixed(2);
+  if (vaultPreview){
+    vaultPreview.innerHTML = "Borrow <b>$" + usdg.toFixed(2) + " USDG</b> against <b>" + v.toFixed(2) +
+      " sWOOD</b> · 0.50% fixed, open-ended · <b>no liquidation price</b>";
+    vaultPreview.hidden = false;
+  }
+}
+if (vaultIn) vaultIn.addEventListener("input", function(){
+  var raw = vaultIn.value;
+  var clean = sanitizeNum(raw), bal = vaultBalance(), v = parseFloat(clean);
+  var note = /-/.test(raw) ? "Amounts cannot be negative."
+           : /[eE]/.test(raw) ? "Enter a plain number, not scientific notation." : null;
+  if (ranger && isFinite(v) && v > bal){
+    clean = bal.toFixed(2);
+    fieldErr(vaultIn, vaultErr, "Capped at your staked balance of " + bal.toFixed(2) + " sWOOD.");
+  } else {
+    fieldErr(vaultIn, vaultErr, note);
+  }
+  if (clean !== vaultIn.value) vaultIn.value = clean;
+  renderVaultPreview();
+});
 if (vaultBtn) vaultBtn.addEventListener("click", function(){
   if (!ranger){ openGate(); return; }
-  if (!parseFloat(vaultIn.value)){ toast("Enter collateral to borrow against."); return; }
+  var v = parseFloat(vaultIn.value);
+  if (!isFinite(v) || v <= 0){
+    fieldErr(vaultIn, vaultErr, "Enter the amount of sWOOD you want to borrow against.");
+    vaultIn.focus(); return;
+  }
+  if (v > vaultBalance()){
+    fieldErr(vaultIn, vaultErr, "You have " + vaultBalance().toFixed(2) + " sWOOD staked. Lower the amount.");
+    vaultIn.focus(); return;
+  }
+  fieldErr(vaultIn, vaultErr, null);
   toast("Concept only — the Vault is a story, not a smart contract.");
+});
+
+/* while disconnected the read-only field itself becomes the connect affordance */
+[stakeIn, vaultIn].forEach(function(el){
+  if (!el) return;
+  el.addEventListener("click", function(){ if (!ranger) openGate(); });
 });
 
 /* bond CTAs */
