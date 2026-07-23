@@ -13,6 +13,7 @@ import {Vault} from "../src/Vault.sol";
 import {RangeBound} from "../src/RangeBound.sol";
 import {MockOracle} from "../src/oracles/MockOracle.sol";
 import {TaxCollector, ITaxSwapRouter} from "../src/TaxCollector.sol";
+import {Redeem} from "../src/Redeem.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract MockERC20 is ERC20 {
@@ -1027,6 +1028,223 @@ contract SherwoodTest is Test {
         assertEq(wood.balanceOf(pair), 1_000 ether);
         assertEq(wood.balanceOf(collector), 0);
     }
+
+
+    // ── Redeem: permissionless RFV floor (InverseBond shape) ──────────────────
+
+    /// @dev Deploy + wire a Redeem against the suite's 18-dec USDG treasury.
+    function _deployRedeem() internal returns (Redeem redeem) {
+        redeem = new Redeem(address(auth), address(wood), address(treasury), address(usdg));
+        vm.startPrank(owner);
+        auth.grantRole(auth.RESERVE_SPENDER(), address(redeem));
+        auth.grantRole(auth.WOOD_MINTER(), address(redeem));
+        vm.stopPrank();
+    }
+
+    function test_redeem_permissionless_paysBackingMinusSpread() public {
+        Redeem redeem = _deployRedeem();
+        // Bob is not governor / guardian / any privileged role.
+        uint256 woodAmount = 100 ether;
+        vm.prank(alice);
+        wood.transfer(bob, woodAmount);
+
+        uint256 backing = treasury.backingPerWood(); // $20 in setUp
+        uint256 expectedUsdg = woodAmount * backing / WAD * (10_000 - redeem.spreadBps()) / 10_000;
+        // default spread 150 bps → 100 * 20 * 0.985 = 1970
+        assertEq(expectedUsdg, 1_970 ether);
+        assertEq(redeem.quote(woodAmount), expectedUsdg);
+
+        uint256 supplyBefore = wood.totalSupply();
+        uint256 treasUsdgBefore = usdg.balanceOf(address(treasury));
+        uint256 bobUsdgBefore = usdg.balanceOf(bob);
+
+        vm.startPrank(bob);
+        wood.approve(address(redeem), woodAmount);
+        uint256 out = redeem.redeem(woodAmount, expectedUsdg);
+        vm.stopPrank();
+
+        assertEq(out, expectedUsdg);
+        assertEq(wood.totalSupply(), supplyBefore - woodAmount);
+        assertEq(wood.balanceOf(bob), 0);
+        assertEq(wood.balanceOf(address(redeem)), 0); // no residual
+        assertEq(usdg.balanceOf(bob) - bobUsdgBefore, expectedUsdg);
+        assertEq(treasUsdgBefore - usdg.balanceOf(address(treasury)), expectedUsdg);
+    }
+
+    function test_redeem_sixDecimalUsdg() public {
+        // Fresh 6-dec USDG + treasury wiring mirrors production USDG.
+        MockERC20 usdg6 = new MockERC20("USDG6", "USDG6", 6);
+        MockOracle o6 = new MockOracle(1e18);
+        Redeem redeem = new Redeem(address(auth), address(wood), address(treasury), address(usdg6));
+
+        vm.startPrank(owner);
+        treasury.registerAsset(address(usdg6), address(o6), 1e18, 6);
+        auth.grantRole(auth.RESERVE_SPENDER(), address(redeem));
+        auth.grantRole(auth.WOOD_MINTER(), address(redeem));
+        // Seed $100k of 6-dec USDG RFV into treasury (100_000 * 1e6 raw = 100k * 1e18 norm).
+        usdg6.mint(owner, 100_000 * 1e6);
+        usdg6.approve(address(treasury), type(uint256).max);
+        treasury.deposit(address(usdg6), 100_000 * 1e6);
+        vm.stopPrank();
+
+        assertEq(redeem.usdgDecimals(), 6);
+
+        uint256 woodAmount = 10 ether;
+        vm.prank(alice);
+        wood.transfer(bob, woodAmount);
+
+        uint256 backing = treasury.backingPerWood(); // 18-dec USD
+        uint256 fairUsd18 = woodAmount * backing / WAD;
+        uint256 afterSpread = fairUsd18 * (10_000 - redeem.spreadBps()) / 10_000;
+        uint256 expectedUsdg6 = afterSpread / 1e12; // 18 → 6
+
+        vm.startPrank(bob);
+        wood.approve(address(redeem), woodAmount);
+        uint256 out = redeem.redeem(woodAmount, expectedUsdg6);
+        vm.stopPrank();
+
+        assertEq(out, expectedUsdg6);
+        assertEq(usdg6.balanceOf(bob), expectedUsdg6);
+        assertEq(wood.balanceOf(address(redeem)), 0);
+    }
+
+    function test_redeem_epochCap_revertsThenResets() public {
+        Redeem redeem = _deployRedeem();
+        vm.prank(owner);
+        redeem.setCapBps(100); // 1% of excess per epoch — tiny so we can hit it
+
+        // excess ≈ 1.9M; 1% = 19_000 USD ≈ capacity for ~965 WOOD at $20 * 0.985
+        uint256 excess = treasury.excessReserves();
+        uint256 epochCap = excess * 100 / 10_000; // 18-dec USDG (mock is 18-dec)
+        assertEq(redeem.remainingCapacity(), epochCap); // view rolls virtually
+
+        // First redeem opens the epoch and takes most of the cap.
+        uint256 wood1 = 900 ether;
+        vm.prank(alice);
+        wood.transfer(bob, wood1 + 200 ether);
+        uint256 out1 = redeem.quote(wood1);
+        assertLe(out1, epochCap);
+
+        vm.startPrank(bob);
+        wood.approve(address(redeem), type(uint256).max);
+        redeem.redeem(wood1, 0);
+        uint256 rem = redeem.epochRemaining();
+        assertEq(rem, epochCap - out1);
+
+        // Next redeem that exceeds remaining must revert.
+        uint256 wood2 = 200 ether;
+        uint256 out2 = redeem.quote(wood2);
+        assertGt(out2, rem);
+        vm.expectRevert(
+            abi.encodeWithSelector(Redeem.EpochCapExceeded.selector, out2, rem)
+        );
+        redeem.redeem(wood2, 0);
+        vm.stopPrank();
+
+        // Warp past epoch → cap re-snapshots and a modest redeem succeeds.
+        vm.warp(block.timestamp + redeem.EPOCH_LENGTH() + 1);
+        uint256 newCap = treasury.excessReserves() * 100 / 10_000;
+        assertEq(redeem.remainingCapacity(), newCap);
+
+        vm.prank(bob);
+        uint256 out3 = redeem.redeem(50 ether, 0);
+        assertGt(out3, 0);
+        assertEq(redeem.epochRemaining(), newCap - out3);
+    }
+
+    function test_redeem_paused_reverts() public {
+        Redeem redeem = _deployRedeem();
+        vm.prank(owner);
+        redeem.setActive(false);
+
+        vm.prank(alice);
+        wood.transfer(bob, 10 ether);
+        vm.startPrank(bob);
+        wood.approve(address(redeem), 10 ether);
+        vm.expectRevert(Redeem.Paused.selector);
+        redeem.redeem(10 ether, 0);
+        vm.stopPrank();
+    }
+
+    function test_redeem_setters_governorOnly() public {
+        Redeem redeem = _deployRedeem();
+        vm.startPrank(bob);
+        vm.expectRevert();
+        redeem.setSpreadBps(100);
+        vm.expectRevert();
+        redeem.setCapBps(500);
+        vm.expectRevert();
+        redeem.setActive(false);
+        vm.stopPrank();
+
+        vm.startPrank(owner);
+        redeem.setSpreadBps(200);
+        redeem.setCapBps(500);
+        redeem.setActive(false);
+        vm.stopPrank();
+        assertEq(redeem.spreadBps(), 200);
+        assertEq(redeem.capBps(), 500);
+        assertFalse(redeem.active());
+    }
+
+    function test_redeem_onlyBurnsOwnBalance_notArbitrary() public {
+        Redeem redeem = _deployRedeem();
+        // Alice holds WOOD; bob has none. Without a pull, redeem cannot burn alice's WOOD:
+        // transferFrom fails closed (no approval / no balance), and there is no public path
+        // that calls wood.burn(alice, …).
+        uint256 aliceBefore = wood.balanceOf(alice);
+        uint256 supplyBefore = wood.totalSupply();
+
+        vm.prank(bob);
+        vm.expectRevert(); // SafeERC20 transferFrom fail
+        redeem.redeem(10 ether, 0);
+
+        assertEq(wood.balanceOf(alice), aliceBefore);
+        assertEq(wood.totalSupply(), supplyBefore);
+        assertEq(wood.balanceOf(address(redeem)), 0);
+
+        // Successful path: pull then burn(self). Redeem residual is always zero afterwards,
+        // and alice only loses what she approved + transferred.
+        vm.startPrank(alice);
+        wood.approve(address(redeem), 25 ether);
+        redeem.redeem(25 ether, 0);
+        vm.stopPrank();
+
+        assertEq(wood.balanceOf(alice), aliceBefore - 25 ether);
+        assertEq(wood.totalSupply(), supplyBefore - 25 ether);
+        assertEq(wood.balanceOf(address(redeem)), 0);
+
+        // Role power note: WOOD_MINTER *could* burn any address, so the safety property is
+        // "Redeem never exposes that" — not "the role is incapable". A direct burn from
+        // redeem on alice still works at the token layer (documents the trust boundary).
+        vm.prank(address(redeem));
+        wood.burn(alice, 1 ether);
+        assertEq(wood.balanceOf(alice), aliceBefore - 25 ether - 1 ether);
+        // …which is exactly why redeem() must only ever burn address(this) after transferFrom.
+    }
+
+    function test_redeem_slippageGuard() public {
+        Redeem redeem = _deployRedeem();
+        vm.prank(alice);
+        wood.transfer(bob, 10 ether);
+        uint256 q = redeem.quote(10 ether);
+        vm.startPrank(bob);
+        wood.approve(address(redeem), 10 ether);
+        vm.expectRevert(abi.encodeWithSelector(Redeem.Slippage.selector, q, q + 1));
+        redeem.redeem(10 ether, q + 1);
+        vm.stopPrank();
+    }
+
+    function test_redeem_wiring_roles() public {
+        Redeem redeem = _deployRedeem();
+        assertTrue(auth.hasRole(auth.WOOD_MINTER(), address(redeem)));
+        assertTrue(auth.hasRole(auth.RESERVE_SPENDER(), address(redeem)));
+        // Mint path still exclusive to Treasury among the core stack.
+        assertTrue(auth.hasRole(auth.WOOD_MINTER(), address(treasury)));
+        assertFalse(auth.hasRole(auth.WOOD_MINTER(), address(camp)));
+        assertFalse(auth.hasRole(auth.WOOD_MINTER(), address(heist)));
+    }
+
 
     function test_treasury_stalePrice_guard() public {
         vm.prank(owner);

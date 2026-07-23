@@ -155,21 +155,45 @@ Single market in Phase 1:
 
 ## Range-bound stability
 
-- Band around `backingPerWood`: default 95%–105%  
-- Spot from `woodSpotOracle`  
-- `executeBid` / `executeAsk` guardian-gated; real DEX routing deferred  
+Two complementary mechanisms; only the bid half is permissionless.
+
+### Redeem (permissionless floor — InverseBond shape)
+
+`Redeem.sol` is a standing right for anyone to burn WOOD for USDG from the Treasury at a
+governor-set discount to `treasury.backingPerWood()` (default `spreadBps = 150`, i.e. 1.5%
+below RFV). No market oracle, no DEX, no keeper:
+
+1. Caller approves WOOD → `redeem(woodAmount, minUsdgOut)`.
+2. Contract `transferFrom`s WOOD to itself, then `burn`s **only its own balance** (needs
+   `WOOD_MINTER` solely for that scoped burn — never burns an arbitrary address).
+3. Pays USDG via `treasury.withdraw` (needs `RESERVE_SPENDER`), scaled to USDG's native
+   decimals (production USDG is 6-dec; the contract reads `decimals()` once at deploy).
+4. Rate-limited per Camp-aligned 8h epoch: at epoch open, cap = `capBps` of then-current
+   `excessReserves()` (default 10%), frozen for the epoch and depleted as redemptions land.
+
+If market price drops below this payout, buying WOOD and redeeming here is free money — that
+buy pressure is the floor defense. Premium to RFV remains market opinion; RFV is the contract
+fact.
+
+### RangeBound (guardian ask side — unchanged)
+
+- Band around `backingPerWood`: default 95%–105%, spot from `woodSpotOracle`
+- `executeAsk` (sell into strength above the upper band) stays **guardian-operated** exactly
+  as today — there is no NET-style equivalent for the ask, so it is not automated here
+- `executeBid` remains as a skeleton for discretionary guardian ops; day-to-day floor defense
+  is now Redeem, not a deferred DEX bid
 
 ## Roles (`Authority`)
 
 | Role | Used by |
 | --- | --- |
-| `GOVERNOR` | Asset registry, rates, markets, band |
+| `GOVERNOR` | Asset registry, rates, markets, band, Redeem spread/cap/pause |
 | `GUARDIAN` | RangeBound ops, emergency posture later |
 | `RESERVE_DEPOSITOR` | Privileged treasury deposits |
-| `RESERVE_SPENDER` | Vault, RangeBound withdrawals |
+| `RESERVE_SPENDER` | Vault, RangeBound, **Redeem** (USDG outflows) |
 | `REWARD_MANAGER` | Camp (and bootstrap minter) |
 | `BOND_MANAGER` | Heist |
-| `WOOD_MINTER` | Treasury (only path that mints WOOD) |
+| `WOOD_MINTER` | Treasury (mint path) and **Redeem** (burn-only of WOOD it already holds) |
 
 Owner of Authority is the bootstrap admin; later transfer to Council (`Authority` is
 `Ownable2Step`, so transfer requires the new owner to `acceptOwnership()`).

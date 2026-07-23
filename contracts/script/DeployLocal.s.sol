@@ -10,6 +10,7 @@ import {Camp} from "../src/Camp.sol";
 import {Heist} from "../src/Heist.sol";
 import {Vault} from "../src/Vault.sol";
 import {RangeBound} from "../src/RangeBound.sol";
+import {Redeem} from "../src/Redeem.sol";
 import {MockOracle} from "../src/oracles/MockOracle.sol";
 import {ManualOracle} from "../src/oracles/ManualOracle.sol";
 
@@ -29,7 +30,11 @@ contract DeployLocal is Script {
         address deployer = vm.addr(pk);
 
         vm.startBroadcast(pk);
+        _deploy(deployer);
+        vm.stopBroadcast();
+    }
 
+    function _deploy(address deployer) internal {
         Authority auth = new Authority(deployer);
         WOOD wood = new WOOD(address(auth));
         Treasury treasury = new Treasury(address(auth), address(wood));
@@ -42,6 +47,7 @@ contract DeployLocal is Script {
 
         Vault vault = new Vault(address(auth), address(camp), address(treasury), address(usdg));
         RangeBound rangeBound = new RangeBound(address(auth), address(wood), address(treasury), address(usdg));
+        Redeem redeem = new Redeem(address(auth), address(wood), address(treasury), address(usdg));
 
         auth.grantRole(auth.WOOD_MINTER(), address(treasury));
         auth.grantRole(auth.REWARD_MANAGER(), address(camp));
@@ -49,15 +55,18 @@ contract DeployLocal is Script {
         auth.grantRole(auth.RESERVE_DEPOSITOR(), deployer);
         auth.grantRole(auth.RESERVE_SPENDER(), address(vault));
         auth.grantRole(auth.RESERVE_SPENDER(), address(rangeBound));
+        auth.grantRole(auth.RESERVE_SPENDER(), address(redeem));
+        auth.grantRole(auth.WOOD_MINTER(), address(redeem));
         auth.grantRole(auth.GUARDIAN(), deployer);
         auth.grantRole(auth.REWARD_MANAGER(), deployer);
 
-        // ── Invariant: only the Treasury may mint WOOD. Camp/Heist mint solely through
-        //    treasury.mintWoodFromExcess (excess-capped); if either held WOOD_MINTER directly they
-        //    could mint unbacked WOOD and bypass the RFV cap. Fail the deploy if wiring is wrong. ──
+        // ── Invariant: only Treasury mints WOOD; Redeem holds WOOD_MINTER solely to burn
+        //    WOOD it has already pulled in. Camp/Heist must never hold WOOD_MINTER. ──
         require(auth.hasRole(auth.WOOD_MINTER(), address(treasury)), "wiring: treasury !WOOD_MINTER");
         require(!auth.hasRole(auth.WOOD_MINTER(), address(camp)), "wiring: camp has WOOD_MINTER");
         require(!auth.hasRole(auth.WOOD_MINTER(), address(heist)), "wiring: heist has WOOD_MINTER");
+        require(auth.hasRole(auth.WOOD_MINTER(), address(redeem)), "wiring: redeem !WOOD_MINTER");
+        require(auth.hasRole(auth.RESERVE_SPENDER(), address(redeem)), "wiring: redeem !RESERVE_SPENDER");
         require(auth.hasRole(auth.REWARD_MANAGER(), address(camp)), "wiring: camp !REWARD_MANAGER");
         require(auth.hasRole(auth.BOND_MANAGER(), address(heist)), "wiring: heist !BOND_MANAGER");
 
@@ -66,16 +75,12 @@ contract DeployLocal is Script {
         usdg.approve(address(treasury), type(uint256).max);
         treasury.deposit(address(usdg), 1_000_000 ether);
 
-        // Bootstrap circulating WOOD
         treasury.mintWoodFromExcess(deployer, 50_000 ether);
 
-        // Bond price ≥ RFV floor * (1 + protocolMintBps). Fresh deploy: backing = 1e6/50k = $20.
         uint256 floor = treasury.backingPerWood();
         uint256 minBondPrice = floor * (10_000 + heist.protocolMintBps()) / 10_000;
         heist.setMarket(address(usdg), address(usdgOracle), 18, 20_000 ether, minBondPrice, 5 days);
         rangeBound.setSpotOracle(address(woodSpot));
-
-        vm.stopBroadcast();
 
         console2.log("Authority ", address(auth));
         console2.log("WOOD      ", address(wood));
@@ -85,6 +90,7 @@ contract DeployLocal is Script {
         console2.log("Heist     ", address(heist));
         console2.log("Vault     ", address(vault));
         console2.log("RangeBound ", address(rangeBound));
+        console2.log("Redeem    ", address(redeem));
         console2.log("USDG      ", address(usdg));
         console2.log("reserves  ", treasury.totalReserves());
         console2.log("excess    ", treasury.excessReserves());
