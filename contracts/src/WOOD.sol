@@ -11,14 +11,17 @@ import {Authority} from "./Authority.sol";
 ///         to transfers into/out of a registered `isTaxedPair` (i.e. buys/sells against a listed
 ///         market), never to plain wallet-to-wallet transfers, staking, or protocol mint/burn
 ///         (mint has from == address(0), burn has to == address(0) — both skip tax entirely).
-///         The tax splits between `platformWallet` and `treasuryWallet` via `platformFeeBps` (a
-///         share OF the tax, not of the transfer — same shape as Heist's `founderFeeBps`).
-///         Default taxBps = 0 → no tax anywhere, matching the "no platform wallet" default this
-///         protocol shipped with; enabling it requires both wallets configured in the same call
-///         so a rate can never go live pointed at an unset (zero) address. `setTax` can freeze
-///         itself permanently (`taxLocked`) — once locked, the rate/split/wallets can never change
-///         again, matching a comparable live token's design where the tax is fixed forever from
-///         genesis. `setTaxedPair` is deliberately NOT lockable — new markets can always be listed.
+///
+///         The full tax (in WOOD) is sent to `treasuryWallet`. Intended production setup points
+///         `treasuryWallet` at a `TaxCollector`, which later converts accumulated WOOD → USDG and
+///         splits the stable proceeds (NET-style). `platformWallet` / `platformFeeBps` remain in
+///         `setTax` for lock-compatible config surface / event transparency but do **not** route
+///         raw WOOD — the collector owns the USDG split.
+///
+///         `isTaxExempt` is a governor toggle (immediate, no queue) so TaxCollector's convert()
+///         sell into a taxed pair does not re-skim the tax. Default taxBps = 0 → no tax anywhere.
+///         `setTax` can freeze itself permanently (`taxLocked`). `setTaxedPair` is deliberately
+///         NOT lockable — new markets can always be listed.
 contract WOOD is ERC20 {
     Authority public immutable authority;
 
@@ -30,19 +33,26 @@ contract WOOD is ERC20 {
 
     /// @notice Total buy/sell tax, in bps of the transfer amount. 0 = disabled (default).
     uint256 public taxBps;
-    /// @notice Share of `taxBps` routed to `platformWallet` instead of `treasuryWallet`.
+    /// @notice Legacy config surface (share of tax historically routed to platform). No longer
+    ///         used for raw WOOD routing — TaxCollector splits USDG after convert(). Kept so
+    ///         `setTax` / `taxLocked` stay a single atomic, lockable config call.
     uint256 public platformFeeBps;
     address public platformWallet;
+    /// @notice Destination of the full WOOD tax skim. Production: TaxCollector address.
     address public treasuryWallet;
     mapping(address => bool) public isTaxedPair;
-    /// @notice Once true, `setTax` can never be called again — rate, split, and wallets are frozen.
+    /// @notice Governor-gated exemption from transfer tax (TaxCollector must be exempt).
+    mapping(address => bool) public isTaxExempt;
+    /// @notice Once true, `setTax` can never be called again — rate/split/wallets are frozen.
     bool public taxLocked;
 
     event TaxedPairSet(address indexed pair, bool taxed);
+    event TaxExemptSet(address indexed account, bool exempt);
     event TaxConfigSet(
         uint256 taxBps, uint256 platformFeeBps, address platformWallet, address treasuryWallet, bool locked
     );
-    /// @param tax splits exactly into `platformAmount` + `treasuryAmount`; `to` receives `value - tax`.
+    /// @param tax full WOOD skim; `platformAmount` is always 0 under collector routing;
+    ///        `treasuryAmount == tax` and lands in `treasuryWallet` (the collector).
     event TransferTaxed(
         address indexed from,
         address indexed to,
@@ -87,13 +97,19 @@ contract WOOD is ERC20 {
         emit TaxedPairSet(pair, taxed);
     }
 
-    /// @notice Governor: set the whole tax config atomically. `platformFeeBps` is a share OF
-    ///         `taxBps_` (10_000 = the entire tax goes to platform). A non-zero `taxBps_` requires
-    ///         both wallets to be real addresses — otherwise the redirected share would silently
-    ///         burn into the zero address. Passing `taxBps_ == 0` disables tax regardless of the
-    ///         other params (wallets may be left configured for a later re-enable). Reverts once
-    ///         `taxLocked` — set `lock_ = true` here to finalize this call's config permanently in
-    ///         the same transaction (no separate unlock path; irreversible by design).
+    /// @notice Governor: immediate tax exemption toggle (no queue). TaxCollector must be exempt
+    ///         so convert() sales into a taxed pair do not re-trigger the transfer tax.
+    function setTaxExempt(address account, bool exempt) external onlyGovernor {
+        if (account == address(0)) revert BadConfig();
+        isTaxExempt[account] = exempt;
+        emit TaxExemptSet(account, exempt);
+    }
+
+    /// @notice Governor: set the whole tax config atomically. A non-zero `taxBps_` requires a
+    ///         real `treasuryWallet_` (typically TaxCollector) — the full WOOD tax lands there.
+    ///         `platformFeeBps_` / `platformWallet_` are retained for lock-compatible config
+    ///         history; they do not route raw WOOD. Passing `taxBps_ == 0` disables tax.
+    ///         Reverts once `taxLocked` — set `lock_ = true` to freeze permanently.
     function setTax(
         uint256 taxBps_,
         uint256 platformFeeBps_,
@@ -104,9 +120,10 @@ contract WOOD is ERC20 {
         if (taxLocked) revert TaxLocked();
         if (taxBps_ > MAX_TAX_BPS) revert BadConfig();
         if (platformFeeBps_ > BPS) revert BadConfig();
-        if (taxBps_ > 0 && (platformWallet_ == address(0) || treasuryWallet_ == address(0))) {
-            revert BadConfig();
-        }
+        // Full tax lands in treasuryWallet (collector). platformWallet only required if a
+        // non-zero platformFeeBps is recorded for the locked config snapshot.
+        if (taxBps_ > 0 && treasuryWallet_ == address(0)) revert BadConfig();
+        if (platformFeeBps_ > 0 && platformWallet_ == address(0)) revert BadConfig();
         taxBps = taxBps_;
         platformFeeBps = platformFeeBps_;
         platformWallet = platformWallet_;
@@ -119,17 +136,15 @@ contract WOOD is ERC20 {
 
     function _update(address from, address to, uint256 value) internal override {
         if (
-            taxBps > 0 && from != address(0) && to != address(0)
+            taxBps > 0 && from != address(0) && to != address(0) && !isTaxExempt[from] && !isTaxExempt[to]
                 && (isTaxedPair[from] || isTaxedPair[to])
         ) {
             uint256 tax = value * taxBps / BPS;
             if (tax > 0) {
-                uint256 platformAmount = tax * platformFeeBps / BPS;
-                uint256 treasuryAmount = tax - platformAmount;
+                // Entire WOOD tax → treasuryWallet (TaxCollector). USDG split happens on convert().
                 super._update(from, to, value - tax);
-                if (platformAmount > 0) super._update(from, platformWallet, platformAmount);
-                if (treasuryAmount > 0) super._update(from, treasuryWallet, treasuryAmount);
-                emit TransferTaxed(from, to, tax, platformAmount, treasuryAmount);
+                super._update(from, treasuryWallet, tax);
+                emit TransferTaxed(from, to, tax, 0, tax);
                 return;
             }
         }

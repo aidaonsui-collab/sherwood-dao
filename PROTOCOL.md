@@ -58,7 +58,7 @@ every split, every recipient, and every resulting mint or skim is public state a
 | **Bond protocol mint** | Extra WOOD minted on each claim (V1 DAO mint, lite); split between Treasury and an optional disclosed founder fee | `protocolMintBps = 1000` (10% of user payout); `founderFeeBps = 0` (0% of that 10% — i.e. 100% to Treasury) |
 | **Vault interest** | Cooler-style borrow APR; repay → Treasury | `interestBps = 50` (0.50% APR), 100% to Treasury, no founder-fee split |
 | **Stake / unstake** | — | **0** |
-| **WOOD transfer tax** | Buy/sell tax on transfers into/out of a registered pair only; split between Treasury and a platform wallet | `taxBps = 0` (disabled); wallet-to-wallet transfers, staking, and protocol mint/burn are never taxed regardless |
+| **WOOD transfer tax** | Buy/sell tax on transfers into/out of a registered pair only; full WOOD skim → TaxCollector; convert() sells WOOD→USDG and splits stables | `taxBps = 0` (disabled); wallet-to-wallet, staking, mint/burn never taxed |
 | **POL fees** (later) | Own WOOD/USDG LP NFT | 100% to Treasury |
 
 ### Transfer tax (WOOD only)
@@ -67,25 +67,41 @@ every split, every recipient, and every resulting mint or skim is public state a
 applies a tax to transfers where **either side is a registered `isTaxedPair`** — i.e. buys and
 sells against a listed market — and nowhere else: plain wallet-to-wallet transfers, `Camp`
 stake/unstake, and every protocol mint or burn (both have one side at `address(0)`) skip it
-unconditionally, by construction, not by exemption list. `taxBps` is capped at `MAX_TAX_BPS =
-2000` (20%) as a hard ceiling regardless of what governance sets — a seatbelt against a
-confiscatory rate, not a target. `platformFeeBps` is a share **of the tax itself** (10,000 = the
-whole tax to platform), and a non-zero `taxBps` requires both `platformWallet` and
-`treasuryWallet` to be real addresses in the same call — so a rate can never go live pointed at an
-unset address (which would otherwise burn the skim into the zero address unnoticed). Default
-`taxBps = 0`: no tax anywhere, matching the shipped "no platform wallet" behavior exactly. Every
-taxed transfer emits `TransferTaxed(from, to, tax, platformAmount, treasuryAmount)` alongside the
-ordinary `Transfer` events — the split is always independently verifiable from an explorer.
+unconditionally, by construction. Addresses on the governor `isTaxExempt` list also skip tax
+(immediate toggle, no delay queue) so the TaxCollector can sell WOOD into a taxed pair without
+re-skimming itself.
+
+`taxBps` is capped at `MAX_TAX_BPS = 2000` (20%) as a hard ceiling — a seatbelt against a
+confiscatory rate, not a target. A non-zero `taxBps` requires a real `treasuryWallet`. Default
+`taxBps = 0`: no tax anywhere.
+
+**Routing (NET-style collector):** the full WOOD tax amount is sent to `treasuryWallet` only —
+production points that address at `TaxCollector`. `platformFeeBps` / `platformWallet` remain on
+`setTax` as a lockable config snapshot / event surface; they do **not** receive raw WOOD.
+`TransferTaxed(from, to, tax, platformAmount=0, treasuryAmount=tax)` is emitted on every skim.
+
+**TaxCollector.convert(woodAmount, minUsdgOut)** (permissionless once configured):
+
+1. Sells WOOD for USDG via a governor-set Uniswap V2-style `router` (and optional `pool` address
+   for ops; no live WOOD market yet, so both are settable not constructor-fixed).
+2. Enforces an **on-chain oracle floor** so a sandwich against `convert(0, 0)` cannot dump
+   accumulated WOOD into a manipulated pool. `woodOracle` (WOOD/USD, same `IPriceOracle`
+   surface as Treasury) and `maxSlippageBps` are governor-set; effective
+   `amountOutMin = max(caller minUsdgOut, minUsdgFromOracle(amountIn))`. Callers may only
+   tighten the floor — a zero or low `minUsdgOut` is ignored in favor of the oracle value.
+3. Splits the resulting USDG by `treasuryBps` / `teamBps` (must sum to 10_000) to
+   `treasuryWallet` / `platformWallet` on the collector.
+4. Emits `Converted(caller, woodIn, usdgOut, treasuryAmount, teamAmount)`.
+
+Setup order (governor): deploy TaxCollector → `WOOD.setTaxExempt(collector, true)` →
+`WOOD.setTax(..., treasuryWallet=collector, ...)` → `setTaxedPair(pool, true)` →
+collector `setRouter` / `setRecipients` / `setSplit` / `setWoodOracle` / optional
+`setMaxSlippageBps`.
 
 **Locking:** passing `lock = true` freezes `taxBps`/`platformFeeBps`/both wallets permanently —
-`setTax` reverts on every call after that, forever, with no unlock path. This is deliberately
-stricter than the founder fee (which stays governor-adjustable indefinitely): it matches a
-comparable live token's actual on-chain shape, where the rate has no setter at all after genesis
-and is fixed forever. `setTaxedPair` is intentionally *not* covered by the lock — new markets can
-always be listed even after the rate itself is frozen, matching that same reference token's
-accepted, disclosed behavior (its guardian can still extend the tax to newly listed pairs
-indefinitely). Until locked, `setTax` can be called repeatedly — useful for iterating during
-testnet rollout before committing to a final rate on mainnet.
+`setTax` reverts on every call after that, forever, with no unlock path. `setTaxedPair` and
+`setTaxExempt` are intentionally *not* covered by the lock — new markets can still be listed and
+the collector can stay exempt after the rate is frozen.
 
 `setTaxedPair` has no live-pool validation (unlike Heist's bond quote check) — Sherwood has no
 deployed WOOD market yet, so there's nothing on-chain to validate a pair address against. The

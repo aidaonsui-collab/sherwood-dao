@@ -12,6 +12,8 @@ import {Heist} from "../src/Heist.sol";
 import {Vault} from "../src/Vault.sol";
 import {RangeBound} from "../src/RangeBound.sol";
 import {MockOracle} from "../src/oracles/MockOracle.sol";
+import {TaxCollector, ITaxSwapRouter} from "../src/TaxCollector.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract MockERC20 is ERC20 {
     uint8 private immutable _decimals;
@@ -26,6 +28,52 @@ contract MockERC20 is ERC20 {
 
     function mint(address to, uint256 amount) external {
         _mint(to, amount);
+    }
+}
+
+/// @dev V2-faithful router mock: pulls WOOD from caller *to the pool* (not to itself), matching
+///      Uniswap V2 TransferHelper.safeTransferFrom(path[0], msg.sender, pair, amounts[0]), then
+///      mints USDG at a fixed rate for tests. The pool must be set via setPool so taxed-pair
+///      semantics are actually exercised when the collector is not tax-exempt.
+contract MockTaxRouter is ITaxSwapRouter {
+    IERC20 public wood;
+    MockERC20 public usdg;
+    /// @notice Pair / sink that receives the WOOD pull (production V2 pair address).
+    address public pool;
+    /// @notice USDG out per 1e18 WOOD in (1e18 = 1:1).
+    uint256 public rate = 1e18;
+
+    constructor(address wood_, address usdg_) {
+        wood = IERC20(wood_);
+        usdg = MockERC20(usdg_);
+    }
+
+    function setPool(address pool_) external {
+        pool = pool_;
+    }
+
+    function setRate(uint256 rate_) external {
+        rate = rate_;
+    }
+
+    function swapExactTokensForTokens(
+        uint256 amountIn,
+        uint256 amountOutMin,
+        address[] calldata path,
+        address to,
+        uint256 /* deadline */
+    ) external returns (uint256[] memory amounts) {
+        require(path.length == 2, "path");
+        require(path[0] == address(wood) && path[1] == address(usdg), "tokens");
+        require(pool != address(0), "no pool");
+        uint256 out = amountIn * rate / 1e18;
+        require(out >= amountOutMin, "slippage");
+        // Pull WOOD from caller to the pair — same leg real V2 uses (never holds the token).
+        require(wood.transferFrom(msg.sender, pool, amountIn), "pull");
+        usdg.mint(to, out);
+        amounts = new uint256[](2);
+        amounts[0] = amountIn;
+        amounts[1] = out;
     }
 }
 
@@ -553,52 +601,43 @@ contract SherwoodTest is Test {
         assertEq(wood.balanceOf(pair), 10_000 ether); // full amount, no skim
     }
 
-    function test_wood_tax_appliesOnBuyAndSell_matchesNetRatio() public {
+    function test_wood_tax_appliesOnBuyAndSell_fullTaxToCollectorWallet() public {
         address pair = makeAddr("pair");
-        address platform = makeAddr("platform");
+        address collector = makeAddr("collector"); // stands in for TaxCollector
         vm.startPrank(owner);
         wood.setTaxedPair(pair, true);
-        // 5% total tax, split 66.6% platform / 33.4% treasury — reproduces NET's observed
-        // 3.33%/1.67% (of the transfer) ratio when taxBps = 500.
-        wood.setTax(500, 6_660, platform, address(treasury), false);
+        // Full WOOD tax lands in treasuryWallet (collector). platformFeeBps is config-only.
+        wood.setTax(500, 0, address(0), collector, false);
         vm.stopPrank();
 
         // Sell: alice → pair.
         uint256 sellAmount = 10_000 ether;
         uint256 sellTax = sellAmount * 500 / 10_000;
-        uint256 sellPlatform = sellTax * 6_660 / 10_000;
-        uint256 sellTreasury = sellTax - sellPlatform;
 
-        uint256 treasuryBefore = wood.balanceOf(address(treasury));
         vm.prank(alice);
         wood.transfer(pair, sellAmount);
 
         assertEq(wood.balanceOf(pair), sellAmount - sellTax);
-        assertEq(wood.balanceOf(platform), sellPlatform);
-        assertEq(wood.balanceOf(address(treasury)) - treasuryBefore, sellTreasury);
+        assertEq(wood.balanceOf(collector), sellTax);
 
         // Buy: pair → bob (pair now holds sellAmount - sellTax from the leg above).
         uint256 buyAmount = 3_000 ether;
         uint256 buyTax = buyAmount * 500 / 10_000;
-        uint256 buyPlatform = buyTax * 6_660 / 10_000;
-        uint256 buyTreasury = buyTax - buyPlatform;
+        uint256 collectorBefore = wood.balanceOf(collector);
 
-        uint256 platformBefore = wood.balanceOf(platform);
-        uint256 treasuryBefore2 = wood.balanceOf(address(treasury));
         vm.prank(pair);
         wood.transfer(bob, buyAmount);
 
         assertEq(wood.balanceOf(bob), buyAmount - buyTax);
-        assertEq(wood.balanceOf(platform) - platformBefore, buyPlatform);
-        assertEq(wood.balanceOf(address(treasury)) - treasuryBefore2, buyTreasury);
+        assertEq(wood.balanceOf(collector) - collectorBefore, buyTax);
     }
 
     function test_wood_tax_skipsMintAndBurn() public {
         address pair = makeAddr("pair");
-        address platform = makeAddr("platform");
+        address collector = makeAddr("collector");
         vm.startPrank(owner);
         wood.setTaxedPair(pair, true);
-        wood.setTax(500, 6_660, platform, address(treasury), false);
+        wood.setTax(500, 0, address(0), collector, false);
         vm.stopPrank();
 
         // Mint straight to the registered pair address itself — from == address(0), must skip tax.
@@ -610,61 +649,61 @@ contract SherwoodTest is Test {
         vm.prank(address(treasury));
         wood.burn(pair, 2_000 ether);
         assertEq(wood.balanceOf(pair), 3_000 ether);
-        assertEq(wood.balanceOf(platform), 0);
+        assertEq(wood.balanceOf(collector), 0);
     }
 
     function test_wood_tax_skipsPlainWalletTransfer() public {
         // Tax enabled, but neither alice nor bob is a registered pair — plain P2P transfer untaxed.
         address pair = makeAddr("pair");
-        address platform = makeAddr("platform");
+        address collector = makeAddr("collector");
         vm.startPrank(owner);
         wood.setTaxedPair(pair, true);
-        wood.setTax(500, 6_660, platform, address(treasury), false);
+        wood.setTax(500, 0, address(0), collector, false);
         vm.stopPrank();
 
         vm.prank(alice);
         wood.transfer(bob, 1_000 ether);
         assertEq(wood.balanceOf(bob), 1_000 ether);
-        assertEq(wood.balanceOf(platform), 0);
+        assertEq(wood.balanceOf(collector), 0);
     }
 
     function test_wood_setTax_governorOnly_reverts() public {
         vm.prank(bob);
         vm.expectRevert();
-        wood.setTax(500, 5_000, bob, address(treasury), false);
+        wood.setTax(500, 0, address(0), address(treasury), false);
     }
 
     function test_wood_setTax_badConfig_reverts() public {
         uint256 tooHigh = wood.MAX_TAX_BPS() + 1; // read before expectRevert — it's a separate call
         vm.startPrank(owner);
         vm.expectRevert(WOOD.BadConfig.selector);
-        wood.setTax(tooHigh, 5_000, bob, address(treasury), false); // > MAX_TAX_BPS
+        wood.setTax(tooHigh, 0, address(0), address(treasury), false); // > MAX_TAX_BPS
 
         vm.expectRevert(WOOD.BadConfig.selector);
         wood.setTax(500, 10_001, bob, address(treasury), false); // platformFeeBps > BPS
 
         vm.expectRevert(WOOD.BadConfig.selector);
-        wood.setTax(500, 5_000, address(0), address(treasury), false); // taxBps > 0, zero platform wallet
+        wood.setTax(500, 5_000, address(0), address(treasury), false); // platformFeeBps > 0, zero platform
 
         vm.expectRevert(WOOD.BadConfig.selector);
-        wood.setTax(500, 5_000, bob, address(0), false); // taxBps > 0, zero treasury wallet
+        wood.setTax(500, 0, address(0), address(0), false); // taxBps > 0, zero treasury wallet
         vm.stopPrank();
     }
 
     function test_wood_setTax_locksPermanently() public {
-        address platform = makeAddr("platform");
+        address collector = makeAddr("collector");
         vm.startPrank(owner);
         // Lock in the same call that sets the real config — matches NET's one-shot-at-genesis shape.
-        wood.setTax(500, 6_660, platform, address(treasury), true);
+        wood.setTax(500, 0, address(0), collector, true);
         assertTrue(wood.taxLocked());
         assertEq(wood.taxBps(), 500);
+        assertEq(wood.treasuryWallet(), collector);
 
         vm.expectRevert(WOOD.TaxLocked.selector);
         wood.setTax(0, 0, address(0), address(0), false); // even disabling it is blocked once locked
         vm.stopPrank();
 
-        // setTaxedPair is deliberately NOT covered by the lock — new markets can still be listed,
-        // matching NET's own accepted "guardian can add new AMM pairs" behavior.
+        // setTaxedPair is deliberately NOT covered by the lock — new markets can still be listed.
         vm.prank(owner);
         wood.setTaxedPair(makeAddr("newPair"), true);
     }
@@ -673,6 +712,320 @@ contract SherwoodTest is Test {
         vm.prank(bob);
         vm.expectRevert();
         wood.setTaxedPair(makeAddr("pair"), true);
+    }
+
+    // ── TaxCollector: WOOD → USDG convert + split (NET-style) ─────────────────
+
+    /// @dev Configure collector + V2-faithful mock router for convert tests.
+    function _configureCollector(TaxCollector collector, MockTaxRouter router, address pair, address platform)
+        internal
+    {
+        router.setPool(pair);
+        collector.setRouter(address(router), pair);
+        collector.setRecipients(address(treasury), platform);
+        collector.setWoodOracle(address(woodSpot)); // $1 WOOD (setUp default)
+        collector.setMaxSlippageBps(0); // require full oracle value unless a test loosens
+    }
+
+    function test_wood_tax_accumulatesInTaxCollector() public {
+        address pair = makeAddr("pair");
+        TaxCollector collector = new TaxCollector(address(auth), address(wood), address(usdg));
+        vm.startPrank(owner);
+        wood.setTaxedPair(pair, true);
+        wood.setTax(500, 0, address(0), address(collector), false);
+        wood.setTaxExempt(address(collector), true);
+        vm.stopPrank();
+
+        uint256 sellAmount = 10_000 ether;
+        uint256 tax = sellAmount * 500 / 10_000;
+        vm.prank(alice);
+        wood.transfer(pair, sellAmount);
+        assertEq(wood.balanceOf(address(collector)), tax);
+    }
+
+    function test_taxCollector_convert_swapsAndSplits() public {
+        address pair = makeAddr("pair");
+        address platform = makeAddr("platform");
+        TaxCollector collector = new TaxCollector(address(auth), address(wood), address(usdg));
+        MockTaxRouter router = new MockTaxRouter(address(wood), address(usdg));
+
+        vm.startPrank(owner);
+        wood.setTaxedPair(pair, true);
+        wood.setTax(500, 0, address(0), address(collector), false);
+        wood.setTaxExempt(address(collector), true);
+        _configureCollector(collector, router, pair, platform);
+        // NET-shaped proceeds split: ~1/3 treasury / ~2/3 team on a 10_000 scale.
+        collector.setSplit(3_340, 6_660);
+        vm.stopPrank();
+
+        // Accumulate tax WOOD in collector.
+        uint256 sellAmount = 10_000 ether;
+        uint256 tax = sellAmount * 500 / 10_000; // 500 ether
+        vm.prank(alice);
+        wood.transfer(pair, sellAmount);
+        assertEq(wood.balanceOf(address(collector)), tax);
+
+        uint256 treasUsdgBefore = usdg.balanceOf(address(treasury));
+        uint256 platformUsdgBefore = usdg.balanceOf(platform);
+
+        // Anyone may convert; minUsdgOut=0 is raised to the oracle floor on chain.
+        vm.prank(bob);
+        uint256 usdgOut = collector.convert(0, 0); // full balance
+        assertEq(usdgOut, tax); // mock 1:1 at $1 oracle
+        assertEq(wood.balanceOf(address(collector)), 0);
+
+        uint256 expectedTeam = usdgOut * 6_660 / 10_000;
+        uint256 expectedTreasury = usdgOut - expectedTeam;
+        assertEq(usdg.balanceOf(platform) - platformUsdgBefore, expectedTeam);
+        assertEq(usdg.balanceOf(address(treasury)) - treasUsdgBefore, expectedTreasury);
+    }
+
+    /// @notice Load-bearing exemption test: MockTaxRouter pulls WOOD to the *taxed pair* (V2
+    ///         semantics). Without setTaxExempt(collector), convert leaves residual tax WOOD on
+    ///         the collector and the pair receives only (amountIn − tax). With exemption, the
+    ///         full amount lands on the pair and the collector balance goes to zero.
+    function test_taxCollector_convert_exemptSaleNotRetaxed() public {
+        address pair = makeAddr("pair");
+        address platform = makeAddr("platform");
+        TaxCollector collector = new TaxCollector(address(auth), address(wood), address(usdg));
+        MockTaxRouter router = new MockTaxRouter(address(wood), address(usdg));
+
+        vm.startPrank(owner);
+        wood.setTaxedPair(pair, true);
+        wood.setTax(500, 0, address(0), address(collector), false);
+        wood.setTaxExempt(address(collector), true);
+        _configureCollector(collector, router, pair, platform);
+        collector.setSplit(5_000, 5_000);
+        vm.stopPrank();
+
+        // Fund collector directly with known WOOD (mint path).
+        vm.prank(address(treasury));
+        wood.mint(address(collector), 1_000 ether);
+
+        uint256 treasBefore = usdg.balanceOf(address(treasury));
+        uint256 platBefore = usdg.balanceOf(platform);
+        // Router pulls 1000 WOOD to the taxed pair. With exemption, full amount lands on pair
+        // and collector residual is zero — these asserts fail if exemption is removed.
+        collector.convert(0, 0);
+        assertEq(wood.balanceOf(address(collector)), 0);
+        assertEq(wood.balanceOf(pair), 1_000 ether);
+        assertEq(
+            (usdg.balanceOf(address(treasury)) - treasBefore) + (usdg.balanceOf(platform) - platBefore),
+            1_000 ether
+        );
+    }
+
+    /// @notice Counterpart to exemptSaleNotRetaxed: without exemption, selling into a taxed pair
+    ///         re-skims the collector. Proves the pair-sink mock makes exemption load-bearing.
+    function test_taxCollector_convert_withoutExempt_leavesResidualTax() public {
+        address pair = makeAddr("pair");
+        address platform = makeAddr("platform");
+        TaxCollector collector = new TaxCollector(address(auth), address(wood), address(usdg));
+        MockTaxRouter router = new MockTaxRouter(address(wood), address(usdg));
+
+        vm.startPrank(owner);
+        wood.setTaxedPair(pair, true);
+        wood.setTax(500, 0, address(0), address(collector), false);
+        // deliberately NO setTaxExempt(collector)
+        _configureCollector(collector, router, pair, platform);
+        collector.setSplit(5_000, 5_000);
+        vm.stopPrank();
+
+        vm.prank(address(treasury));
+        wood.mint(address(collector), 1_000 ether);
+
+        // convert still "succeeds" (transferFrom of amountIn nets tax back to collector),
+        // but leaves residual WOOD and under-delivers to the pair.
+        collector.convert(0, 0);
+        uint256 expectedTax = 1_000 ether * 500 / 10_000; // 50 ether
+        assertEq(wood.balanceOf(address(collector)), expectedTax);
+        assertEq(wood.balanceOf(pair), 1_000 ether - expectedTax);
+    }
+
+    function test_taxCollector_nonExemptStillTaxedNormally() public {
+        address pair = makeAddr("pair");
+        TaxCollector collector = new TaxCollector(address(auth), address(wood), address(usdg));
+        // Collector is treasuryWallet but deliberately NOT exempt — proves exemption is scoped.
+        vm.startPrank(owner);
+        wood.setTaxedPair(pair, true);
+        wood.setTax(500, 0, address(0), address(collector), false);
+        // no setTaxExempt
+        vm.stopPrank();
+
+        vm.prank(alice);
+        wood.transfer(pair, 10_000 ether);
+        // Tax still lands on collector as recipient of the skim (from=alice, to=collector is not
+        // pair-sided for the skim legs... wait: skim is from→collector, collector not pair, so
+        // the skim itself is not taxed. Non-exempt matters for collector selling INTO pair.
+        assertEq(wood.balanceOf(address(collector)), 500 ether);
+
+        // Non-exempt address selling into pair still pays tax.
+        vm.prank(alice);
+        wood.transfer(bob, 2_000 ether); // P2P untaxed
+        vm.prank(bob);
+        wood.transfer(pair, 1_000 ether);
+        uint256 expectedTax = 1_000 ether * 500 / 10_000;
+        assertEq(wood.balanceOf(pair), (10_000 ether - 500 ether) + (1_000 ether - expectedTax));
+        assertEq(wood.balanceOf(address(collector)), 500 ether + expectedTax);
+        assertEq(wood.balanceOf(bob), 1_000 ether); // 2k received − 1k sold
+    }
+
+    function test_taxCollector_setters_governorOnly() public {
+        TaxCollector collector = new TaxCollector(address(auth), address(wood), address(usdg));
+        vm.prank(bob);
+        vm.expectRevert();
+        collector.setRouter(makeAddr("r"), makeAddr("p"));
+
+        vm.prank(bob);
+        vm.expectRevert();
+        collector.setRecipients(address(treasury), bob);
+
+        vm.prank(bob);
+        vm.expectRevert();
+        collector.setSplit(5_000, 5_000);
+
+        vm.prank(bob);
+        vm.expectRevert();
+        collector.setWoodOracle(address(woodSpot));
+
+        vm.prank(bob);
+        vm.expectRevert();
+        collector.setMaxSlippageBps(100);
+
+        vm.prank(bob);
+        vm.expectRevert();
+        wood.setTaxExempt(address(collector), true);
+    }
+
+    function test_taxCollector_splitMustSumToBps() public {
+        TaxCollector collector = new TaxCollector(address(auth), address(wood), address(usdg));
+        vm.startPrank(owner);
+        collector.setRecipients(address(treasury), bob);
+        vm.expectRevert(TaxCollector.BadConfig.selector);
+        collector.setSplit(5_000, 4_999); // != 10000
+        collector.setSplit(3_340, 6_660); // ok
+        vm.stopPrank();
+    }
+
+    function test_taxCollector_convert_requiresConfig() public {
+        TaxCollector collector = new TaxCollector(address(auth), address(wood), address(usdg));
+        vm.prank(address(treasury));
+        wood.mint(address(collector), 100 ether);
+        // No router / recipients / oracle → NotConfigured.
+        vm.expectRevert(TaxCollector.NotConfigured.selector);
+        collector.convert(0, 0);
+
+        // Router + recipients still insufficient without oracle.
+        MockTaxRouter router = new MockTaxRouter(address(wood), address(usdg));
+        address pair = makeAddr("pair");
+        vm.startPrank(owner);
+        router.setPool(pair);
+        collector.setRouter(address(router), pair);
+        collector.setRecipients(address(treasury), address(0));
+        vm.stopPrank();
+        vm.expectRevert(TaxCollector.NotConfigured.selector);
+        collector.convert(0, 0);
+    }
+
+    function test_taxCollector_minUsdgFromOracle() public {
+        TaxCollector collector = new TaxCollector(address(auth), address(wood), address(usdg));
+        vm.startPrank(owner);
+        collector.setWoodOracle(address(woodSpot)); // $1
+        collector.setMaxSlippageBps(500); // 5%
+        vm.stopPrank();
+
+        // fair = 1000e18 * 1e18 / 1e18 = 1000e18; floor = 95%
+        assertEq(collector.minUsdgFromOracle(1_000 ether), 950 ether);
+
+        vm.prank(owner);
+        woodSpot.setPrice(2e18); // $2 WOOD
+        assertEq(collector.minUsdgFromOracle(1_000 ether), 1_900 ether); // 2000 * 0.95
+    }
+
+    /// @notice Depressed pool rate below the oracle floor must revert even when caller passes
+    ///         minUsdgOut = 0 (the sandwich vector: manipulate pool → convert(0,0) → restore).
+    function test_taxCollector_convert_oracleFloor_blocksSandwich() public {
+        address pair = makeAddr("pair");
+        address platform = makeAddr("platform");
+        TaxCollector collector = new TaxCollector(address(auth), address(wood), address(usdg));
+        MockTaxRouter router = new MockTaxRouter(address(wood), address(usdg));
+
+        vm.startPrank(owner);
+        wood.setTaxedPair(pair, true);
+        wood.setTax(500, 0, address(0), address(collector), false);
+        wood.setTaxExempt(address(collector), true);
+        _configureCollector(collector, router, pair, platform);
+        collector.setSplit(5_000, 5_000);
+        collector.setMaxSlippageBps(100); // allow 1% below oracle
+        vm.stopPrank();
+
+        vm.prank(address(treasury));
+        wood.mint(address(collector), 1_000 ether);
+
+        // Attacker depresses pool to 50% of fair value.
+        router.setRate(0.5e18);
+        // convert(0, 0) raises min to oracleFloor = 1000 * 0.99 = 990; mock out = 500 → reverts.
+        vm.expectRevert(bytes("slippage"));
+        collector.convert(0, 0);
+
+        // Fair rate succeeds; convert(0,0) is protected but still permissionless.
+        router.setRate(1e18);
+        uint256 out = collector.convert(0, 0);
+        assertEq(out, 1_000 ether);
+        assertEq(wood.balanceOf(address(collector)), 0);
+    }
+
+    /// @notice Caller-supplied minUsdgOut may only tighten the oracle floor, never loosen it.
+    function test_taxCollector_convert_callerMinTightensFloor() public {
+        address pair = makeAddr("pair");
+        address platform = makeAddr("platform");
+        TaxCollector collector = new TaxCollector(address(auth), address(wood), address(usdg));
+        MockTaxRouter router = new MockTaxRouter(address(wood), address(usdg));
+
+        vm.startPrank(owner);
+        wood.setTaxExempt(address(collector), true);
+        _configureCollector(collector, router, pair, platform);
+        collector.setSplit(10_000, 0);
+        collector.setMaxSlippageBps(500); // oracle floor = 95% of fair
+        vm.stopPrank();
+
+        vm.prank(address(treasury));
+        wood.mint(address(collector), 1_000 ether);
+
+        // Oracle floor = 950. Mock at 97% would clear the floor but not a tighter caller min.
+        router.setRate(0.97e18);
+        assertEq(collector.minUsdgFromOracle(1_000 ether), 950 ether);
+
+        // Loose caller min is raised to floor → succeeds at 970 >= 950.
+        uint256 out = collector.convert(500 ether, 0);
+        assertEq(out, 500 ether * 0.97e18 / 1e18);
+
+        // Tight caller min above mock out reverts even though mock is above oracle floor.
+        // remaining bal = 500; fair floor = 475; caller asks for 490; mock out = 485.
+        router.setRate(0.97e18);
+        vm.expectRevert(bytes("slippage"));
+        collector.convert(500 ether, 490 ether);
+    }
+
+    function test_wood_taxExempt_skipsTaxWhenFromExempt() public {
+        address pair = makeAddr("pair");
+        address collector = makeAddr("collector");
+        address exemptSeller = makeAddr("exemptSeller");
+        vm.startPrank(owner);
+        wood.setTaxedPair(pair, true);
+        wood.setTax(500, 0, address(0), collector, false);
+        wood.setTaxExempt(exemptSeller, true);
+        vm.stopPrank();
+
+        // Fund exempt seller.
+        vm.prank(alice);
+        wood.transfer(exemptSeller, 1_000 ether);
+
+        vm.prank(exemptSeller);
+        wood.transfer(pair, 1_000 ether);
+        // Full amount delivered — no tax.
+        assertEq(wood.balanceOf(pair), 1_000 ether);
+        assertEq(wood.balanceOf(collector), 0);
     }
 
     function test_treasury_stalePrice_guard() public {
