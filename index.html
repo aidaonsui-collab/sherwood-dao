@@ -1207,13 +1207,16 @@ var arrowStage = document.getElementById("arrowStage");
 function applyParallax(t){
   var sy = S.sy;
   if (sy > S.heroH*1.25) return;
-  /* was also fading heroInner/oakWrap to 0 opacity by ~80-85% of hero height —
-     while the hero was still on screen, so it visually "ghosted" behind the
-     ticker and chapter I content scrolling in underneath it. Scroll motion
-     (the translates below) reads as parallax; the opacity fade just looked
-     like a broken cross-fade. Removed, kept the movement. */
-  heroInner.style.transform = "translateY(" + (sy*0.22).toFixed(1) + "px)";
-  oakWrap.style.transform = "translate(calc(-50% + " + (S.mx*-16).toFixed(1) + "px), " + (sy*0.15 + S.my*-8).toFixed(1) + "px)";
+  /* heroInner/oakWrap used to lag scroll (translateY at 0.22x/0.15x speed) and
+     fade to 0 opacity by ~80-85% of hero height. Both were removed: the fade
+     ghosted the still-visible content behind the ticker/chapter I scrolling in
+     underneath it, and — since .hero clips its own overflow — the LAG made
+     matters worse by letting the scroll-fast page catch up to and clip the
+     scroll-slow hero content early, truncating it right at that boundary
+     instead of letting it scroll away normally. Mouse-driven motion (S.mx/my)
+     doesn't have this problem — it's independent of scroll position — so it
+     stays; only the scroll-position (sy) terms are gone. */
+  oakWrap.style.transform = "translate(calc(-50% + " + (S.mx*-16).toFixed(1) + "px), " + (S.my*-8).toFixed(1) + "px)";
   arrowStage.style.transform = "translate(" + (S.mx*12).toFixed(1) + "px, " + (Math.sin(t*0.0011)*9 + S.my*7).toFixed(1) + "px)";
 }
 
