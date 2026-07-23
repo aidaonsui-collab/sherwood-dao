@@ -7,6 +7,19 @@
 <meta name="description" content="SherwoodDAO — a treasury-backed reserve currency for Robinhood. Tokenized T-bills, equities and protocol-owned liquidity behind every $WOOD. Taken from the market makers, given to the holders.">
 <meta property="og:title" content="SherwoodDAO — Backed by the real world">
 <meta property="og:description" content="A treasury-backed reserve currency for Robinhood. (🏹,🏹)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SherwoodDAO">
+<meta property="og:image" content="og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A golden arrow suspended above a moonlit pine forest — SherwoodDAO.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SherwoodDAO — Backed by the real world">
+<meta name="twitter:description" content="A treasury-backed reserve currency for Robinhood. Tokenized T-bills, equities and protocol-owned liquidity behind every $WOOD.">
+<meta name="twitter:image" content="og-image.png">
+<!-- TODO: once the production domain is known, add <link rel="canonical"> + <meta property="og:url">,
+     and change og:image / twitter:image to ABSOLUTE URLs — the Open Graph spec requires them and
+     most scrapers will not resolve the relative path above, so previews render without an image. -->
 <title>SherwoodDAO — Backed by the real world</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23081009'/%3E%3Cpath d='M32 8l7 14h-5v26h6l-8 8-8-8h6V22h-5z' fill='%23D4AF37'/%3E%3C/svg%3E">
 <style>
@@ -30,7 +43,7 @@
 
   --text:#ECEFEA;
   --text-2:#9DAFA1;
-  --text-3:#6D7E71;
+  --text-3:#7E9184;
 
   --gold:#D8B85A;
   --gold-soft:#E7CE86;
@@ -49,7 +62,7 @@
   --cw:1120px;
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 body{
   margin:0;color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.65;
@@ -96,7 +109,7 @@ button{font:inherit}
 
 /* ---------- nav ---------- */
 .topnav{position:fixed;inset:0 0 auto 0;z-index:50;transition:background .3s,border-color .3s;border-bottom:1px solid transparent;background:transparent}
-.topnav.scrolled{background:rgba(9,13,10,.92);border-bottom-color:var(--border)}
+.topnav.scrolled{background:rgba(9,13,10,.85);backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3);border-bottom-color:var(--border)}
 .nav-inner{display:flex;align-items:center;gap:28px;height:60px}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
 .brand svg{width:22px;height:22px;flex:none}
@@ -146,6 +159,7 @@ button{font:inherit}
   .hero-stats>div:nth-child(-n+2){border-top:none}
   .hero-stats>div:nth-child(2){border-left:1px solid var(--hair)}
   .hero-stats>div:nth-child(4){border-left:1px solid var(--hair)}
+  .hero-stats>div:nth-child(5){grid-column:1 / -1;border-left:none}
 }
 .scroll-cue{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12px;color:var(--text-3);font-weight:500}
 .scroll-cue i{width:1px;height:36px;background:linear-gradient(180deg,var(--border-2),transparent);display:block;position:relative;overflow:hidden}
@@ -160,7 +174,7 @@ button{font:inherit}
 /* ---------- ticker ---------- */
 .ticker{border-block:1px solid var(--border);background:var(--surface);overflow:hidden;position:relative;z-index:4}
 .ticker-track{display:inline-flex;white-space:nowrap;padding:12px 0;animation:tick 52s linear infinite}
-.ticker:hover .ticker-track{animation-play-state:paused}
+.ticker:hover .ticker-track,.ticker:focus-within .ticker-track{animation-play-state:paused}
 .ticker-track span{font-size:13px;font-weight:500;color:var(--text-3);padding-right:2em}
 .ticker-track span b{font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
 .ticker-track span::after{content:"·";color:var(--text-3);margin-left:2em;font-weight:400}
@@ -178,7 +192,9 @@ button{font:inherit}
 .chapter .copy{font-size:15.5px;color:var(--text-2);max-width:62ch;line-height:1.7}
 .chapter .copy + .copy{margin-top:14px}
 .copy em{font-style:normal;color:var(--text);font-weight:500}
-.split{display:grid;grid-template-columns:5fr 7fr;gap:56px;align-items:center}
+/* start, not center: centering let the tall card overhang the chapter eyebrow,
+   so visual order contradicted reading order in chapters III and IV */
+.split{display:grid;grid-template-columns:5fr 7fr;gap:56px;align-items:start}
 .split.rev{grid-template-columns:7fr 5fr}
 @media (max-width:980px){.split,.split.rev{grid-template-columns:1fr;gap:40px}}
 
@@ -239,7 +255,11 @@ table.ledger tr.total .num{color:var(--gold);font-size:14.5px;font-weight:600}
 .poster .reward{font-size:12.5px;color:var(--text-3);margin-top:10px;text-transform:none;letter-spacing:0}
 .poster .reward b{font-weight:600;color:var(--gold)}
 .stamp{position:absolute;top:14px;right:14px;background:var(--surface-2);font-size:11px;font-weight:600;color:var(--gold);border:1px solid var(--border);padding:4px 9px;border-radius:20px;pointer-events:none;letter-spacing:0;text-transform:none;transform:none}
-.poster.closed{opacity:.72}
+/* unavailable state via explicit tokens — never opacity, which drags body text below AA */
+.poster.closed{border-color:var(--border)}
+.poster.closed .disc{color:var(--text-2)}
+.poster.closed .cap i{background:var(--text-3)}
+.poster.closed .wanted,.poster.closed .for,.poster.closed .reward{color:var(--text-3)}
 .poster.closed .stamp{color:var(--down);border-color:rgba(208,138,106,.35)}
 .poster.closed:hover{box-shadow:var(--shadow)}
 
@@ -261,7 +281,7 @@ table.ledger tr.total .num{color:var(--gold);font-size:14.5px;font-weight:600}
 .camp-stats .v{font-variant-numeric:tabular-nums;font-size:20px;font-weight:600;color:var(--text)}
 @media (max-width:400px){.camp-stats{grid-template-columns:1fr}}
 .truth-row{margin-top:18px;width:100%;display:flex;flex-direction:column;gap:10px}
-.truth{display:inline-flex;align-items:center;gap:10px;background:none;border:none;padding:0;font-size:13px;font-weight:500;color:var(--text-2);cursor:pointer;transition:color .2s;text-transform:none;letter-spacing:0}
+.truth{display:inline-flex;align-items:center;gap:10px;background:none;border:none;padding:11px 4px;margin:-11px -4px;font-size:13px;font-weight:500;color:var(--text-2);cursor:pointer;transition:color .2s;text-transform:none;letter-spacing:0}
 .truth:hover{color:var(--text)}
 .truth .knob{width:34px;height:18px;border-radius:10px;border:1px solid var(--border-2);position:relative;flex:none;background:var(--surface-2);transition:background .3s,border-color .3s}
 .truth .knob::after{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:var(--text-3);transition:transform .3s var(--e),background .3s}
@@ -343,9 +363,65 @@ footer{padding:72px 0 40px;position:relative;border-top:1px solid var(--hair)}
   .vault-panel{padding:4px 18px}
 }
 
+/* A marquee that runs over 5s needs a real pause mechanism (WCAG 2.2.2, Level A).
+   Hover alone is not one, and :focus-within was dead code until this button existed. */
+.ticker-pause{position:absolute;left:10px;top:50%;transform:translateY(-50%);z-index:6;width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;padding:0;border:1px solid var(--border);border-radius:50%;background:var(--surface-2);color:var(--text-2);cursor:pointer;box-shadow:0 0 0 7px var(--surface);transition:color .2s,border-color .2s}
+.ticker-pause:hover{color:var(--text);border-color:var(--border-2)}
+.ticker-pause svg{width:12px;height:12px;fill:currentColor;stroke:none}
+.ticker-pause .i-play{display:none}
+.ticker.paused .ticker-pause .i-pause{display:none}
+.ticker.paused .ticker-pause .i-play{display:block}
+.ticker.paused .ticker-track{animation-play-state:paused}
+
+/* ---------- mobile chapter menu ---------- */
+.nav-cta{display:flex;align-items:center;gap:10px}
+.nav-burger{display:none;width:44px;height:44px;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:var(--r-xs);background:var(--surface);color:var(--text-2);cursor:pointer}
+.nav-burger svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round}
+.nav-scrim{position:fixed;inset:0;background:rgba(4,7,5,.62);opacity:0;pointer-events:none;transition:opacity .25s;z-index:48}
+.nav-scrim.on{opacity:1;pointer-events:auto}
+.nav-sheet{position:fixed;top:0;right:0;bottom:0;width:min(330px,86vw);background:var(--surface);border-left:1px solid var(--border);z-index:49;padding:88px 24px 28px;overflow-y:auto;transform:translateX(102%);visibility:hidden;transition:transform .3s var(--e),visibility 0s linear .3s}
+.nav-sheet.open{transform:none;visibility:visible;transition:transform .3s var(--e),visibility 0s}
+.nav-sheet a{display:flex;align-items:baseline;gap:12px;padding:15px 0;border-bottom:1px solid var(--hair);font-size:16px;color:var(--text);text-decoration:none;transition:color .2s}
+.nav-sheet a i{font-style:italic;font-family:var(--serif);color:var(--gold);font-size:14px;min-width:28px}
+.nav-sheet a:hover{color:var(--gold-soft)}
+.nav-sheet .sheet-cta{margin-top:18px;border:1px solid var(--border-2);border-bottom-color:var(--border-2);border-radius:var(--r-sm);justify-content:center;padding:14px 0;color:var(--gold-soft);font-weight:600}
+@media (max-width:900px){.nav-burger{display:inline-flex}}
+@media (min-width:901px){.nav-sheet,.nav-scrim{display:none}}
+@media (prefers-reduced-motion:reduce){.nav-sheet{transition:none}}
+
+/* nothing is deployed, so these are labelled rather than faked as working links */
+.foot-col .soon{display:block;font-size:13.5px;color:var(--text-3);padding:5px 0}
+.foot-col .soon i{font-style:normal;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);border:1px solid var(--hair);border-radius:20px;padding:1px 7px;margin-left:7px;vertical-align:1px}
+
+/* ---------- skip link ---------- */
+.skip{position:absolute;left:-9999px;top:0;z-index:300;background:var(--surface-2);color:var(--text);border:1px solid var(--border-2);border-radius:var(--r-xs);padding:12px 18px;font-size:14px;font-weight:600;text-decoration:none}
+.skip:focus{left:12px;top:12px}
+
+/* ---------- glossary ---------- */
+.glossary{margin-top:44px;padding:26px 28px}
+.glossary .gl-k{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.glossary dl{margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:0 34px}
+.glossary dl>div{display:flex;gap:10px;align-items:baseline;border-top:1px solid var(--hair);padding:12px 0}
+.glossary dt{font-weight:600;color:var(--text);white-space:nowrap}
+.glossary dd{margin:0;font-size:13.5px;color:var(--text-2);line-height:1.55}
+
+/* ---------- brand signature mark (inline SVG, not emoji) ---------- */
+.bowsig{display:inline-flex;align-items:center;gap:.06em;white-space:nowrap;vertical-align:-.08em}
+.bowsig svg{width:.95em;height:.95em;flex:none;fill:currentColor;stroke:none}
+
 </style>
+<noscript><style>
+  /* Without JS the IntersectionObserver never fires, so revealed content would stay invisible. */
+  [data-rv]{opacity:1!important;transform:none!important;transition:none!important}
+  /* the same observer gates the .grown class, so every progress bar would render empty */
+  .alloc-bar i{width:var(--w)!important}
+  .cap i{width:var(--w)!important}
+</style></noscript>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
+
+<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute"><symbol id="bowmark" viewBox="0 0 64 64"><path d="M32 4l8 16h-6v30h7l-9 10-9-10h7V20h-6z"/></symbol></svg>
 
 <div class="atmos" aria-hidden="true"></div>
 <div class="grain" aria-hidden="true"></div>
@@ -364,9 +440,22 @@ footer{padding:72px 0 40px;position:relative;border-top:1px solid var(--hair)}
       <a href="#stability">The Band</a>
       <a href="#ballads">The Ballads</a>
     </div>
-    <div class="nav-cta"><a class="btn small ghost" href="app.html">Enter the forest</a></div>
+    <div class="nav-cta">
+      <a class="btn small ghost" href="app.html">Enter the forest</a>
+      <button class="nav-burger" id="navBurger" type="button" aria-label="Open chapter menu" aria-expanded="false" aria-controls="navSheet"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    </div>
   </div>
 </nav>
+<div class="nav-scrim" id="navScrim" aria-hidden="true"></div>
+<aside class="nav-sheet" id="navSheet" role="dialog" aria-modal="true" aria-label="Chapters">
+  <a href="#ledger"><i>I.</i>The Ledger</a>
+  <a href="#heist"><i>II.</i>The Heist</a>
+  <a href="#camp"><i>III.</i>The Camp</a>
+  <a href="#vault"><i>IV.</i>The Vault</a>
+  <a href="#stability"><i>V.</i>The Band</a>
+  <a href="#ballads"><i>VI.</i>The Ballads</a>
+  <a class="sheet-cta" href="app.html">Enter the forest</a>
+</aside>
 
 <header class="hero" id="top">
   <canvas id="bgGL" aria-hidden="true"></canvas>
@@ -396,19 +485,20 @@ footer{padding:72px 0 40px;position:relative;border-top:1px solid var(--hair)}
       <div><div class="k">Market price</div><div class="v" data-count="38.11" data-dec="2" data-prefix="$">$38.11</div></div>
       <div><div class="k">Premium</div><div class="v up" data-count="21.3" data-dec="1" data-prefix="+" data-suffix="%">+21.3%</div></div>
       <div><div class="k">Treasury</div><div class="v" data-count="4.21" data-dec="2" data-prefix="$" data-suffix="M">$4.21M</div></div>
-      <div><div class="k">Staked (🏹,🏹)</div><div class="v" data-count="87.4" data-dec="1" data-suffix="%">87.4%</div></div>
+      <div><div class="k">Staked <span class="bowsig" role="img" aria-label="(arrow, arrow)">(<svg aria-hidden="true"><use href="#bowmark"/></svg>,<svg aria-hidden="true"><use href="#bowmark"/></svg>)</span></div><div class="v" data-count="87.4" data-dec="1" data-suffix="%">87.4%</div></div>
     </div>
   </div>
   <div class="scroll-cue" aria-hidden="true"><i></i>Descend</div>
 </header>
 
-<div class="ticker" aria-label="Treasury ticker">
+<div class="ticker" id="ticker" role="region" aria-label="Treasury ticker">
+  <button class="ticker-pause" id="tickerPause" type="button" aria-pressed="false" aria-label="Pause the treasury ticker"><svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="5" width="3.6" height="14" rx="1"/><rect x="13.4" y="5" width="3.6" height="14" rx="1"/></svg><svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg></button>
   <div class="ticker-track" id="tickerTrack">
-    <span>TREASURY <b>$4.21M</b></span><span>BACKING <b>$31.42</b></span><span>SGOV <b>41.0%</b></span><span>USDG <b>22.0%</b></span><span>WOOD∕USDG POL <b>17.1%</b></span><span>tSPY <b>7.8%</b></span><span>tTSLA <b>7.0%</b></span><span>tAAPL <b>5.1%</b></span><span>STAKED <b>87.4%</b> (🏹,🏹)</span><span>FLOOR DEFENDED <b>10 JUN</b> — 4,210 WOOD REPURCHASED</span>
+    <span>TREASURY <b>$4.21M</b></span><span>BACKING <b>$31.42</b></span><span>SGOV <b>41.0%</b></span><span>USDG <b>22.0%</b></span><span>WOOD∕USDG POL <b>17.1%</b></span><span>tSPY <b>7.8%</b></span><span>tTSLA <b>7.0%</b></span><span>tAAPL <b>5.1%</b></span><span>STAKED <b>87.4%</b> <span class="bowsig" role="img" aria-label="(arrow, arrow)">(<svg aria-hidden="true"><use href="#bowmark"/></svg>,<svg aria-hidden="true"><use href="#bowmark"/></svg>)</span></span><span>FLOOR DEFENDED <b>10 JUN</b> — 4,210 WOOD REPURCHASED</span>
   </div>
 </div>
 
-<main>
+<main id="main" tabindex="-1">
   <!-- ============ I · THE LEDGER ============ -->
   <section class="chapter" id="ledger">
     <div class="wrap">
@@ -442,18 +532,18 @@ footer{padding:72px 0 40px;position:relative;border-top:1px solid var(--hair)}
             <span><span class="sw" style="background:#14402A"></span>tAAPL <b>5.1%</b></span>
           </div>
         </div>
-        <div class="table-scroll">
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Treasury holdings, scrollable">
           <table class="ledger">
             <thead>
               <tr><th scope="col">Asset</th><th scope="col" class="num">Holdings</th><th scope="col" class="num">uiMultiplier</th><th scope="col" class="num">Value</th><th scope="col" class="num">Share</th></tr>
             </thead>
             <tbody>
-              <tr><td class="asset"><b>SGOV</b><span class="note">tokenized 0–3mo T-bills</span><span class="addr">0x51aE…90Ve ↗</span></td><td class="num">17,150 sh</td><td class="num">1.00095752</td><td class="num">$1,726,489</td><td class="num">41.0%</td></tr>
-              <tr><td class="asset"><b>USDG</b><span class="note">reserve stable</span><span class="addr">0x8aC1…44dF ↗</span></td><td class="num">926,014</td><td class="num">—</td><td class="num">$926,014</td><td class="num">22.0%</td></tr>
-              <tr><td class="asset"><b>WOOD∕USDG</b><span class="note">protocol-owned liquidity · v4</span><span class="addr">0xP0L1…c4fE ↗</span></td><td class="num">1.9M LP</td><td class="num">—</td><td class="num">$719,900</td><td class="num">17.1%</td></tr>
-              <tr><td class="asset"><b>tSPY</b><span class="note">S&amp;P 500 ETF</span><span class="addr">0x5pY0…11Aa ↗</span></td><td class="num">590 sh</td><td class="num">1.00000000</td><td class="num">$330,400</td><td class="num">7.8%</td></tr>
-              <tr><td class="asset"><b>tTSLA</b><span class="note">Tesla, Inc.</span><span class="addr">0x7e5L…a0b2 ↗</span></td><td class="num">890 sh</td><td class="num">1.00000000</td><td class="num">$292,810</td><td class="num">7.0%</td></tr>
-              <tr><td class="asset"><b>tAAPL</b><span class="note">Apple Inc.</span><span class="addr">0xAaP1…93Cd ↗</span></td><td class="num">1,020 sh</td><td class="num">1.00000000</td><td class="num">$214,200</td><td class="num">5.1%</td></tr>
+              <tr><td class="asset"><b>SGOV</b><span class="note">tokenized 0–3mo T-bills</span><span class="addr">0x51aE…90Ve</span></td><td class="num">17,150 sh</td><td class="num">1.00095752</td><td class="num">$1,726,489</td><td class="num">41.0%</td></tr>
+              <tr><td class="asset"><b>USDG</b><span class="note">reserve stable</span><span class="addr">0x8aC1…44dF</span></td><td class="num">926,014</td><td class="num">—</td><td class="num">$926,014</td><td class="num">22.0%</td></tr>
+              <tr><td class="asset"><b>WOOD∕USDG</b><span class="note">protocol-owned liquidity · v4</span><span class="addr">0xP0L1…c4fE</span></td><td class="num">1.9M LP</td><td class="num">—</td><td class="num">$719,900</td><td class="num">17.1%</td></tr>
+              <tr><td class="asset"><b>tSPY</b><span class="note">S&amp;P 500 ETF</span><span class="addr">0x5pY0…11Aa</span></td><td class="num">590 sh</td><td class="num">1.00000000</td><td class="num">$330,400</td><td class="num">7.8%</td></tr>
+              <tr><td class="asset"><b>tTSLA</b><span class="note">Tesla, Inc.</span><span class="addr">0x7e5L…a0b2</span></td><td class="num">890 sh</td><td class="num">1.00000000</td><td class="num">$292,810</td><td class="num">7.0%</td></tr>
+              <tr><td class="asset"><b>tAAPL</b><span class="note">Apple Inc.</span><span class="addr">0xAaP1…93Cd</span></td><td class="num">1,020 sh</td><td class="num">1.00000000</td><td class="num">$214,200</td><td class="num">5.1%</td></tr>
               <tr class="total"><td class="asset"><b>Treasury total</b><span class="note">133,985 WOOD outstanding</span></td><td class="num"></td><td class="num"></td><td class="num">$4,209,813</td><td class="num">100%</td></tr>
             </tbody>
           </table>
@@ -546,7 +636,7 @@ footer{padding:72px 0 40px;position:relative;border-top:1px solid var(--hair)}
           <div class="chap-head" data-rv><span class="chap-num">III.</span><span class="chap-rule"></span><span class="chap-kicker">The Camp · Staking</span></div>
           <h2 data-rv style="--d:80ms">Nock. Draw. <em>Hold</em>.</h2>
           <p class="copy" data-rv style="--d:160ms">Stake $WOOD, receive sWOOD, and every eight hours — one <em>watch</em> — the camp divides the spoils. Rebases mint against treasury surplus, so the yield is honest and your share of the forest stays yours.</p>
-          <p class="copy" data-rv style="--d:240ms">(🏹,🏹) is not a promise that the price only rises. It is a promise that the ledger never lies.</p>
+          <p class="copy" data-rv style="--d:240ms"><span class="bowsig" role="img" aria-label="(arrow, arrow)">(<svg aria-hidden="true"><use href="#bowmark"/></svg>,<svg aria-hidden="true"><use href="#bowmark"/></svg>)</span> is not a promise that the price only rises. It is a promise that the ledger never lies.</p>
         </div>
         <div>
           <div class="watch-card glass" data-rv style="--d:150ms">
@@ -575,11 +665,11 @@ footer{padding:72px 0 40px;position:relative;border-top:1px solid var(--hair)}
             <div class="camp-stats">
               <div><div class="k">Rebase / watch</div><div class="v">0.23%</div></div>
               <div><div class="k">APY</div><div class="v">1,204%</div></div>
-              <div><div class="k">Staked (🏹,🏹)</div><div class="v">87.4%</div></div>
+              <div><div class="k">Staked <span class="bowsig" role="img" aria-label="(arrow, arrow)">(<svg aria-hidden="true"><use href="#bowmark"/></svg>,<svg aria-hidden="true"><use href="#bowmark"/></svg>)</span></div><div class="v">87.4%</div></div>
             </div>
             <div class="truth-row">
-              <button class="truth" id="truthBtn" type="button" aria-pressed="false"><span class="knob" aria-hidden="true"></span>Show it straight</button>
-              <p id="apyLine">Three watches to a day, and the horn is blown at each.</p>
+              <button class="truth" id="truthBtn" type="button" aria-pressed="true" aria-controls="apyLine"><span class="knob" aria-hidden="true"></span>Honest reading</button>
+              <p id="apyLine" aria-live="polite">APY is emissions, not profit: rebases dilute every unstaked holder while your staked share of supply stays ≈ constant. The real return is the treasury compounding underneath it.</p>
             </div>
           </div>
         </div>
@@ -658,6 +748,20 @@ footer{padding:72px 0 40px;position:relative;border-top:1px solid var(--hair)}
           <p class="moral"><b>Moral</b> — Below the band the treasury bids with real assets; far above, it sells. Price walks; backing marches.</p>
         </article>
       </div>
+
+      <div class="glossary glass" data-rv style="--d:120ms">
+        <div class="gl-k">The forest, translated</div>
+        <dl>
+          <div><dt>Watch</dt><dd>One eight-hour rebase epoch — three to a day.</dd></div>
+          <div><dt>The Camp</dt><dd>Staking. Stake $WOOD, receive sWOOD.</dd></div>
+          <div><dt>The Heist</dt><dd>Bonds. Buy $WOOD at a discount with assets the treasury wants.</dd></div>
+          <div><dt>The Vault</dt><dd>Loans. Borrow USDG against your backing floor.</dd></div>
+          <div><dt>The Band</dt><dd>Range-bound stability — the corridor price is held within.</dd></div>
+          <div><dt>Ranger</dt><dd>A visitor in demo mode. Nothing here is deployed.</dd></div>
+          <div><dt>The Sheriff</dt><dd>Whoever is betting against the floor.</dd></div>
+          <div><dt>POL</dt><dd>Protocol-owned liquidity — the forest owns its own market.</dd></div>
+        </dl>
+      </div>
     </div>
   </section>
 </main>
@@ -684,19 +788,19 @@ footer{padding:72px 0 40px;position:relative;border-top:1px solid var(--hair)}
       <div class="foot-col">
         <h4>Lore</h4>
         <a href="#ballads">The Ballads</a>
-        <a href="#">Governance</a>
-        <a href="#">Audits</a>
+        <a href="app.html#council">Governance</a>
+        <a href="#ledger">Audits</a>
       </div>
       <div class="foot-col">
         <h4>Network</h4>
-        <a href="#">Robinhood</a>
-        <a href="#">Explorer</a>
-        <a href="#">$WOOD contract</a>
+        <span class="soon">Robinhood <i>soon</i></span>
+        <span class="soon">Explorer <i>soon</i></span>
+        <span class="soon">$WOOD contract <i>soon</i></span>
       </div>
     </div>
     <div class="foot-note">
       <p>Concept mock — nothing on this page is deployed and all figures are illustrative. SherwoodDAO is an independent protocol concept built for Robinhood and is not affiliated with Robinhood Markets, Inc.</p>
-      <span class="sigil">(🏹,🏹)</span>
+      <span class="sigil bowsig" role="img" aria-label="(arrow, arrow)">(<svg aria-hidden="true"><use href="#bowmark"/></svg>,<svg aria-hidden="true"><use href="#bowmark"/></svg>)</span>
     </div>
   </div>
 </footer>
@@ -1198,7 +1302,7 @@ function drawChart(prog){
     g.fillText("$"+gv,padL-10,Y(gv));
   }
   var months=[{i:0,l:"22 MAR"},{i:40,l:"MAY"},{i:80,l:"JUN"},{i:119,l:"20 JUL"}];
-  g.textAlign="center"; g.fillStyle="rgba(126,143,129,0.85)"; g.font="9px 'Geist Mono',Menlo,monospace";
+  g.textAlign="center"; g.fillStyle="#7E9184"; g.font="9px 'Geist Mono',Menlo,monospace";
   months.forEach(function(m){ g.fillText(m.l, Math.max(padL+20,Math.min(cw-30,X(m.i))), ch-10); });
 
   var pe = prog<1 ? (1-Math.pow(1-prog,3)) : 1;
@@ -1309,7 +1413,48 @@ function tickWatch(){
     for (var i=0;i<3;i++) ds[i].classList.toggle("on", i===blk);
   }
 }
-tickWatch(); setInterval(tickWatch,1000);
+/* skip ticks while the tab is hidden — the rAF loop already does this, the timer did not */
+tickWatch(); setInterval(function(){ if (!document.hidden) tickWatch(); },1000);
+
+/* ------- ticker pause (WCAG 2.2.2) ------- */
+var tickerEl=document.getElementById("ticker"), tickerPause=document.getElementById("tickerPause");
+if (tickerEl && tickerPause) tickerPause.addEventListener("click", function(){
+  var paused = tickerEl.classList.toggle("paused");
+  tickerPause.setAttribute("aria-pressed", paused?"true":"false");
+  tickerPause.setAttribute("aria-label", paused?"Resume the treasury ticker":"Pause the treasury ticker");
+});
+
+/* ------- mobile chapter menu ------- */
+var navBurger=document.getElementById("navBurger"), navSheet=document.getElementById("navSheet"), navScrim=document.getElementById("navScrim");
+function closeNavSheet(restore){
+  if (!navSheet) return;
+  var was=navSheet.classList.contains("open");
+  navSheet.classList.remove("open");
+  if (navScrim) navScrim.classList.remove("on");
+  document.body.style.overflow="";
+  if (navBurger){ navBurger.setAttribute("aria-expanded","false"); navBurger.setAttribute("aria-label","Open chapter menu"); }
+  if (was && restore && navBurger) navBurger.focus();
+}
+if (navBurger) navBurger.addEventListener("click", function(){
+  var open=!navSheet.classList.contains("open");
+  navSheet.classList.toggle("open", open);
+  if (navScrim) navScrim.classList.toggle("on", open);
+  document.body.style.overflow = open ? "hidden" : "";
+  navBurger.setAttribute("aria-expanded", open?"true":"false");
+  navBurger.setAttribute("aria-label", open?"Close chapter menu":"Open chapter menu");
+  if (open){ var a=navSheet.querySelector("a"); if (a) a.focus(); } else navBurger.focus();
+});
+if (navScrim) navScrim.addEventListener("click", function(){ closeNavSheet(true); });
+if (navSheet) navSheet.addEventListener("click", function(e){ if (e.target.closest && e.target.closest("a")) closeNavSheet(false); });
+document.addEventListener("keydown", function(e){ if (e.key==="Escape") closeNavSheet(true); });
+if (navSheet) navSheet.addEventListener("keydown", function(e){
+  if (e.key!=="Tab" || !navSheet.classList.contains("open")) return;
+  var f=[].slice.call(navSheet.querySelectorAll("a[href]")).filter(function(el){ return el.offsetParent!==null; });
+  if (!f.length) return;
+  var first=f[0], last=f[f.length-1];
+  if (e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+});
 
 /* ------- honesty toggle ------- */
 var tb=document.getElementById("truthBtn"), line=document.getElementById("apyLine");
@@ -1319,7 +1464,7 @@ if (tb && line){
   tb.addEventListener("click",function(){
     var on = tb.getAttribute("aria-pressed")==="true";
     tb.setAttribute("aria-pressed", on?"false":"true");
-    tb.lastChild.textContent = on ? "Show it straight" : "Return to the lore";
+    /* the accessible name stays constant; aria-pressed alone carries state */
     line.textContent = on ? LORE : TRUTH;
   });
 }
